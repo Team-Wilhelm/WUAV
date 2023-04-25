@@ -8,18 +8,21 @@ import java.util.UUID;
 
 public class CustomerDAO implements IDAO<Customer> {
     @Override
-    public void add(Customer customer) {
-
+    public String add(Customer customer) {
+        String result = "saved";
+        return result;
     }
 
     @Override
-    public void update(Customer customer) {
-
+    public String update(Customer customer) {
+        String result = "updated";
+        return result;
     }
 
     @Override
-    public void delete(UUID id) {
-
+    public String delete(UUID id) {
+        String result = "deleted";
+        return result;
     }
 
     @Override

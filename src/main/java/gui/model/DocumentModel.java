@@ -10,10 +10,10 @@ import java.util.UUID;
 
 public class DocumentModel implements IModel<Document> {
     private static DocumentModel instance;
-    private IManager documentManager;
+    private IManager<Document> bll;
 
     private DocumentModel() {
-        documentManager = ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
+        bll = ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
     }
 
     public static DocumentModel getInstance() {
@@ -24,18 +24,18 @@ public class DocumentModel implements IModel<Document> {
     }
 
     @Override
-    public void add(Document document) {
-        documentManager.add(document);
+    public String add(Document document) {
+        return bll.add(document);
     }
 
     @Override
-    public void update(Document document) {
-        documentManager.update(document);
+    public String update(Document document) {
+        return bll.update(document);
     }
 
     @Override
-    public void delete(UUID id) {
-        documentManager.delete(id);
+    public String delete(UUID id) {
+        return bll.delete(id);
     }
 
     @Override

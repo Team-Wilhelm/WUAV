@@ -1,5 +1,6 @@
 package dao;
 
+import be.Customer;
 import be.Document;
 
 import java.util.Collection;
@@ -8,19 +9,23 @@ import java.util.UUID;
 
 public class DocumentDAO implements IDAO<Document> {
     @Override
-    public void add(Document document) {
-
+    public String add(Document document) {
+        String result = "saved";
+        return result;
     }
 
     @Override
-    public void update(Document document) {
-
+    public String update(Document document) {
+        String result = "updated";
+        return result;
     }
 
     @Override
-    public void delete(UUID id) {
-
+    public String delete(UUID id) {
+        String result = "deleted";
+        return result;
     }
+
 
     @Override
     public Map<UUID, Document> getAll() {

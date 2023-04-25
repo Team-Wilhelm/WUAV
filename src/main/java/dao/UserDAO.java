@@ -1,5 +1,6 @@
 package dao;
 
+import be.Customer;
 import be.User;
 
 import java.util.Collection;
@@ -8,19 +9,23 @@ import java.util.UUID;
 
 public class UserDAO implements IDAO<User> {
     @Override
-    public void add(User user) {
-
+    public String add(User user) {
+        String result = "saved";
+        return result;
     }
 
     @Override
-    public void update(User user) {
-
+    public String update(User user) {
+        String result = "updated";
+        return result;
     }
 
     @Override
-    public void delete(UUID id) {
-
+    public String delete(UUID id) {
+        String result = "deleted";
+        return result;
     }
+
 
     @Override
     public Map<UUID, User> getAll() {

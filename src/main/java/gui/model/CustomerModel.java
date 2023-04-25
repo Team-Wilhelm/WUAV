@@ -25,18 +25,18 @@ public class CustomerModel implements IModel<Customer> {
     }
 
     @Override
-    public void add(Customer customer) {
-        customerManager.add(customer);
+    public String add(Customer customer) {
+        return customerManager.add(customer);
     }
 
     @Override
-    public void update(Customer customer) {
-        customerManager.update(customer);
+    public String update(Customer customer) {
+        return customerManager.update(customer);
     }
 
     @Override
-    public void delete(UUID id) {
-        customerManager.delete(id);
+    public String delete(UUID id) {
+        return customerManager.delete(id);
     }
 
     @Override

@@ -1,30 +1,39 @@
 package bll;
 
 import be.Document;
+import dao.DAOFactory;
+import dao.DocumentDAO;
+import dao.IDAO;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
 public class DocumentManager implements IManager<Document> {
-    @Override
-    public void add(Document document) {
+    private DocumentDAO dao;
 
+    public DocumentManager() {
+        dao = (DocumentDAO) DAOFactory.createDAO(DAOFactory.DAOType.DOCUMENT);
     }
 
     @Override
-    public void update(Document document) {
-
+    public String add(Document document) {
+        return dao.add(document);
     }
 
     @Override
-    public void delete(UUID id) {
+    public String update(Document document) {
+        return dao.update(document);
+    }
 
+    @Override
+    public String delete(UUID id) {
+        return dao.delete(id);
     }
 
     @Override
     public Map<UUID, Document> getAll() {
-        return null;
+        return dao.getAll();
     }
 
     @Override
