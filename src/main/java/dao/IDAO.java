@@ -9,5 +9,5 @@ public interface IDAO<T> {
     String update(T obj);
     String delete(UUID id);
     Map<UUID, T> getAll();
-    Object getById(UUID id);
+    T getById(UUID id);
 }

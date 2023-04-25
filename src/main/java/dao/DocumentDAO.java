@@ -33,7 +33,7 @@ public class DocumentDAO implements IDAO<Document> {
     }
 
     @Override
-    public Object getById(UUID id) {
+    public Document getById(UUID id) {
         return null;
     }
 }

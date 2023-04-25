@@ -33,7 +33,7 @@ public class UserDAO implements IDAO<User> {
     }
 
     @Override
-    public Object getById(UUID id) {
+    public User getById(UUID id) {
         return null;
     }
 }

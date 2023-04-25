@@ -7,6 +7,7 @@ import dao.IDAO;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class UserModel implements IModel<User> {
@@ -43,12 +44,12 @@ public class UserModel implements IModel<User> {
     }
 
     @Override
-    public HashMap<UUID, User> getAll() {
-        return null;
+    public Map<UUID, User> getAll() {
+        return bll.getAll();
     }
 
     @Override
-    public Object getById(UUID id) {
-        return null;
+    public User getById(UUID id) {
+        return bll.getById(id);
     }
 }

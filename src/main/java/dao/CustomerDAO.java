@@ -31,7 +31,7 @@ public class CustomerDAO implements IDAO<Customer> {
     }
 
     @Override
-    public Object getById(UUID id) {
+    public Customer getById(UUID id) {
         return null;
     }
 }

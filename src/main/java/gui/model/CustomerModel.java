@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class CustomerModel implements IModel<Customer> {
     private static CustomerModel instance;
-    private IManager customerManager;
+    private IManager<Customer> customerManager;
 
     private CustomerModel() {
         customerManager = ManagerFactory.createManager(ManagerFactory.ManagerType.CUSTOMER);
@@ -45,7 +45,7 @@ public class CustomerModel implements IModel<Customer> {
     }
 
     @Override
-    public Object getById(UUID id) {
+    public Customer getById(UUID id) {
         return customerManager.getById(id);
     }
 }

@@ -3,9 +3,7 @@ package bll;
 import be.Document;
 import dao.DAOFactory;
 import dao.DocumentDAO;
-import dao.IDAO;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,7 +35,7 @@ public class DocumentManager implements IManager<Document> {
     }
 
     @Override
-    public Object getById(UUID id) {
+    public Document getById(UUID id) {
         return null;
     }
 }
