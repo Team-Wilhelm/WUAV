@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class Document {
-
     private UUID documentID;
     private Customer customer;
     private List<User> technicians;

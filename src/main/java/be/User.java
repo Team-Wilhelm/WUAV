@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class User {
-
     private UUID userID;
     private String fullName, username, password;
     private List<Document> assignedDocuments;
@@ -17,5 +16,4 @@ public class User {
         assignedDocuments = new ArrayList<>();
         //TODO set userRole
     }
-
 }

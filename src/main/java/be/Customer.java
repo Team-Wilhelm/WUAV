@@ -5,7 +5,6 @@ import be.enums.CustomerType;
 import java.util.UUID;
 
 public class Customer {
-
     private UUID customerID;
     private String customerName, customerEmail, customerAddress, customerPhoneNumber;
     private CustomerType customerType;
