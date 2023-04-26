@@ -9,8 +9,8 @@
 }
 
 .mfx-button{
-    -fx-background-color: -fx-light-gray;
-    -fx-border-color: derive(-fx-orange, 60%);
+    -fx-background-color: derive(-fx-orange, 20%);
+    -fx-border-color: transparent;
     -fx-border-radius: 3;
     -fx-text-fill: white;
     -fx-font-weight: 600;
