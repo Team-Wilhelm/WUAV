@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class CustomerDAO implements IDAO<Customer> {
+public class CustomerDAO extends DAO implements IDAO<Customer> {
     private DBConnection dbConnection;
 
     public CustomerDAO() {
@@ -27,7 +27,6 @@ public class CustomerDAO implements IDAO<Customer> {
                 "SET @AddressID = SCOPE_IDENTITY();" +
                 "INSERT INTO Customer (CustomerName, CustomerEmail, CustomerPhoneNumber, AddressID, LastContract) " +
                 "VALUES (?,?,?,@AddressID,?)";
-
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
@@ -47,6 +46,18 @@ public class CustomerDAO implements IDAO<Customer> {
             ps.setDate(9, customer.getLastContract());
 
             ps.executeUpdate();
+
+            // Get the generated customerID from the database and set it as the customer's ID
+            sql = "SELECT CustomerID FROM Customer WHERE CustomerName = ? AND CustomerEmail = ? AND CustomerPhoneNumber = ?";
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, customer.getCustomerName());
+            ps.setString(2, customer.getCustomerEmail());
+            ps.setString(3, customer.getCustomerPhoneNumber());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                customer.setCustomerID(UUID.fromString(rs.getString("CustomerID")));
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
             result = e.getMessage();
@@ -97,23 +108,8 @@ public class CustomerDAO implements IDAO<Customer> {
 
     @Override
     public String delete(UUID id) {
-        String result = "deleted";
-        String sql = "UPDATE Customer " +
-                "SET Deleted = 1 " +
-                "WHERE CustomerID = ?";
-        Connection connection = null;
-        try {
-            connection = dbConnection.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setString(1, id.toString());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            result = e.getMessage();
-        } finally {
-            dbConnection.releaseConnection(connection);
-        }
-        return result;
+        String sql = "UPDATE Customer SET Deleted = 1 WHERE CustomerID = ?";
+        return delete(id, sql);
     }
 
     @Override

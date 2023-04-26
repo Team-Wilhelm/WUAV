@@ -18,6 +18,18 @@ public class Document {
         this.sitePhotos = new ArrayList<>();
     }
 
+    public Document(Customer customer, String jobDescription, String optionalNotes) {
+        this();
+        this.customer = customer;
+        this.jobDescription = jobDescription;
+        this.optionalNotes = optionalNotes;
+    }
+
+    public Document(UUID documentID, Customer customer, String jobDescription, String optionalNotes) {
+       this(customer, jobDescription, optionalNotes);
+         this.documentID = documentID;
+    }
+
     public UUID getDocumentID() {
         return documentID;
     }
