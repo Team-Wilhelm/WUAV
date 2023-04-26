@@ -1,0 +1,2 @@
+ALTER TABLE Document
+ADD JobTitle NVARCHAR(255) NOT NULL;

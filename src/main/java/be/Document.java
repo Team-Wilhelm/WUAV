@@ -13,7 +13,7 @@ public class Document {
     private Date dateOfCreation;
     private List<User> technicians;
     private List<Image> electricalDrawings, sitePhotos;
-    private String jobDescription, optionalNotes;
+    private String jobTitle, jobDescription, optionalNotes;
 
     public Document (){
         this.technicians = new ArrayList<>();
@@ -21,15 +21,22 @@ public class Document {
         this.sitePhotos = new ArrayList<>();
     }
 
-    public Document(Customer customer, String jobDescription, String optionalNotes) {
+    public Document(Customer customer, String jobTitle, String jobDescription){
+        this.customer = customer;
+        this.jobTitle = jobTitle;
+        this.jobDescription = jobDescription;
+    }
+
+    public Document(Customer customer, String jobTitle, String jobDescription, String optionalNotes) {
         this();
         this.customer = customer;
+        this.jobTitle = jobTitle;
         this.jobDescription = jobDescription;
         this.optionalNotes = optionalNotes;
     }
 
-    public Document(UUID documentID, Customer customer, String jobDescription, String optionalNotes) {
-       this(customer, jobDescription, optionalNotes);
+    public Document(UUID documentID, Customer customer, String jobTitle, String jobDescription, String optionalNotes) {
+       this(customer, jobTitle, jobDescription, optionalNotes);
          this.documentID = documentID;
     }
 
@@ -79,6 +86,14 @@ public class Document {
 
     public void setSitePhotos(List<Image> sitePhotos) {
         this.sitePhotos = sitePhotos;
+    }
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 
     public String getJobDescription() {

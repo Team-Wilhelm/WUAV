@@ -40,19 +40,21 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             }
 
             // Insert the document into the database
-            sql = "INSERT INTO Document (JobDescription, Notes, CustomerId) VALUES (?, ?, ?)";
+            sql = "INSERT INTO Document (JobTitle, JobDescription, Notes, CustomerId) VALUES (?, ?, ?, ?)";
             ps = connection.prepareStatement(sql);
-            ps.setString(1, document.getJobDescription());
-            ps.setString(2, document.getOptionalNotes());
-            ps.setString(3, customerID.toString());
+            ps.setString(1, document.getJobTitle());
+            ps.setString(2, document.getJobDescription());
+            ps.setString(3, document.getOptionalNotes());
+            ps.setString(4, customerID.toString());
             ps.executeUpdate();
 
             // Get the documentID from the database and set it as the document's ID
-            sql = "SELECT DocumentID FROM Document WHERE JobDescription = ? AND Notes = ? AND CustomerID = ?";
+            sql = "SELECT DocumentID FROM Document WHERE JobTitle = ? AND JobDescription = ? AND Notes = ? AND CustomerID = ?";
             ps = connection.prepareStatement(sql);
-            ps.setString(1, document.getJobDescription());
-            ps.setString(2, document.getOptionalNotes());
-            ps.setString(3, customerID.toString());
+            ps.setString(1, document.getJobTitle());
+            ps.setString(2, document.getJobDescription());
+            ps.setString(3, document.getOptionalNotes());
+            ps.setString(4, customerID.toString());
             rs = ps.executeQuery();
             if (rs.next()) {
                 document.setDocumentID(UUID.fromString(rs.getString("DocumentID")));
@@ -69,16 +71,17 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     @Override
     public String update(Document document) {
         String result = "updated";
-        String sql = "UPDATE Document SET JobDescription = ?, Notes = ?, CustomerID = ? " +
+        String sql = "UPDATE Document SET JobTitle = ?, JobDescription = ?, Notes = ?, CustomerID = ? " +
                 "WHERE DocumentID = ?";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setString(1, document.getJobDescription());
-            ps.setString(2, document.getOptionalNotes());
-            ps.setString(3, document.getCustomer().getCustomerID().toString());
-            ps.setString(4, document.getDocumentID().toString());
+            ps.setString(1, document.getJobTitle());
+            ps.setString(2, document.getJobDescription());
+            ps.setString(3, document.getOptionalNotes());
+            ps.setString(4, document.getCustomer().getCustomerID().toString());
+            ps.setString(5, document.getDocumentID().toString());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -141,6 +144,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         return new Document(
                 UUID.fromString(rs.getString("DocumentID")),
                 new CustomerDAO().getById(UUID.fromString(rs.getString("CustomerID"))),
+                rs.getString("JobTitle"),
                 rs.getString("JobDescription"),
                 rs.getString("Notes")
             );
