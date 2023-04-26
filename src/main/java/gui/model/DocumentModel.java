@@ -69,10 +69,9 @@ public class DocumentModel implements IModel<Document> {
         allDocuments.values().stream().filter(document ->
                         document.getCustomer().getCustomerName().toLowerCase().contains(query.toLowerCase())
                                 || document.getCustomer().getCustomerEmail().toLowerCase().contains(query.toLowerCase())
-                                || document.getCustomer().getCustomerAddress().toLowerCase().contains(query.toLowerCase())
                                 || document.getCustomer().getCustomerPhoneNumber().toLowerCase().contains(query.toLowerCase())
                                 || document.getDateOfCreation().toString().toLowerCase().contains(query.toLowerCase())
-                                || document.getTechnicians().stream().allMatch(user -> user.getUsername().toLowerCase().contains(query.toLowerCase()))
+                                || document.getTechnicians().stream().allMatch(user -> user.getFullName().toLowerCase().contains(query.toLowerCase()))
                                 || document.getTechnicians().stream().allMatch(user -> user.getUsername().toLowerCase().contains(query.toLowerCase()))
                         ).forEach(filteredDocuments::add);
         return filteredDocuments;
