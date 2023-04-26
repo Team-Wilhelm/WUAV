@@ -1,9 +1,7 @@
-package dao;
+package dal;
 
-import be.Customer;
 import be.User;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 

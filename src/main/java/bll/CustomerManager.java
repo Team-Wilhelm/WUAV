@@ -1,10 +1,9 @@
 package bll;
 
 import be.Customer;
-import dao.CustomerDAO;
-import dao.DAOFactory;
+import dal.CustomerDAO;
+import dal.DAOFactory;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 

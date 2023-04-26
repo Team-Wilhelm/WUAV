@@ -1,6 +1,8 @@
 package be;
 
 import javafx.scene.image.Image;
+
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -8,6 +10,7 @@ import java.util.UUID;
 public class Document {
     private UUID documentID;
     private Customer customer;
+    private Date dateOfCreation;
     private List<User> technicians;
     private List<Image> electricalDrawings, sitePhotos;
     private String jobDescription, optionalNotes;
@@ -32,6 +35,14 @@ public class Document {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public Date getDateOfCreation() {
+        return dateOfCreation;
+    }
+
+    public void setDateOfCreation(Date dateOfCreation) {
+        this.dateOfCreation = dateOfCreation;
     }
 
     public List<User> getTechnicians() {

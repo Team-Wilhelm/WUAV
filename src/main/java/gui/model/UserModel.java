@@ -3,22 +3,20 @@ package gui.model;
 import be.User;
 import bll.IManager;
 import bll.ManagerFactory;
-import dao.IDAO;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 
 public class UserModel implements IModel<User> {
     private static UserModel instance;
-    private IManager<User> bll;
-    private HashMap<UUID, User> users;
+    private IManager<User> userManager;
+    private HashMap<UUID, User> allUsers;
     private User loggedInUser;
 
     private UserModel() {
-        bll = ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
-        users = new HashMap<>();
+        userManager = ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
+        allUsers = new HashMap<>();
     }
 
     public static UserModel getInstance() {
@@ -29,27 +27,55 @@ public class UserModel implements IModel<User> {
     }
 
     @Override
-    public String add(User user) {
-        return bll.add(user);
+    public CompletableFuture<String> add(User user) {
+        String message = userManager.add(user);
+
+        CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
+        return future.thenApplyAsync(users -> {
+            allUsers = (HashMap<UUID, User>) users;
+            return message;
+        });
     }
 
     @Override
-    public String update(User user) {
-        return bll.update(user);
+    public String update(User user, CountDownLatch latch) {
+        return userManager.update(user);
     }
 
     @Override
     public String delete(UUID id) {
-        return bll.delete(id);
+        return userManager.delete(id);
     }
 
     @Override
     public Map<UUID, User> getAll() {
-        return bll.getAll();
+        return userManager.getAll();
     }
 
     @Override
     public User getById(UUID id) {
-        return bll.getById(id);
+        return userManager.getById(id);
+    }
+
+    public User getLoggedInUser() {
+        return loggedInUser;
+    }
+
+    public void setLoggedInUser(User loggedInUser) {
+        this.loggedInUser = loggedInUser;
+    }
+
+    public User getUserByUsername(String username){
+        return allUsers.values().stream().filter(user -> user.getUsername().equals(username)).findFirst().orElse(null);
+    }
+
+    public List<User> searchUsers(String query) {
+        List<User> filteredUsers = new ArrayList<>();
+        allUsers.values().stream().filter(user ->
+                user.getUsername().toLowerCase().contains(query.toLowerCase())
+                        || user.getFullName().toLowerCase().contains(query.toLowerCase())
+                        || user.getUserRole().toString().toLowerCase().contains(query.toLowerCase())
+        ).forEach(filteredUsers::add);
+        return filteredUsers;
     }
 }

@@ -10,7 +10,6 @@ public class Customer {
     private CustomerType customerType;
 
     public Customer(){
-        //TODO set customertypes
     }
 
     public UUID getCustomerID() {

@@ -1,4 +1,4 @@
-package dao;
+package dal;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
 

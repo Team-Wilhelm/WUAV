@@ -1,21 +1,19 @@
-package dao;
+package dal;
 
 import be.Customer;
-import be.Document;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
-public class DocumentDAO implements IDAO<Document> {
+public class CustomerDAO implements IDAO<Customer> {
     @Override
-    public String add(Document document) {
+    public String add(Customer customer) {
         String result = "saved";
         return result;
     }
 
     @Override
-    public String update(Document document) {
+    public String update(Customer customer) {
         String result = "updated";
         return result;
     }
@@ -26,14 +24,13 @@ public class DocumentDAO implements IDAO<Document> {
         return result;
     }
 
-
     @Override
-    public Map<UUID, Document> getAll() {
+    public Map<UUID, Customer> getAll() {
         return null;
     }
 
     @Override
-    public Document getById(UUID id) {
+    public Customer getById(UUID id) {
         return null;
     }
 }
