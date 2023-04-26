@@ -1,6 +1,5 @@
-package dao;
+package dal;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package dao;
+package dal;
 
 public class DAOFactory {
     public enum DAOType {

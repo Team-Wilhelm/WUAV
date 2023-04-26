@@ -3,9 +3,7 @@ package gui.model;
 import be.User;
 import bll.IManager;
 import bll.ManagerFactory;
-import dao.IDAO;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;

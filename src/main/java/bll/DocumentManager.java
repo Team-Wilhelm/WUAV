@@ -1,8 +1,8 @@
 package bll;
 
 import be.Document;
-import dao.DAOFactory;
-import dao.DocumentDAO;
+import dal.DAOFactory;
+import dal.DocumentDAO;
 
 import java.util.Map;
 import java.util.UUID;
