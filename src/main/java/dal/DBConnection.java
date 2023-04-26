@@ -46,7 +46,7 @@ public class DBConnection {
     }
 
     public void releaseConnection(Connection connection){
-        if (usedConnections.contains(connection)){
+        if (connection != null && usedConnections.contains(connection)){
             usedConnections.remove(connection);
             connectionPool.add(connection);
         }

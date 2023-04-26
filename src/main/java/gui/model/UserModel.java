@@ -7,6 +7,9 @@ import bll.ManagerFactory;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class UserModel implements IModel<User> {
     private static UserModel instance;
