@@ -1,3 +1,32 @@
+* {
+    -fx-orange: #e83d00;
+    -fx-dark-gray: #333333;
+    -fx-light-gray: #b0afaf;
+}
+
 .background {
-    -fx-background-color: white;
+    -fx-background-color: -fx-light-gray;
+}
+
+.mfx-button{
+    -fx-background-color: -fx-light-gray;
+    -fx-border-color: derive(-fx-orange, 60%);
+    -fx-border-radius: 3;
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+}
+
+.mfx-toggle-button {
+    -mfx-main: -fx-orange;
+}
+
+.menuButtons {
+    -fx-border-color: transparent;
+}
+
+.createButton {
+    -fx-background-color: derive(-fx-orange, 20%);
+    -fx-border-color: derive(-fx-orange, 20%);
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
 }

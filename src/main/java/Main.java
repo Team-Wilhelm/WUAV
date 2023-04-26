@@ -12,12 +12,11 @@ import javafx.stage.Stage;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.UUID;
 
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.MENU_SCENE)));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.ADD_DOCUMENT_SCENE)));
         primaryStage.setTitle("WUAV");
         primaryStage.setScene(new Scene(root));
         primaryStage.centerOnScreen();
@@ -25,7 +24,7 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        //launch(args);
+        launch(args);
         Address a = new Address("Rainbow road", "77", "1234", "Night city", "Wonderland");
         Customer c = new Customer("Justin Timbersea", "justin@hotmail.com", "12345678", a, CustomerType.PRIVATE, Date.valueOf(LocalDate.now()));
         CustomerDAO customerDAO = new CustomerDAO();
