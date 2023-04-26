@@ -1,18 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXFilterComboBox?>
+<?import io.github.palexdev.materialfx.controls.MFXListView?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-
-<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="900.0" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.AddDocumentController">
+<GridPane hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="900.0" stylesheets="@../../css/style.css" vgap="10.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.AddDocumentController">
   <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" prefWidth="100.0" />
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
   </columnConstraints>
   <rowConstraints>
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
+   <children>
+      <MFXTextField fx:id="txtJobTitle" floatingText="Job title" maxWidth="1.7976931348623157E308" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+      <TextArea fx:id="txtJobDescription" prefHeight="200.0" prefWidth="200.0" promptText="Job description" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
+      <TextArea fx:id="txtNotes" prefHeight="200.0" prefWidth="200.0" promptText="Notes" GridPane.columnSpan="2" GridPane.rowIndex="5" GridPane.rowSpan="2" />
+      <MFXListView fx:id="listViewPictures" depthLevel="LEVEL1" maxWidth="1.7976931348623157E308" prefWidth="517.0" GridPane.columnSpan="2" GridPane.rowIndex="7" GridPane.rowSpan="2" />
+      <MFXButton fx:id="btnDelete" maxWidth="1.7976931348623157E308" text="Delete" GridPane.rowIndex="9">
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin>
+      </MFXButton>
+      <MFXButton fx:id="btnUploadPictures" text="Upload pictures..." onAction="#uploadPicturesAction" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
+      <MFXTextField fx:id="txtName" floatingText="Name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+      <MFXTextField fx:id="txtEmail" floatingText="Email" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+      <MFXTextField fx:id="txtPhoneNumber" floatingText="Phone number" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+      <MFXTextField fx:id="txtStreetName" floatingText="Street name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+      <MFXTextField fx:id="txtHouseNumber" floatingText="House number" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+      <MFXTextField fx:id="txtCity" floatingText="City" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+      <MFXTextField fx:id="txtPostcode" floatingText="Postal code" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+      <MFXTextField fx:id="txtCountry" floatingText="Country" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+      <MFXFilterComboBox fx:id="comboTechnicians" floatingText="Assign technicians" maxWidth="1.7976931348623157E308" selectable="true" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+      <MFXButton fx:id="btnCancel" onAction="#cancelAction" maxWidth="1.7976931348623157E308" text="Cancel" GridPane.columnIndex="2" GridPane.rowIndex="9">
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin>
+      </MFXButton>
+      <MFXButton fx:id="btnSave" onAction="#saveAction" maxWidth="1.7976931348623157E308" text="Save" GridPane.columnIndex="3" GridPane.rowIndex="9">
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin>
+      </MFXButton>
+      <Label text="Customer information" GridPane.columnIndex="2" />
+      <Label text="Job information" />
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
 </GridPane>
