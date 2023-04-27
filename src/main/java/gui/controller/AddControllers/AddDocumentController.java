@@ -6,6 +6,7 @@ import be.Document;
 import be.User;
 import be.enums.CustomerType;
 import gui.controller.ViewControllers.DocumentController;
+import gui.model.CustomerModel;
 import gui.model.DocumentModel;
 import gui.model.IModel;
 import gui.tasks.SaveTask;
@@ -113,11 +114,16 @@ public class AddDocumentController extends AddController implements Initializabl
 
         Address address = new Address(streetName, houseNumber, postcode, city, country);
         Customer customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
-        Document document = new Document(customer, jobTitle, jobDescription, notes, Date.valueOf(LocalDate.now()));
-        if (isEditing) document.setDocumentID(documentToEdit.getDocumentID());
+        Document document = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
+
+        if (isEditing) {
+            document.setDocumentID(documentToEdit.getDocumentID());
+            customer.setCustomerID(documentToEdit.getCustomer().getCustomerID());
+            address.setAddressID(documentToEdit.getCustomer().getCustomerAddress().getAddressID());
+        }
 
         Task<TaskState> task = new SaveTask<>(document, isEditing, documentModel);
-        setUpSaveTask(task, documentController, actionEvent);
+        setUpSaveTask(task, documentController, txtCity.getScene().getWindow());
         executeTask(task);
     }
 
@@ -127,6 +133,25 @@ public class AddDocumentController extends AddController implements Initializabl
         documentToEdit = document;
         btnSave.setDisable(false);
         btnDelete.setDisable(false);
+
+        // Customer information
+        txtName.setText(document.getCustomer().getCustomerName());
+        txtEmail.setText(document.getCustomer().getCustomerEmail());
+        txtPhoneNumber.setText(document.getCustomer().getCustomerPhoneNumber());
+        dateLastContract.setValue(document.getCustomer().getLastContract().toLocalDate());
+        toggleCustomerType.setSelected(document.getCustomer().getCustomerType() == CustomerType.PRIVATE);
+
+        // Customer address
+        txtStreetName.setText(document.getCustomer().getCustomerAddress().getStreetName());
+        txtHouseNumber.setText(document.getCustomer().getCustomerAddress().getStreetNumber());
+        txtCity.setText(document.getCustomer().getCustomerAddress().getTown());
+        txtPostcode.setText(document.getCustomer().getCustomerAddress().getPostcode());
+        txtCountry.setText(document.getCustomer().getCustomerAddress().getCountry());
+
+        // Document information
+        txtJobTitle.setText(document.getJobTitle());
+        txtJobDescription.setText(document.getJobDescription());
+        txtNotes.setText(document.getOptionalNotes());
     }
 
     private void assignListenersToTextFields() {

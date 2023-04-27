@@ -41,7 +41,7 @@ public class DocumentModel implements IModel<Document> {
     }
 
     @Override
-    public String update(Document document, CountDownLatch latch) {
+    public String update(Document document) {
         return documentManager.update(document);
     }
 

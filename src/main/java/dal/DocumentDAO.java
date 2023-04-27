@@ -73,26 +73,30 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     @Override
     public String update(Document document) {
         String result = "updated";
-        String sql = "UPDATE Document SET JobTitle = ?, JobDescription = ?, Notes = ?, CustomerID = ?, DateOfCreation = ?" +
+        String sql = "UPDATE Document SET JobTitle = ?, JobDescription = ?, Notes = ?, CustomerID = ?, DateOfCreation = ? " +
                 "WHERE DocumentID = ?";
         Connection connection = null;
         try {
+            new CustomerDAO().addOrUpdateCustomer(document.getCustomer());
+
             connection = dbConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, document.getJobTitle());
             ps.setString(2, document.getJobDescription());
             ps.setString(3, document.getOptionalNotes());
             ps.setString(4, document.getCustomer().getCustomerID().toString());
-            ps.setString(5, document.getDocumentID().toString());
-            ps.setDate(6, document.getDateOfCreation());
+            ps.setDate(5, document.getDateOfCreation());
+            ps.setString(6, document.getDocumentID().toString());
             ps.executeUpdate();
-        } catch (SQLException e) {
+
+            return result;
+        } catch (Exception e) {
             e.printStackTrace();
             result = e.getMessage();
+            return result;
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        return result;
     }
 
     @Override

@@ -139,4 +139,8 @@ public class DocumentController extends ViewController implements Initializable 
             AlertManager.getInstance().showWarning("No document selected", "Please select a document to edit", owner);
         }
     }
+
+    public void addDocumentAction(ActionEvent actionEvent) throws IOException {
+        ((AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController()).setDocumentController(this);
+    }
 }

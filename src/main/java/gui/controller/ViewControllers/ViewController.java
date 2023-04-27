@@ -28,7 +28,7 @@ public abstract class ViewController {
         Stage stage = new Stage();
         Scene scene = new Scene(fxmlLoader.load());
         stage.setScene(scene);
-        stage.setTitle("EASV Ticket System");
+        stage.setTitle("WUAV Documentation Management System");
         //TODO add icon
         //stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream(""))));
         stage.centerOnScreen();

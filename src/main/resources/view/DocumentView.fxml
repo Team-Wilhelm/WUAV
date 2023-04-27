@@ -32,7 +32,7 @@
                 </FlowPane>
             </content>
         </ScrollPane>
-        <MFXButton fx:id="btnAddDocument" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="createButton" text="+ Add document" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+        <MFXButton fx:id="btnAddDocument" onAction="#addDocumentAction" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="createButton" text="+ Add document" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
             <GridPane.margin>
                 <Insets left="15.0" right="15.0" />
             </GridPane.margin>

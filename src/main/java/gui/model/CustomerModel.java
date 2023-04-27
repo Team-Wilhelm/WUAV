@@ -20,7 +20,7 @@ public class CustomerModel implements IModel<Customer> {
 
     private CustomerModel() {
         customerManager = ManagerFactory.createManager(ManagerFactory.ManagerType.CUSTOMER);
-        allCustomers = new HashMap<>();
+        setAllCustomers();
     }
 
     public static CustomerModel getInstance() {
@@ -42,7 +42,7 @@ public class CustomerModel implements IModel<Customer> {
     }
 
     @Override
-    public String update(Customer customer, CountDownLatch latch) {
+    public String update(Customer customer) {
         return customerManager.update(customer);
     }
 
@@ -53,11 +53,15 @@ public class CustomerModel implements IModel<Customer> {
 
     @Override
     public Map<UUID, Customer> getAll() {
-        return customerManager.getAll();
+        return allCustomers;
     }
 
     @Override
     public Customer getById(UUID id) {
         return customerManager.getById(id);
+    }
+
+    public void setAllCustomers() {
+        allCustomers = (HashMap<UUID, Customer>) customerManager.getAll();
     }
 }

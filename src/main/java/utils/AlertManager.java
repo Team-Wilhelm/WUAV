@@ -15,22 +15,6 @@ public class AlertManager {
     }
 
     /**
-     * Creates an Alert template, allowing it to be reused multiple times.
-     */
-    public Alert getAlert(Alert.AlertType type, String text, Event actionEvent) {
-        alert.setAlertType(type);
-        alert.setContentText(text);
-
-        if (actionEvent != null){
-            Node node = (Node) actionEvent.getSource();
-            Window window = node.getScene().getWindow();
-            if (alert.getOwner() == null)
-                alert.initOwner(window);
-        }
-        return alert;
-    }
-
-    /**
      * Makes AlertManager a singleton class, in order to reuse the same alert and avoid code repetition
      */
     public static AlertManager getInstance() {
@@ -44,6 +28,15 @@ public class AlertManager {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.initOwner(owner);
         alert.setTitle("Warning");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    public void showError(String header, String content, Window owner) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.initOwner(owner);
+        alert.setTitle("Error");
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();

@@ -7,6 +7,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.stage.Window;
 import utils.AlertManager;
 
 import java.util.concurrent.ExecutorService;
@@ -14,8 +15,8 @@ import java.util.concurrent.Executors;
 
 public abstract class AddController {
     private AlertManager alertManager = AlertManager.getInstance();
-    protected void setUpSaveTask(Task<TaskState> task, ViewController controller, ActionEvent actionEvent) {
-        setUpTask(task, controller, actionEvent);
+    protected void setUpSaveTask(Task<TaskState> task, ViewController controller, Window owner) {
+        setUpTask(task, controller, owner);
 
         task.setOnSucceeded(event -> {
             // unbind the progress label and spinner from the task and set spinner to 100%
@@ -33,18 +34,18 @@ public abstract class AddController {
             );
 
             if (task.getValue() == TaskState.DUPLICATE_DATA) {
-                AlertManager.getInstance().getAlert(Alert.AlertType.ERROR, "Username already exists!", actionEvent).showAndWait();
+                alertManager.showError("Username already exists!", "Username already exists!", owner);
             } else if (task.getValue() == TaskState.SUCCESSFUL && ((SaveTask) task).isEditing()) {
                 controller.refreshLastFocusedCard();
             } else if (task.getValue() == TaskState.SUCCESSFUL) {
                 controller.refreshItems();
             } else {
-                alertManager.getAlert(Alert.AlertType.ERROR, "Something went wrong!", actionEvent).showAndWait();
+                alertManager.showError("Oops...", "Something went wrong!", owner);
             }
         });
     }
 
-    private void setUpTask(Task<TaskState> task, ViewController controller, ActionEvent actionEvent) {
+    private void setUpTask(Task<TaskState> task, ViewController controller, Window owner) {
         task.setOnRunning(event -> {
             controller.bindProgressToTask(task);
             controller.setProgressVisibility(true);
@@ -61,7 +62,7 @@ public abstract class AddController {
                     },
                     3000
             );
-            alertManager.getAlert(Alert.AlertType.ERROR, "Something went wrong!", actionEvent).showAndWait();
+            alertManager.showError("Oops...", "Something went wrong!", owner);
         });
     }
 
