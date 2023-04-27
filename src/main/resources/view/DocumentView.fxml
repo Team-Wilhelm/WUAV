@@ -5,6 +5,7 @@
 <?import io.github.palexdev.materialfx.controls.MFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
@@ -25,10 +26,13 @@
     <children>
         <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" style="-fx-background-color: transparent;" styleClass="background" vbarPolicy="ALWAYS" GridPane.rowSpan="3">
             <content>
-                <FlowPane fx:id="eventFlowPane" alignment="TOP_CENTER" columnHalignment="CENTER" hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" rowValignment="TOP" styleClass="background" vgap="20.0">
+                <FlowPane fx:id="eventFlowPane" alignment="TOP_CENTER" columnHalignment="CENTER" hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="${scrollPane.height}" prefWidth="${scrollPane.width}" rowValignment="TOP" styleClass="background" vgap="20.0">
                     <padding>
                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                     </padding>
+               <children>
+                  <ListView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+               </children>
                 </FlowPane>
             </content>
         </ScrollPane>
