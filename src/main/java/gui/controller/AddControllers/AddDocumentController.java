@@ -155,33 +155,43 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     private void assignListenersToTextFields() {
-        txtCity.textProperty().addListener(inputListener);
-        txtCountry.textProperty().addListener(inputListener);
-        txtEmail.textProperty().addListener(inputListener);
-        txtHouseNumber.textProperty().addListener(inputListener);
-        txtJobTitle.textProperty().addListener(inputListener);
+        // Customer information
         txtName.textProperty().addListener(inputListener);
+        txtEmail.textProperty().addListener(inputListener);
         txtPhoneNumber.textProperty().addListener(inputListener);
-        txtPostcode.textProperty().addListener(inputListener);
+
+        // Customer address
         txtStreetName.textProperty().addListener(inputListener);
+        txtHouseNumber.textProperty().addListener(inputListener);
+        txtCity.textProperty().addListener(inputListener);
+        txtPostcode.textProperty().addListener(inputListener);
+        txtCountry.textProperty().addListener(inputListener);
+
+        // Document information
+        txtJobTitle.textProperty().addListener(inputListener);
         txtJobDescription.textProperty().addListener(inputListener);
         txtNotes.textProperty().addListener(inputListener);
     }
 
     private void assignInputToVariables() {
-        city = txtCity.getText();
-        country = txtCountry.getText();
-        email = txtEmail.getText();
-        houseNumber = txtHouseNumber.getText();
-        jobTitle = txtJobTitle.getText();
+        // Customer information
         name = txtName.getText();
+        email = txtEmail.getText();
         phoneNumber = txtPhoneNumber.getText();
-        postcode = txtPostcode.getText();
-        streetName = txtStreetName.getText();
         customerType = toggleCustomerType.isSelected() ? CustomerType.PRIVATE : CustomerType.BUSINESS;
+        lastContract = dateLastContract.getValue() != null ? Date.valueOf(dateLastContract.getValue()) : Date.valueOf(LocalDate.now());
+
+        // Customer address
+        streetName = txtStreetName.getText();
+        houseNumber = txtHouseNumber.getText();
+        city = txtCity.getText();
+        postcode = txtPostcode.getText();
+        country = txtCountry.getText();
+
+        // Document information
+        jobTitle = txtJobTitle.getText();
         jobDescription = txtJobDescription.getText();
         notes = txtNotes.getText();
-        lastContract = dateLastContract.getValue() != null ? Date.valueOf(dateLastContract.getValue()) : Date.valueOf(LocalDate.now());
     }
 
     private final ChangeListener<String> inputListener = new ChangeListener<>() {
