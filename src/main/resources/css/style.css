@@ -1,35 +1,9 @@
-* {
-    -fx-orange: #e83d00;
-    -fx-dark-gray: #333333;
-    -fx-light-gray: #b0afaf;
-}
-
 .background {
-    -fx-background-color: -fx-light-gray;
+    -fx-background-color: #f9fbfb;
 }
-
-.mfx-button{
-    -fx-background-color: derive(-fx-orange, 20%);
-    -fx-border-color: transparent;
-    -fx-border-radius: 3;
-    -fx-text-fill: white;
-    -fx-font-weight: 600;
-}
-
-.mfx-toggle-button {
-    -mfx-main: -fx-orange;
-}
-
-.menuButtons {
-    -fx-border-color: transparent;
-}
-
-.createButton {
-    -fx-background-color: derive(-fx-orange, 20%);
-    -fx-border-color: derive(-fx-orange, 20%);
-    -fx-text-fill: white;
-    -fx-font-weight: 800;
-    -fx-background-color: pink;
+.menu{
+    -fx-background-color: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 4, 0, 0, 4);
 }
 
 .document-view {

@@ -1,8 +1,6 @@
 package gui.controller;
 
 import gui.SceneManager;
-import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -25,7 +23,7 @@ public class MenuController implements Initializable {
             documentView = documentLoader.load();
             employeeView = employeeLoader.load();
             currentScene = documentView;
-            gridPane.add(currentScene, 1, 0, 1,gridPane.getRowCount());
+            gridPane.add(currentScene, 2, 0, 1,gridPane.getRowCount());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -34,16 +32,16 @@ public class MenuController implements Initializable {
     private void switchScene(Node scene) {
        if (currentScene != scene) {
               gridPane.getChildren().remove(currentScene);
-              gridPane.add(scene, 1, 0, 1, gridPane.getRowCount());
+              gridPane.add(scene, 2, 0, 1, gridPane.getRowCount());
               currentScene = scene;
        }
     }
 
-    public void btnDocumentAction(ActionEvent actionEvent) {
+    public void btnDocumentAction() {
         switchScene(documentView);
     }
 
-    public void btnEmployeesAction(ActionEvent actionEvent) {
+    public void btnEmployeesAction() {
         switchScene(employeeView);
     }
 }
