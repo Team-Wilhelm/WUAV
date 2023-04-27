@@ -1,6 +1,5 @@
 package utils;
 
-import java.sql.Blob;
 import java.util.Locale;
 
 import com.azure.storage.blob.*;
@@ -9,11 +8,10 @@ import java.util.UUID;
 
 public class BlobService {
     private static BlobService instance;
-    private String connectStr;
-    private BlobServiceClient blobServiceClient;
-    private String containerName = "wuav";
+    private final BlobServiceClient blobServiceClient;
+    private final String containerName = "wuav";
     private BlobService() {
-        connectStr = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
+        String connectStr = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
         blobServiceClient = new BlobServiceClientBuilder()
                 .connectionString(connectStr)
                 .buildClient();
@@ -46,19 +44,19 @@ public class BlobService {
 
         // Upload the blob
         blobClient.uploadFromFile(filePath + "\\" + fileName);
-        var blobUrl = blobClient.getBlobUrl();
-        System.out.println(blobUrl);
-        return blobUrl;
+
+        return blobClient.getBlobUrl();
     }
 
     /**
      * Deletes a blob from the storage
-     * The Url needs to be without the container name: https://wuav.blob.core.windows.net/wuav/
+     * The Url needs to be without the container name: <a href="https://wuav.blob.core.windows.net/wuav/">https://wuav.blob.core.windows.net/wuav/</a>
      * @param blobUrl The url of the blob to delete
      * @return True if the blob was deleted, false if not
      */
 
     public boolean DeleteBlob(String blobUrl) {
+        blobUrl = blobUrl.replace("https://easvprojects.blob.core.windows.net/wuav/", "").replace("%2F", "/");
         BlobClient blobClient = this.blobServiceClient.getBlobContainerClient(containerName).getBlobClient(blobUrl);
         return blobClient.deleteIfExists();
     }
@@ -66,9 +64,12 @@ public class BlobService {
 
 class startup{
     public static void main(String[] args) {
+        // This is just a test
+        // The file test.txt needs to be in the folder C:\Users\matej\EASV\CSe22\2ndSemester\WUAV\src\test
+        // TODO: Make this into unit tests
         BlobService blobService = BlobService.getInstance();
-        var Url = blobService.UploadFile("C:\\Users\\matej\\EASV\\CSe22\\2ndSemester\\WUAV\\src\\test", "test.txt", UUID.randomUUID());
-        var out = blobService.DeleteBlob("a812f7b0-284f-4494-a139-631db6dc49f9/a8a48ace-acc9-4eaa-bd32-d58c67aa0023-test.txt");
+        var url = blobService.UploadFile("C:\\Users\\matej\\EASV\\CSe22\\2ndSemester\\WUAV\\src\\test", "test.txt", UUID.randomUUID());
+        var out = blobService.DeleteBlob(url);
         System.out.println(out);
     }
 }
