@@ -6,6 +6,7 @@ import gui.SceneManager;
 import gui.controller.AddControllers.AddDocumentController;
 import gui.model.DocumentModel;
 import gui.tasks.TaskState;
+import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -37,6 +38,8 @@ public class DocumentController extends ViewController implements Initializable 
     private MFXProgressSpinner progressSpinner;
     @FXML
     private Label progressLabel;
+    @FXML
+    private MFXButton btnAddDocument;
 
     private ObservableList<DocumentCard> documentCards = FXCollections.observableArrayList();
     private final DocumentModel documentModel = DocumentModel.getInstance();
@@ -56,6 +59,7 @@ public class DocumentController extends ViewController implements Initializable 
 
         setProgressVisibility(false);
         refreshItems();
+        btnAddDocument.getStyleClass().addAll("addButton", "rounded");
     }
 
     //region progress methods
