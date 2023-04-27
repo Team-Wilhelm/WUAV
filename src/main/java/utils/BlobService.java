@@ -50,7 +50,6 @@ public class BlobService {
 
     /**
      * Deletes a blob from the storage
-     * The Url needs to be without the container name: <a href="https://wuav.blob.core.windows.net/wuav/">https://wuav.blob.core.windows.net/wuav/</a>
      * @param blobUrl The url of the blob to delete
      * @return True if the blob was deleted, false if not
      */
