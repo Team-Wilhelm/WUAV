@@ -50,6 +50,14 @@ public class DocumentCard extends VBox {
 
         //Populate document card
         this.getChildren().addAll(jobTitleBox, dateBox, nameBox);
+
+        this.setOnMouseClicked(e -> {
+            if (!this.isFocused())
+                this.requestFocus();
+        });
     }
 
+    public Document getDocument() {
+        return document;
+    }
 }

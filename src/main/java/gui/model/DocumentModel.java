@@ -17,7 +17,6 @@ public class DocumentModel implements IModel<Document> {
 
     private DocumentModel() {
         documentManager = ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
-        allDocuments = new HashMap<>();
         createdDocumentCards = new HashMap<>();
         setAllDocuments();
         createDocumentCards();

@@ -1,5 +1,6 @@
 package gui.controller.ViewControllers;
 
+import gui.model.UserModel;
 import gui.tasks.TaskState;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import javafx.concurrent.Task;
@@ -8,6 +9,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class UserController extends ViewController implements Initializable {
@@ -15,6 +17,7 @@ public class UserController extends ViewController implements Initializable {
     private MFXProgressSpinner progressSpinner;
     @FXML
     private Label progressLabel;
+    private UserModel userModel = UserModel.getInstance();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -48,7 +51,12 @@ public class UserController extends ViewController implements Initializable {
     }
 
     @Override
-    public void refreshItems() {
+    public void refreshItems(List<?> items) {
 
+    }
+
+    @Override
+    public void refreshItems() {
+        refreshItems(List.copyOf(userModel.getAll().values()));
     }
 }

@@ -71,6 +71,7 @@ public class AddDocumentController extends AddController implements Initializabl
     public void initialize(URL location, ResourceBundle resources) {
         isEditing = false;
         btnSave.setDisable(true);
+        btnDelete.setDisable(true);
         assignListenersToTextFields();
         setUpListView();
         dateLastContract.setValue(LocalDate.now());
@@ -112,7 +113,7 @@ public class AddDocumentController extends AddController implements Initializabl
 
         Address address = new Address(streetName, houseNumber, postcode, city, country);
         Customer customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
-        Document document = new Document(customer, jobTitle, jobDescription, notes);
+        Document document = new Document(customer, jobTitle, jobDescription, notes, Date.valueOf(LocalDate.now()));
         if (isEditing) document.setDocumentID(documentToEdit.getDocumentID());
 
         Task<TaskState> task = new SaveTask<>(document, isEditing, documentModel);
@@ -121,9 +122,11 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     // UTILITIES & HELPERS
-    private void setDocumentToEdit(Document document) {
+    public void setDocumentToEdit(Document document) {
         isEditing = true;
         documentToEdit = document;
+        btnSave.setDisable(false);
+        btnDelete.setDisable(false);
     }
 
     private void assignListenersToTextFields() {

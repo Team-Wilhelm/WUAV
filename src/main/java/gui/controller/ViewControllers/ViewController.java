@@ -12,6 +12,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class ViewController {
@@ -19,6 +20,7 @@ public abstract class ViewController {
     public abstract void bindProgressToTask(Task<TaskState> task);
     public abstract void unbindProgress();
     public abstract void refreshLastFocusedCard();
+    public abstract void refreshItems(List<?> items);
     public abstract void refreshItems();
 
     protected FXMLLoader openWindow(String fxmlPath, Modality modalityType) throws IOException {
