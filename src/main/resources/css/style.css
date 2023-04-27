@@ -7,8 +7,10 @@
 }
 
 .document-view {
+    -fx-background-color: white;
     -fx-border-radius: 10px;
     -fx-padding: 10px;
+    -fx-border-style: outset;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 1);
 }
 

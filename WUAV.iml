@@ -10,5 +10,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: io.github.palexdev:materialfx:11.13.5" level="project" />
+    <orderEntry type="library" name="Maven: io.github.palexdev:virtualizedfx:11.2.6" level="project" />
+    <orderEntry type="library" name="Maven: com.microsoft.sqlserver:mssql-jdbc:11.2.3.jre18" level="project" />
   </component>
 </module>
