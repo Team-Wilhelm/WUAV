@@ -4,6 +4,7 @@ import be.Document;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
@@ -21,13 +22,11 @@ public class DocumentCard extends VBox {
 
         //Create label and populate jobTitleBox
         HBox jobTitleBox = new HBox();
-        jobTitleBox.setAlignment(Pos.CENTER_LEFT);
+        jobTitleBox.setAlignment(Pos.TOP_LEFT);
 
         jobTitle = new Label(document.getJobTitle());
         jobTitle.maxWidthProperty().bind(jobTitleBox.prefWidthProperty());
         jobTitle.setWrapText(true);
-
-
 
         //Create labels and populate nameAndDate box
         HBox dateBox = new HBox();
@@ -49,6 +48,7 @@ public class DocumentCard extends VBox {
         nameBox.getChildren().add(customerName);
 
         //Populate document card
+        VBox.setVgrow(jobTitleBox, Priority.ALWAYS);
         this.getChildren().addAll(jobTitleBox, dateBox, nameBox);
     }
 
