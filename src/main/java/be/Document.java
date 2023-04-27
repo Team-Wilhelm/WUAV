@@ -10,6 +10,7 @@ import java.util.UUID;
 public class Document {
     private UUID documentID;
     private Customer customer;
+    private Date dateOfCreation;
     private List<User> technicians;
     private List<Image> electricalDrawings, sitePhotos;
     private String jobDescription, optionalNotes, jobTitle;
@@ -49,6 +50,14 @@ public class Document {
         this.customer = customer;
     }
 
+    public Date getDateOfCreation() {
+        return dateOfCreation;
+    }
+
+    public void setDateOfCreation(Date dateOfCreation) {
+        this.dateOfCreation = dateOfCreation;
+    }
+
     public List<User> getTechnicians() {
         return technicians;
     }
@@ -71,6 +80,14 @@ public class Document {
 
     public void setSitePhotos(List<Image> sitePhotos) {
         this.sitePhotos = sitePhotos;
+    }
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 
     public String getJobDescription() {

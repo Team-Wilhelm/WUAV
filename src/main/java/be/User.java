@@ -14,7 +14,6 @@ public class User {
 
     public User(){
         assignedDocuments = new ArrayList<>();
-        //TODO set userRole
     }
 
     public User(String fullName, String username, String password, UserRole userRole) {
@@ -77,4 +76,5 @@ public class User {
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
     }
+
 }

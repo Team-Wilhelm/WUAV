@@ -29,4 +29,27 @@
     -fx-border-color: derive(-fx-orange, 20%);
     -fx-text-fill: white;
     -fx-font-weight: 800;
+    -fx-background-color: pink;
+}
+
+.document-view {
+    -fx-border-radius: 10px;
+    -fx-padding: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 1);
+}
+
+.document-view:hover{
+    -fx-scale-x: 105%;
+    -fx-scale-y: 105%;
+    -fx-scale-z: 105%;
+}
+
+.document-information .label {
+    -fx-font-size: 10;
+    -fx-text-fill: gray;
+}
+
+.document-information .info-label {
+    -fx-font-size: 16;
+    -fx-text-fill: black;
 }

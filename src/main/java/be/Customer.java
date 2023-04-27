@@ -13,7 +13,6 @@ public class Customer {
     private Date lastContract;
 
     public Customer(){
-        //TODO set customertypes
     }
 
     public Customer(String customerName, String customerEmail, String customerPhoneNumber, Address customerAddress, CustomerType customerType, Date lastContract) {
