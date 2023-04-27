@@ -3,15 +3,15 @@ package be.cards;
 import be.Document;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.OverrunStyle;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 public class DocumentCard extends VBox {
     private Document document;
     private Label customerName, dateOfCreation, jobTitle;
 
-    private DocumentCard(Document document){
+    public DocumentCard(Document document){
         super();
         this.document = document;
 
@@ -21,31 +21,35 @@ public class DocumentCard extends VBox {
 
         //Create label and populate jobTitleBox
         HBox jobTitleBox = new HBox();
-        jobTitleBox.setAlignment(Pos.TOP_LEFT);
+        jobTitleBox.setAlignment(Pos.CENTER_LEFT);
 
         jobTitle = new Label(document.getJobTitle());
         jobTitle.maxWidthProperty().bind(jobTitleBox.prefWidthProperty());
         jobTitle.setWrapText(true);
-        jobTitle.getStyleClass().add("info-label");
 
-        jobTitleBox.getChildren().add(jobTitle);
+
 
         //Create labels and populate nameAndDate box
-        HBox nameAndDate = new HBox();
-        nameAndDate.setAlignment(Pos.BOTTOM_LEFT);
+        HBox dateBox = new HBox();
+        dateBox.setAlignment(Pos.CENTER_LEFT);
 
         dateOfCreation = new Label("Created: " + document.getDateOfCreation().toString());
-        dateOfCreation.maxWidthProperty().bind(nameAndDate.prefWidthProperty());
-        dateOfCreation.getStyleClass().add("label");
+        dateOfCreation.maxWidthProperty().bind(dateBox.prefWidthProperty());
+
+
+        HBox nameBox = new HBox();
+        nameBox.setAlignment(Pos.CENTER_LEFT);
 
         customerName = new Label("Customer: " + document.getCustomer().getCustomerName());
-        customerName.maxWidthProperty().bind(nameAndDate.prefWidthProperty());
-        customerName.getStyleClass().add("label");
+        customerName.maxWidthProperty().bind(nameBox.prefWidthProperty());
 
-        nameAndDate.getChildren().addAll(dateOfCreation, customerName);
+
+        jobTitleBox.getChildren().add(jobTitle);
+        dateBox.getChildren().add(dateOfCreation);
+        nameBox.getChildren().add(customerName);
 
         //Populate document card
-        this.getChildren().addAll(jobTitleBox, nameAndDate);
+        this.getChildren().addAll(jobTitleBox, dateBox, nameBox);
     }
 
 }

@@ -21,22 +21,23 @@ public class Document {
         this.sitePhotos = new ArrayList<>();
     }
 
-    public Document(Customer customer, String jobTitle, String jobDescription){
+    public Document(Customer customer, String jobTitle, Date dateOfCreation){
         this.customer = customer;
         this.jobTitle = jobTitle;
-        this.jobDescription = jobDescription;
+        this.dateOfCreation = dateOfCreation;
     }
 
-    public Document(Customer customer, String jobTitle, String jobDescription, String optionalNotes) {
+    public Document(Customer customer, String jobTitle, String jobDescription, String optionalNotes, Date dateOfCreation) {
         this();
         this.customer = customer;
         this.jobTitle = jobTitle;
         this.jobDescription = jobDescription;
         this.optionalNotes = optionalNotes;
+        this.dateOfCreation = dateOfCreation;
     }
 
-    public Document(UUID documentID, Customer customer, String jobTitle, String jobDescription, String optionalNotes) {
-       this(customer, jobTitle, jobDescription, optionalNotes);
+    public Document(UUID documentID, Customer customer, String jobTitle, String jobDescription, String optionalNotes, Date dateOfCreation) {
+       this(customer, jobTitle, jobDescription, optionalNotes, dateOfCreation);
          this.documentID = documentID;
     }
 

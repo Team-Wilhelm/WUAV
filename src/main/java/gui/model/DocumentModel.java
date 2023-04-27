@@ -1,6 +1,7 @@
 package gui.model;
 
 import be.Document;
+import be.cards.DocumentCard;
 import bll.IManager;
 import bll.ManagerFactory;
 
@@ -12,10 +13,14 @@ public class DocumentModel implements IModel<Document> {
     private static DocumentModel instance;
     private IManager<Document> documentManager;
     private HashMap<UUID, Document> allDocuments;
+    private HashMap<Document, DocumentCard> createdDocumentCards;
 
     private DocumentModel() {
         documentManager = ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
         allDocuments = new HashMap<>();
+        createdDocumentCards = new HashMap<>();
+        setAllDocuments();
+        createDocumentCards();
     }
 
     public static DocumentModel getInstance() {
@@ -48,21 +53,31 @@ public class DocumentModel implements IModel<Document> {
 
     @Override
     public Map<UUID, Document> getAll() {
-        return null;
+        return allDocuments;
     }
 
     @Override
     public Document getById(UUID id) {
-        return null;
+        return documentManager.getById(id);
     }
 
-    public HashMap<UUID, Document> getAllDocuments() {
-        return allDocuments;
+    public void setAllDocuments() {
+        this.allDocuments = (HashMap<UUID, Document>) documentManager.getAll();
     }
 
-    public void setAllDocuments(HashMap<UUID, Document> allDocuments) {
-        this.allDocuments = allDocuments;
+
+    public HashMap<Document, DocumentCard> getCreatedDocumentCards() {
+        return createdDocumentCards;
     }
+
+    public void createDocumentCards() {
+        for (Document document: allDocuments.values()){
+            if(!createdDocumentCards.containsKey(document)){
+                createdDocumentCards.put(document, new DocumentCard(document));
+            }
+        }
+    }
+
 
     public List<Document> searchDocuments(String query) {
         List<Document> filteredDocuments = new ArrayList<>();

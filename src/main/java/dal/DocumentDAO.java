@@ -40,21 +40,23 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             }
 
             // Insert the document into the database
-            sql = "INSERT INTO Document (JobTitle, JobDescription, Notes, CustomerId) VALUES (?, ?, ?, ?)";
+            sql = "INSERT INTO Document (JobTitle, JobDescription, Notes, CustomerId, DateOfCreation) VALUES (?, ?, ?, ?, ?)";
             ps = connection.prepareStatement(sql);
             ps.setString(1, document.getJobTitle());
             ps.setString(2, document.getJobDescription());
             ps.setString(3, document.getOptionalNotes());
             ps.setString(4, customerID.toString());
+            ps.setDate(5, document.getDateOfCreation());
             ps.executeUpdate();
 
             // Get the documentID from the database and set it as the document's ID
-            sql = "SELECT DocumentID FROM Document WHERE JobTitle = ? AND JobDescription = ? AND Notes = ? AND CustomerID = ?";
+            sql = "SELECT DocumentID FROM Document WHERE JobTitle = ? AND JobDescription = ? AND Notes = ? AND CustomerID = ? AND DateOfCreation = ?";
             ps = connection.prepareStatement(sql);
             ps.setString(1, document.getJobTitle());
             ps.setString(2, document.getJobDescription());
             ps.setString(3, document.getOptionalNotes());
             ps.setString(4, customerID.toString());
+            ps.setDate(5, document.getDateOfCreation());
             rs = ps.executeQuery();
             if (rs.next()) {
                 document.setDocumentID(UUID.fromString(rs.getString("DocumentID")));
@@ -71,7 +73,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     @Override
     public String update(Document document) {
         String result = "updated";
-        String sql = "UPDATE Document SET JobTitle = ?, JobDescription = ?, Notes = ?, CustomerID = ? " +
+        String sql = "UPDATE Document SET JobTitle = ?, JobDescription = ?, Notes = ?, CustomerID = ?, DateOfCreation = ?" +
                 "WHERE DocumentID = ?";
         Connection connection = null;
         try {
@@ -82,6 +84,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             ps.setString(3, document.getOptionalNotes());
             ps.setString(4, document.getCustomer().getCustomerID().toString());
             ps.setString(5, document.getDocumentID().toString());
+            ps.setDate(6, document.getDateOfCreation());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -117,7 +120,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        return null;
+        return documents;
     }
 
     @Override
@@ -146,7 +149,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 new CustomerDAO().getById(UUID.fromString(rs.getString("CustomerID"))),
                 rs.getString("JobTitle"),
                 rs.getString("JobDescription"),
-                rs.getString("Notes")
+                rs.getString("Notes"),
+                rs.getDate("DateOfCreation")
             );
     }
 }
