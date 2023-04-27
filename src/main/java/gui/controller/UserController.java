@@ -1,5 +1,6 @@
 package gui.controller;
 
+import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,10 +14,14 @@ public class UserController implements Initializable {
     private MFXProgressSpinner progressSpinner;
     @FXML
     private Label progressLabel;
+    @FXML
+    private MFXButton btnAddEmployee;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setProgressVisibility(false);
+
+        btnAddEmployee.getStyleClass().addAll("addButton", "rounded");
     }
 
     private void setProgressVisibility(boolean visible) {
