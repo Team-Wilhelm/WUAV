@@ -1,15 +1,19 @@
-package gui.controller;
+package gui.controller.AddControllers;
 
 import be.Address;
 import be.Customer;
 import be.Document;
 import be.User;
 import be.enums.CustomerType;
+import gui.controller.ViewControllers.DocumentController;
 import gui.model.DocumentModel;
+import gui.model.IModel;
+import gui.tasks.SaveTask;
+import gui.tasks.TaskState;
 import io.github.palexdev.materialfx.controls.*;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -21,16 +25,16 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 
-import javax.print.Doc;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
-public class AddDocumentController implements Initializable {
+public class AddDocumentController extends AddController implements Initializable {
     @FXML
     private MFXButton btnCancel, btnDelete, btnSave, btnUploadPictures;
     @FXML
@@ -49,6 +53,7 @@ public class AddDocumentController implements Initializable {
     private DocumentModel documentModel;
     private boolean isEditing;
     private Document documentToEdit;
+    private DocumentController documentController;
     private HashMap<Image, String> pictures;
 
     // Document and customer information
@@ -60,8 +65,6 @@ public class AddDocumentController implements Initializable {
     public AddDocumentController() {
         documentModel = DocumentModel.getInstance();
         pictures = new HashMap<>();
-
-
     }
 
     @Override
@@ -70,6 +73,7 @@ public class AddDocumentController implements Initializable {
         btnSave.setDisable(true);
         assignListenersToTextFields();
         setUpListView();
+        dateLastContract.setValue(LocalDate.now());
     }
 
     @FXML
@@ -98,23 +102,22 @@ public class AddDocumentController implements Initializable {
 
     @FXML
     private void cancelAction(ActionEvent actionEvent) {
-        ((Node) actionEvent.getSource()).getScene().getWindow().hide();
+        closeWindow(actionEvent);
     }
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
-        if (checkInput()) {
+        closeWindow(actionEvent);
+        assignInputToVariables();
 
-            Address address = new Address(streetName, houseNumber, postcode, city, country);
-            Customer customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
-            Document document = new Document(customer, jobTitle, jobDescription, notes);
+        Address address = new Address(streetName, houseNumber, postcode, city, country);
+        Customer customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
+        Document document = new Document(customer, jobTitle, jobDescription, notes);
+        if (isEditing) document.setDocumentID(documentToEdit.getDocumentID());
 
-            if (isEditing) {
-                document.setDocumentID(documentToEdit.getDocumentID());
-            } else {
-
-            }
-        }
+        Task<TaskState> task = new SaveTask<>(document, isEditing, documentModel);
+        setUpSaveTask(task, documentController, actionEvent);
+        executeTask(task);
     }
 
     // UTILITIES & HELPERS
@@ -137,7 +140,7 @@ public class AddDocumentController implements Initializable {
         txtNotes.textProperty().addListener(inputListener);
     }
 
-    private boolean checkInput() {
+    private void assignInputToVariables() {
         city = txtCity.getText();
         country = txtCountry.getText();
         email = txtEmail.getText();
@@ -147,7 +150,10 @@ public class AddDocumentController implements Initializable {
         phoneNumber = txtPhoneNumber.getText();
         postcode = txtPostcode.getText();
         streetName = txtStreetName.getText();
-        return true;
+        customerType = toggleCustomerType.isSelected() ? CustomerType.PRIVATE : CustomerType.BUSINESS;
+        jobDescription = txtJobDescription.getText();
+        notes = txtNotes.getText();
+        lastContract = dateLastContract.getValue() != null ? Date.valueOf(dateLastContract.getValue()) : Date.valueOf(LocalDate.now());
     }
 
     private final ChangeListener<String> inputListener = new ChangeListener<>() {
@@ -192,5 +198,9 @@ public class AddDocumentController implements Initializable {
                 return null;
             }
         });
+    }
+
+    public void setDocumentController(DocumentController documentController) {
+        this.documentController = documentController;
     }
 }

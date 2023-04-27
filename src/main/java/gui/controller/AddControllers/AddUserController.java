@@ -1,4 +1,4 @@
-package gui.controller;
+package gui.controller.AddControllers;
 
 import be.User;
 import gui.model.IModel;

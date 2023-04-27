@@ -6,12 +6,12 @@ import javafx.concurrent.Task;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 
-public class SaveTask extends Task<TaskState> {
-    private final Object objectToSave;
+public class SaveTask<T> extends Task<TaskState> {
+    private final T objectToSave;
     private final boolean isEditing;
-    private final IModel<Object> model;
+    private final IModel<T> model;
 
-    public SaveTask(Object objectToSave, boolean isEditing, IModel<Object> model) {
+    public SaveTask(T objectToSave, boolean isEditing, IModel<T> model) {
         this.objectToSave = objectToSave;
         this.isEditing = isEditing;
         this.model = model;

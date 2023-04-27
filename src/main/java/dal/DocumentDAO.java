@@ -144,7 +144,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         return new Document(
                 UUID.fromString(rs.getString("DocumentID")),
                 new CustomerDAO().getById(UUID.fromString(rs.getString("CustomerID"))),
-                rs.getString("JobTitle"),
                 rs.getString("JobDescription"),
                 rs.getString("Notes"),
                 rs.getString("JobTitle")
