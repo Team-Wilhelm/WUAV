@@ -1,12 +1,12 @@
 package gui.controller;
 
+import be.Address;
+import be.Customer;
 import be.Document;
 import be.User;
+import be.enums.CustomerType;
 import gui.model.DocumentModel;
-import io.github.palexdev.materialfx.controls.MFXButton;
-import io.github.palexdev.materialfx.controls.MFXFilterComboBox;
-import io.github.palexdev.materialfx.controls.MFXListView;
-import io.github.palexdev.materialfx.controls.MFXTextField;
+import io.github.palexdev.materialfx.controls.*;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -21,10 +21,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 
+import javax.print.Doc;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
@@ -39,16 +41,27 @@ public class AddDocumentController implements Initializable {
     private MFXTextField txtCity, txtCountry, txtEmail, txtHouseNumber, txtJobTitle, txtName, txtPhoneNumber, txtPostcode, txtStreetName;
     @FXML
     private TextArea txtJobDescription, txtNotes;
+    @FXML
+    private MFXToggleButton toggleCustomerType;
+    @FXML
+    private MFXDatePicker dateLastContract;
 
     private DocumentModel documentModel;
     private boolean isEditing;
     private Document documentToEdit;
-    private String city, country, email, houseNumber, jobTitle, name, phoneNumber, postcode, streetName;
     private HashMap<Image, String> pictures;
+
+    // Document and customer information
+    private String city, country, email, houseNumber, jobTitle, name, phoneNumber, postcode, streetName;
+    private String jobDescription, notes;
+    private CustomerType customerType;
+    private Date lastContract;
 
     public AddDocumentController() {
         documentModel = DocumentModel.getInstance();
         pictures = new HashMap<>();
+
+
     }
 
     @Override
@@ -62,10 +75,18 @@ public class AddDocumentController implements Initializable {
     @FXML
     private void uploadPicturesAction(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose profile picture");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.jpeg"),
                 new FileChooser.ExtensionFilter("All Files", "*.*"));
+        fileChooser.setTitle("Choose a picture");
+
+        // Try to set the initial directory to the user's pictures folder
+        try {
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home") + System.getProperty("file.separator") + "Pictures"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         File selectedFile = fileChooser.showOpenDialog(((Node) actionEvent.getSource()).getScene().getWindow());
         if (selectedFile != null) {
             //TODO blobs
@@ -82,7 +103,18 @@ public class AddDocumentController implements Initializable {
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
+        if (checkInput()) {
 
+            Address address = new Address(streetName, houseNumber, postcode, city, country);
+            Customer customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
+            Document document = new Document(customer, jobTitle, jobDescription, notes);
+
+            if (isEditing) {
+                document.setDocumentID(documentToEdit.getDocumentID());
+            } else {
+
+            }
+        }
     }
 
     // UTILITIES & HELPERS
@@ -105,8 +137,17 @@ public class AddDocumentController implements Initializable {
         txtNotes.textProperty().addListener(inputListener);
     }
 
-    private void checkInput() {
-
+    private boolean checkInput() {
+        city = txtCity.getText();
+        country = txtCountry.getText();
+        email = txtEmail.getText();
+        houseNumber = txtHouseNumber.getText();
+        jobTitle = txtJobTitle.getText();
+        name = txtName.getText();
+        phoneNumber = txtPhoneNumber.getText();
+        postcode = txtPostcode.getText();
+        streetName = txtStreetName.getText();
+        return true;
     }
 
     private final ChangeListener<String> inputListener = new ChangeListener<>() {

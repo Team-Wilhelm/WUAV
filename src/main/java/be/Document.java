@@ -1,6 +1,8 @@
 package be;
 
 import javafx.scene.image.Image;
+
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -10,7 +12,7 @@ public class Document {
     private Customer customer;
     private List<User> technicians;
     private List<Image> electricalDrawings, sitePhotos;
-    private String jobDescription, optionalNotes;
+    private String jobDescription, optionalNotes, jobTitle;
 
     public Document (){
         this.technicians = new ArrayList<>();
@@ -18,15 +20,16 @@ public class Document {
         this.sitePhotos = new ArrayList<>();
     }
 
-    public Document(Customer customer, String jobDescription, String optionalNotes) {
+    public Document(Customer customer, String jobDescription, String optionalNotes, String jobTitle) {
         this();
         this.customer = customer;
         this.jobDescription = jobDescription;
         this.optionalNotes = optionalNotes;
+        this.jobTitle = jobTitle;
     }
 
-    public Document(UUID documentID, Customer customer, String jobDescription, String optionalNotes) {
-       this(customer, jobDescription, optionalNotes);
+    public Document(UUID documentID, Customer customer, String jobDescription, String optionalNotes, String jobTitle) {
+       this(customer, jobDescription, optionalNotes, jobTitle);
          this.documentID = documentID;
     }
 
