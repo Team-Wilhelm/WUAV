@@ -6,11 +6,17 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 4, 0, 0, 4);
 }
 
+.addButton {
+    -fx-background-color: #2b2b2c;
+    -fx-border-color: #2b2b2c;
+    -fx-text-fill: white;
+    -fx-font-size: 14;
+}
+
 .document-view {
     -fx-background-color: white;
     -fx-border-radius: 10px;
     -fx-padding: 10px;
-    -fx-border-style: outset;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 1);
 }
 
@@ -18,4 +24,9 @@
     -fx-scale-x: 105%;
     -fx-scale-y: 105%;
     -fx-scale-z: 105%;
+}
+
+.rounded{
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
 }

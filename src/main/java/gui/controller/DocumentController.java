@@ -2,6 +2,7 @@ package gui.controller;
 
 import be.cards.DocumentCard;
 import gui.model.DocumentModel;
+import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -22,7 +23,8 @@ public class DocumentController implements Initializable {
     private MFXProgressSpinner progressSpinner;
     @FXML
     private Label progressLabel;
-
+    @FXML
+    private MFXButton btnAddDocument;
     private ObservableList<DocumentCard> documentCards = FXCollections.observableArrayList();
     private final DocumentModel documentModel = DocumentModel.getInstance();
 
@@ -34,6 +36,8 @@ public class DocumentController implements Initializable {
             documentCards.setAll(documentModel.getCreatedDocumentCards().values());
             Bindings.bindContent(documentFlowPane.getChildren(), documentCards);
         });
+
+        btnAddDocument.getStyleClass().addAll("addButton", "rounded");
 
     }
 
