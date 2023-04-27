@@ -1,5 +1,9 @@
 .background {
-    -fx-background-color: pink;
+    -fx-background-color: #f9fbfb;
+}
+.menu{
+    -fx-background-color: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 4, 0, 0, 4);
 }
 
 .document-view {
