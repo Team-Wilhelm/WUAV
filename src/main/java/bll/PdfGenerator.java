@@ -4,6 +4,8 @@ import be.Address;
 import be.Document;
 import be.User;
 import com.itextpdf.io.font.FontConstants;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.Rectangle;
@@ -18,15 +20,14 @@ import com.itextpdf.layout.property.AreaBreakType;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
-import javafx.scene.image.Image;
+
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 
 public class PdfGenerator {
     private static PdfFont FONT;
     private static final int FONT_SIZE = 12;
-    private final float margin = 75;
-    private Image logo = new Image("img/WUAV.png");
 
     public void generatePdf(Document document){
         try {
@@ -37,12 +38,20 @@ public class PdfGenerator {
             PdfWriter writer = new PdfWriter(home + "/Downloads/" + document.getDocumentID() + ".pdf");
             PdfDocument pdfDoc = new PdfDocument(writer);
             com.itextpdf.layout.Document doc = new com.itextpdf.layout.Document(pdfDoc);
-            doc.setMargins(margin,margin,margin,margin);
+            float margin = 75;
+            doc.setMargins(margin, margin, margin, margin);
 
             //Create formatting elements
             Paragraph lineBreak = new Paragraph();
             Paragraph lineBreak3 = new Paragraph("\n"+"\n"+"\n");
             AreaBreak pageBreak = new AreaBreak(AreaBreakType.NEXT_AREA);
+
+            //Add logo
+            //TODO why no be added?
+            Table logoTable = new Table(1);
+            Cell logoCell = new Cell();
+            logoCell.add(getLogo());
+            doc.add(logoTable);
 
             //Left side header, customer info
             Paragraph customerParagraph = new Paragraph(getCustomerInfo(document));
@@ -115,6 +124,12 @@ public class PdfGenerator {
         }
     }
 
+    private Image getLogo() throws MalformedURLException {
+        String imageFile = "src/main/resources/img/WUAV.png";
+        ImageData data = ImageDataFactory.create(imageFile);
+        return new Image(data);
+    }
+
     private String getWUAVinfo() {
         return           "WUAV"
                 + "\n" + "Murervej 7a"
@@ -132,13 +147,6 @@ public class PdfGenerator {
                 + "\n" + document.getCustomer().getCustomerEmail();
     }
 
-    private void removeBorder(Table table)
-    {
-        for (IElement iElement : table.getChildren()) {
-            ((Cell)iElement).setBorder(Border.NO_BORDER);
-        }
-    }
-
     private String getTechnicianNames(Document document){
         String technicians = "";
         if(!document.getTechnicians().isEmpty()) {
@@ -148,5 +156,12 @@ public class PdfGenerator {
             }
         }
         return technicians;
+    }
+
+    private void removeBorder(Table table)
+    {
+        for (IElement iElement : table.getChildren()) {
+            ((Cell)iElement).setBorder(Border.NO_BORDER);
+        }
     }
 }
