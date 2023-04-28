@@ -16,13 +16,24 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import utils.HashPasswordHelper;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
+import java.util.Stack;
 
 public class AddUserController extends AddController implements Initializable {
     @FXML
@@ -64,6 +75,7 @@ public class AddUserController extends AddController implements Initializable {
         isUpdating = false;
         btnSave.setDisable(true);
         comboActions.setDisable(true);
+        //profilePictureDoubleClick();
         populateComboboxes();
         assignListenersToTextFields();
         comboActions.getSelectionModel().selectedItemProperty().addListener(actionListener);
@@ -179,7 +191,7 @@ public class AddUserController extends AddController implements Initializable {
     }
 
     public void setIsEditing(User user) {
-        disableFields(false);
+        disableFields(true);
         comboActions.setDisable(false);
         isEditing = true;
 
@@ -200,10 +212,10 @@ public class AddUserController extends AddController implements Initializable {
     }
 
     private void disableFields(boolean disable) {
-        txtName.setDisable(disable);
-        txtUsername.setDisable(disable);
-        txtPassword.setDisable(disable);
-        txtPhoneNumber.setDisable(disable);
+        txtName.setEditable(!disable);
+        txtUsername.setEditable(!disable);
+        txtPassword.setEditable(!disable);
+        txtPhoneNumber.setEditable(!disable);
         comboPosition.setDisable(disable);
     }
 
@@ -215,6 +227,48 @@ public class AddUserController extends AddController implements Initializable {
         comboPosition.getItems().setAll(Arrays.stream(UserRole.values()).toList().subList(0, 4));
         comboActions.getItems().setAll(Action.EDIT, Action.DELETE);
     }
+
+    /*private void profilePictureDoubleClick() {
+        imgProfilePicture.setOnMouseClicked(event -> {
+            if(event.getClickCount() == 2) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Choose profile picture");
+                fileChooser.getExtensionFilters().addAll(
+                        new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.jpeg"),
+                        new FileChooser.ExtensionFilter("All Files", "*.*"));
+                File selectedFile = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
+                if (selectedFile != null) {
+                    Image image = new Image(selectedFile.toURI().toString());
+                    GridPane root = new GridPane();
+                    root.setPadding(new Insets(10));
+
+                    ImageView imageView = new ImageView(image);
+                    StackPane imagePane = new StackPane(imageView);
+
+                    Rectangle cropRectangle = new Rectangle(300, 300);
+                    cropRectangle.setFill(null);
+                    cropRectangle.setStrokeWidth(2);
+                    cropRectangle.setStroke(javafx.scene.paint.Color.RED);
+
+                    cropRectangle.setOnMousePressed(this::startCrop);
+                    cropRectangle.setOnMouseDragged(this::resizeCrop);
+                    cropRectangle.setOnMouseReleased(this::endCrop);
+
+                    imagePane.getChildren().add(cropRectangle);
+                    root.add(imagePane, 0, 0);
+
+                    Stage stage = new Stage();
+                    stage.setTitle("Crop profile picture");
+                    stage.setScene(new Scene(root, image.getWidth(), image.getHeight()));
+                    stage.show();
+
+                    imgProfilePicture.setImage(image);
+                }
+            }
+        });
+    }
+
+     */
 
     //endregion
 }

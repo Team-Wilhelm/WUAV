@@ -50,6 +50,7 @@ public class UserDAO extends DAO implements IDAO<User> {
             PreparedStatement ps = connection.prepareStatement(sql);
             fillPreparedStatement(ps, user);
             ps.setString(6, user.getUserID().toString());
+            ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
             result = e.getMessage();

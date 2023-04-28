@@ -22,7 +22,7 @@ public class MenuController implements Initializable {
         try {
             documentView = documentLoader.load();
             employeeView = employeeLoader.load();
-            currentScene = documentView;
+            currentScene = employeeView;
             gridPane.add(currentScene, 2, 0, 1,gridPane.getRowCount());
         } catch (Exception e) {
             e.printStackTrace();

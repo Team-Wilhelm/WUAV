@@ -1,9 +1,7 @@
 package gui.controller.ViewControllers;
 
-import be.Document;
 import be.User;
-import be.cards.DocumentCard;
-import be.cards.EmployeeCard;
+import be.cards.UserCard;
 import gui.SceneManager;
 import gui.controller.AddControllers.AddUserController;
 import gui.model.UserModel;
@@ -43,16 +41,16 @@ public class UserController extends ViewController implements Initializable {
     @FXML
     private MFXButton btnAddEmployee;
 
-    private ObservableList<EmployeeCard> employeeCards = FXCollections.observableArrayList();
+    private ObservableList<UserCard> userCards = FXCollections.observableArrayList();
     private UserModel userModel = UserModel.getInstance();
-    private EmployeeCard lastFocusedCard;
+    private UserCard lastFocusedCard;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setProgressVisibility(false);
 
-        Bindings.bindContent(flowPane.getChildren(), employeeCards);
-        employeeCards.setAll(userModel.getLoadedCards().values());
+        Bindings.bindContent(flowPane.getChildren(), userCards);
+        userCards.setAll(userModel.getLoadedCards().values());
 
         flowPane.prefHeightProperty().bind(scrollPane.heightProperty());
         flowPane.prefWidthProperty().bind(scrollPane.widthProperty());
@@ -89,32 +87,33 @@ public class UserController extends ViewController implements Initializable {
 
     @Override
     public void refreshItems(List<?> items) {
-        employeeCards.clear();
+        //TODO after saving a new user
+        userCards.clear();
 
-        HashMap<User, EmployeeCard> loadedCards = (HashMap<User, EmployeeCard>) userModel.getLoadedCards();
+        HashMap<User, UserCard> loadedCards = (HashMap<User, UserCard>) userModel.getLoadedCards();
         for (User user : (List<User>) items) {
-            EmployeeCard employeeCard = loadedCards.get(user);
-            if (employeeCard == null) {
-                employeeCard = new EmployeeCard(user);
-                userModel.getLoadedCards().put(user, employeeCard);
-                loadedCards.put(user, employeeCard);
+            UserCard userCard = loadedCards.get(user);
+            if (userCard == null) {
+                userCard = new UserCard(user);
+                userModel.getLoadedCards().put(user, userCard);
+                loadedCards.put(user, userCard);
             }
 
-            final EmployeeCard finalEmployeeCard = employeeCard;
-            employeeCard.focusedProperty().addListener((observable, oldValue, newValue) -> {
-                if (!newValue) lastFocusedCard = finalEmployeeCard;
+            final UserCard finalUserCard = userCard;
+            userCard.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue) lastFocusedCard = finalUserCard;
             });
 
-            employeeCard.setOnMouseClicked(e -> {
-                if (!finalEmployeeCard.isFocused())
-                    finalEmployeeCard.requestFocus();
+            userCard.setOnMouseClicked(e -> {
+                if (!finalUserCard.isFocused())
+                    finalUserCard.requestFocus();
 
                 if (e.getClickCount() == 2) {
-                    lastFocusedCard = finalEmployeeCard;
+                    lastFocusedCard = finalUserCard;
                     editUser(scrollPane.getScene().getWindow());
                 }
             });
-            employeeCards.add(employeeCard);
+            userCards.add(userCard);
         }
     }
 
@@ -124,7 +123,7 @@ public class UserController extends ViewController implements Initializable {
                 FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
                 AddUserController controller = loader.getController();
                 controller.setUserController(this);
-                controller.setIsEditing(lastFocusedCard.getEmployee());
+                controller.setIsEditing(lastFocusedCard.getUser());
             } catch (Exception e) {
                e.printStackTrace();
             }

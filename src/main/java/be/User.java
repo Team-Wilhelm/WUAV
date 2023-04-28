@@ -26,7 +26,7 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.userRole = userRole;
         this.assignedDocuments = new ArrayList<>();
-        this.profilePicture = new Image("/img/userIcon.png");
+        this.profilePicture = new Image("/img/09f63ad7-0b64-4b7e-bd4d-ef2d9939cfe6.jpg");
     }
 
     public User(UUID userID, String fullName, String username, byte[] password, String phoneNumber, UserRole userRole) {

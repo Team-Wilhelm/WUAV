@@ -1,10 +1,9 @@
 package gui.model;
 
 import be.User;
-import be.cards.EmployeeCard;
+import be.cards.UserCard;
 import bll.IManager;
 import bll.ManagerFactory;
-import com.nimbusds.openid.connect.sdk.UserInfoErrorResponse;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -16,14 +15,14 @@ public class UserModel implements IModel<User> {
     private static UserModel instance;
     private IManager<User> userManager;
     private HashMap<UUID, User> allUsers;
-    private HashMap<User, EmployeeCard> loadedCards;
+    private HashMap<User, UserCard> loadedCards;
     private static User loggedInUser;
 
     private UserModel() {
         userManager = ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
         loadedCards = new HashMap<>();
         setAllUsersFromManager();
-        createEmployeeCards();
+        createUserCards();
     }
 
     public static UserModel getInstance() {
@@ -106,16 +105,16 @@ public class UserModel implements IModel<User> {
         return filteredUsers;
     }
 
-    public Map<User, EmployeeCard> getLoadedCards() {
+    public Map<User, UserCard> getLoadedCards() {
         return loadedCards;
     }
 
     /**
      * Creates a card for each user
      */
-    public void createEmployeeCards() {
+    public void createUserCards() {
         for (User user : allUsers.values()) {
-            loadedCards.put(user, new EmployeeCard(user));
+            loadedCards.put(user, new UserCard(user));
         }
     }
 }
