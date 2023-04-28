@@ -14,14 +14,13 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Window;
-import utils.AlertManager;
+import gui.util.AlertManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -97,7 +96,6 @@ public class DocumentController extends ViewController implements Initializable 
         documentCards.clear();
 
         HashMap<Document, DocumentCard> loadedCards = documentModel.getCreatedDocumentCards();
-        System.out.println(documentsToDisplay.size());
 
         for (Document document : (List<Document>) documentsToDisplay) {
             DocumentCard documentCard = loadedCards.get(document);

@@ -31,11 +31,11 @@ public class UserManager implements IManager<User> {
 
     @Override
     public Map<UUID, User> getAll() {
-        return null;
+        return dao.getAll();
     }
 
     @Override
     public User getById(UUID id) {
-        return null;
+        return dao.getById(id);
     }
 }

@@ -1,6 +1,7 @@
 package be;
 
 import be.enums.UserRole;
+import javafx.scene.image.Image;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ public class User {
     private String fullName, username, password;
     private List<Document> assignedDocuments;
     private UserRole userRole;
+    private Image profilePicture;
 
     public User(){
         assignedDocuments = new ArrayList<>();
@@ -22,6 +24,7 @@ public class User {
         this.password = password;
         this.assignedDocuments = new ArrayList<>();
         this.userRole = userRole;
+        this.profilePicture = new Image("/img/userIcon.png");
     }
 
     public User(UUID userID, String fullName, String username, String password, UserRole userRole) {
@@ -77,4 +80,11 @@ public class User {
         this.userRole = userRole;
     }
 
+    public Image getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(Image profilePicture) {
+        this.profilePicture = profilePicture;
+    }
 }

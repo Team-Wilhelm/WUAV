@@ -6,9 +6,8 @@ import gui.tasks.TaskState;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.stage.Window;
-import utils.AlertManager;
+import gui.util.AlertManager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

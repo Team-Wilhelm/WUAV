@@ -8,8 +8,8 @@ import java.util.concurrent.CountDownLatch;
 
 public interface IModel<T> {
     CompletableFuture<String> add(T obj);
-    String update(T obj);
-    String delete(UUID id);
+    CompletableFuture<String> update(T obj);
+    CompletableFuture<String> delete(UUID id);
     Map<UUID, T> getAll();
     T getById(UUID id);
 

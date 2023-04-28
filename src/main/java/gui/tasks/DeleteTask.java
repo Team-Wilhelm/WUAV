@@ -4,6 +4,7 @@ import gui.model.IModel;
 import javafx.concurrent.Task;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class DeleteTask extends Task<TaskState> {
     private final UUID objectToDelete;
@@ -22,9 +23,10 @@ public class DeleteTask extends Task<TaskState> {
         }
         else {
             updateMessage("Deleting...");
-            String message = model.delete(objectToDelete);
+            CompletableFuture<String> future = model.delete(objectToDelete);
+            String message = future.join();
 
-            if (message.isEmpty()) {
+            if (message.equals("deleted")) {
                 updateMessage("Deleted successfully");
                 return TaskState.SUCCESSFUL;
             }
