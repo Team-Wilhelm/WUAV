@@ -52,6 +52,7 @@ public class AddDocumentController extends AddController implements Initializabl
     private MFXDatePicker dateLastContract;
 
     private DocumentModel documentModel;
+    private CustomerModel customerModel;
     private boolean isEditing;
     private Document documentToEdit;
     private DocumentController documentController;
@@ -65,6 +66,7 @@ public class AddDocumentController extends AddController implements Initializabl
 
     public AddDocumentController() {
         documentModel = DocumentModel.getInstance();
+        customerModel = CustomerModel.getInstance();
         pictures = new HashMap<>();
     }
 
@@ -113,7 +115,10 @@ public class AddDocumentController extends AddController implements Initializabl
         assignInputToVariables();
 
         Address address = new Address(streetName, houseNumber, postcode, city, country);
-        Customer customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
+        Customer customer = customerModel.getAll().values().stream()
+                .filter(c -> c.getCustomerEmail().equals(email))
+                .findFirst()
+                .orElse(new Customer(name, email, phoneNumber, address, customerType, lastContract));
         Document document = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
 
         if (isEditing) {

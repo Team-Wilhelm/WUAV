@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class User {
     private UUID userID;
-    private String fullName, username, password;
+    private String fullName, username, password, phoneNumber;
     private List<Document> assignedDocuments;
     private UserRole userRole;
     private Image profilePicture;
@@ -18,17 +18,18 @@ public class User {
         assignedDocuments = new ArrayList<>();
     }
 
-    public User(String fullName, String username, String password, UserRole userRole) {
+    public User(String fullName, String username, String password, String phoneNumber, UserRole userRole) {
         this.fullName = fullName;
         this.username = username;
         this.password = password;
-        this.assignedDocuments = new ArrayList<>();
+        this.phoneNumber = phoneNumber;
         this.userRole = userRole;
+        this.assignedDocuments = new ArrayList<>();
         this.profilePicture = new Image("/img/userIcon.png");
     }
 
-    public User(UUID userID, String fullName, String username, String password, UserRole userRole) {
-        this(fullName, username, password, userRole);
+    public User(UUID userID, String fullName, String username, String password, String phoneNumber, UserRole userRole) {
+        this(fullName, username, password, phoneNumber, userRole);
         this.userID = userID;
     }
 
@@ -86,5 +87,21 @@ public class User {
 
     public void setProfilePicture(Image profilePicture) {
         this.profilePicture = profilePicture;
+    }
+
+    public void addDocument(Document document) {
+        assignedDocuments.add(document);
+    }
+
+    public void removeDocument(Document document) {
+        assignedDocuments.remove(document);
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

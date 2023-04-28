@@ -21,8 +21,8 @@ public class UserDAO extends DAO implements IDAO<User> {
     @Override
     public String add(User user) {
         String result = "saved";
-        String sql = "INSERT INTO SystemUser (FullName, Username, UserPassword, UserRole" +
-                "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO SystemUser (FullName, Username, UserPassword, UserRole, PhoneNumber) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
         Connection connection = null;
         try {
@@ -42,14 +42,14 @@ public class UserDAO extends DAO implements IDAO<User> {
     @Override
     public String update(User user) {
         String result = "updated";
-        String sql = "UPDATE SystemUser SET FullName = ?, Username = ?, UserPassword = ?, UserRole = ? " +
+        String sql = "UPDATE SystemUser SET FullName = ?, Username = ?, UserPassword = ?, UserRole = ?, PhoneNumber = ? " +
                 "WHERE UserID = ?";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             fillPreparedStatement(ps, user);
-            ps.setString(5, user.getUserID().toString());
+            ps.setString(6, user.getUserID().toString());
         } catch (SQLException e) {
             e.printStackTrace();
             result = e.getMessage();
@@ -115,6 +115,7 @@ public class UserDAO extends DAO implements IDAO<User> {
                 resultSet.getString("FullName"),
                 resultSet.getString("Username"),
                 resultSet.getString("UserPassword"),
+                resultSet.getString("PhoneNumber"),
                 UserRole.valueOf(resultSet.getString("UserRole"))
         );
         return user;
@@ -125,5 +126,6 @@ public class UserDAO extends DAO implements IDAO<User> {
         ps.setString(2, user.getUsername());
         ps.setString(3, user.getPassword());
         ps.setString(4, user.getUserRole().toString());
+        ps.setString(5, user.getPhoneNumber());
     }
 }

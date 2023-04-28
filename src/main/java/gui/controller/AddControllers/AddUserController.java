@@ -6,6 +6,8 @@ import be.enums.UserRole;
 import gui.controller.ViewControllers.UserController;
 import gui.model.IModel;
 import gui.model.UserModel;
+import gui.tasks.SaveTask;
+import gui.tasks.TaskState;
 import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
@@ -13,6 +15,7 @@ import io.github.palexdev.materialfx.controls.MFXListView;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -65,7 +68,15 @@ public class AddUserController extends AddController implements Initializable {
 
     @FXML
     private void btnSaveAction(ActionEvent actionEvent) {
-
+        if (checkInput()) {
+            User user = new User(name, username, password, phoneNumber, userRole);
+            Task<TaskState> saveTask = new SaveTask<>(user, isEditing, userModel);
+            if (isEditing) {
+                user.setUserID(userToUpdate.getUserID());
+            }
+            setUpSaveTask(saveTask, userController, txtName.getScene().getWindow());
+            executeTask(saveTask);
+        }
     }
 
 
