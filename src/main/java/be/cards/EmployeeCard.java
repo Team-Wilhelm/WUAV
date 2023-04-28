@@ -17,7 +17,7 @@ public class EmployeeCard extends VBox {
     // Child nodes
     private StackPane imageView;
     private Image userIcon;
-    private Label nameLabel, usernameLabel, mostRecentEvent;
+    private Label nameLabel, usernameLabel;
 
     public EmployeeCard(User employee) {
         super();
@@ -46,7 +46,7 @@ public class EmployeeCard extends VBox {
         information.getChildren().addAll(
                 new VBox(new Label("Name"), nameLabel),
                 new VBox(new Label("Username"), usernameLabel),
-                new VBox(new Label("Most recent event"), mostRecentEvent));
+                new VBox(new Label("Most recent event")));
         information.setAlignment(Pos.CENTER_LEFT);
 
         // Add all the elements to the VBox
@@ -68,6 +68,9 @@ public class EmployeeCard extends VBox {
                 .when(this.focusedProperty())
                 .then(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)))
                 .otherwise(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY))));
+    }
 
+    public User getEmployee() {
+        return employee;
     }
 }

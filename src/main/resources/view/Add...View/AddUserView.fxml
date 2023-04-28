@@ -3,6 +3,7 @@
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import io.github.palexdev.materialfx.controls.MFXComboBox?>
 <?import io.github.palexdev.materialfx.controls.MFXListView?>
+<?import io.github.palexdev.materialfx.controls.MFXPasswordField?>
 <?import io.github.palexdev.materialfx.controls.MFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
@@ -38,7 +39,7 @@
       <MFXTextField fx:id="txtName" floatingText="Name" maxWidth="1.7976931348623157E308" GridPane.rowIndex="3" />
       <MFXTextField fx:id="txtUsername" floatingText="Username" maxWidth="1.7976931348623157E308" GridPane.rowIndex="4" />
       <MFXTextField fx:id="txtPhoneNumber" floatingText="Phone number" maxWidth="1.7976931348623157E308" textLimit="30" GridPane.rowIndex="5" />
-      <MFXTextField fx:id="txtPassword" floatingText="Password" maxWidth="1.7976931348623157E308" GridPane.rowIndex="6" />
+      <MFXPasswordField fx:id="txtPassword" floatingText="Password" maxWidth="1.7976931348623157E308" GridPane.rowIndex="6" />
       <MFXComboBox fx:id="comboPosition" floatingText="Position" GridPane.rowIndex="7" />
       <MFXComboBox fx:id="comboActions" floatingText="Actions" GridPane.columnIndex="2" />
       <MFXButton fx:id="btnSave" onAction="#btnSaveAction" text="Save" GridPane.columnIndex="2" GridPane.rowIndex="7" />

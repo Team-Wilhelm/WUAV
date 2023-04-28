@@ -9,7 +9,8 @@ import java.util.UUID;
 
 public class User {
     private UUID userID;
-    private String fullName, username, password, phoneNumber;
+    private String fullName, username, phoneNumber;
+    private byte[] password;
     private List<Document> assignedDocuments;
     private UserRole userRole;
     private Image profilePicture;
@@ -18,7 +19,7 @@ public class User {
         assignedDocuments = new ArrayList<>();
     }
 
-    public User(String fullName, String username, String password, String phoneNumber, UserRole userRole) {
+    public User(String fullName, String username, byte[] password, String phoneNumber, UserRole userRole) {
         this.fullName = fullName;
         this.username = username;
         this.password = password;
@@ -28,7 +29,7 @@ public class User {
         this.profilePicture = new Image("/img/userIcon.png");
     }
 
-    public User(UUID userID, String fullName, String username, String password, String phoneNumber, UserRole userRole) {
+    public User(UUID userID, String fullName, String username, byte[] password, String phoneNumber, UserRole userRole) {
         this(fullName, username, password, phoneNumber, userRole);
         this.userID = userID;
     }
@@ -57,11 +58,11 @@ public class User {
         this.username = username;
     }
 
-    public String getPassword() {
+    public byte[] getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(byte[] password) {
         this.password = password;
     }
 

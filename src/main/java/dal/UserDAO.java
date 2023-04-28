@@ -30,7 +30,7 @@ public class UserDAO extends DAO implements IDAO<User> {
             PreparedStatement ps = connection.prepareStatement(sql);
             fillPreparedStatement(ps, user);
             ps.executeUpdate();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             result = e.getMessage();
         } finally {
@@ -50,7 +50,7 @@ public class UserDAO extends DAO implements IDAO<User> {
             PreparedStatement ps = connection.prepareStatement(sql);
             fillPreparedStatement(ps, user);
             ps.setString(6, user.getUserID().toString());
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             result = e.getMessage();
         } finally {
@@ -81,7 +81,7 @@ public class UserDAO extends DAO implements IDAO<User> {
                 User user = getUserFromResultSet(resultSet);
                 users.put(user.getUserID(), user);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             dbConnection.releaseConnection(connection);
@@ -101,7 +101,7 @@ public class UserDAO extends DAO implements IDAO<User> {
             if (resultSet.next()) {
                 return getUserFromResultSet(resultSet);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             dbConnection.releaseConnection(connection);
@@ -114,9 +114,9 @@ public class UserDAO extends DAO implements IDAO<User> {
                 UUID.fromString(resultSet.getString("UserID")),
                 resultSet.getString("FullName"),
                 resultSet.getString("Username"),
-                resultSet.getString("UserPassword"),
+                resultSet.getBytes("UserPassword"),
                 resultSet.getString("PhoneNumber"),
-                UserRole.valueOf(resultSet.getString("UserRole"))
+                UserRole.fromString(resultSet.getString("UserRole"))
         );
         return user;
     }
@@ -124,7 +124,7 @@ public class UserDAO extends DAO implements IDAO<User> {
     private void fillPreparedStatement(PreparedStatement ps, User user) throws SQLException {
         ps.setString(1, user.getFullName());
         ps.setString(2, user.getUsername());
-        ps.setString(3, user.getPassword());
+        ps.setBytes(3, user.getPassword());
         ps.setString(4, user.getUserRole().toString());
         ps.setString(5, user.getPhoneNumber());
     }

@@ -4,26 +4,24 @@ import be.Document;
 import be.User;
 import be.enums.UserRole;
 import gui.controller.ViewControllers.UserController;
-import gui.model.IModel;
 import gui.model.UserModel;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
-import io.github.palexdev.materialfx.controls.MFXButton;
-import io.github.palexdev.materialfx.controls.MFXComboBox;
-import io.github.palexdev.materialfx.controls.MFXListView;
-import io.github.palexdev.materialfx.controls.MFXTextField;
+import io.github.palexdev.materialfx.controls.*;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import utils.HashPasswordHelper;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 public class AddUserController extends AddController implements Initializable {
@@ -32,7 +30,9 @@ public class AddUserController extends AddController implements Initializable {
     @FXML
     private Label lblPosition;
     @FXML
-    private MFXTextField txtName, txtUsername, txtPhoneNumber, txtPassword;
+    private MFXTextField txtName, txtUsername, txtPhoneNumber;
+    @FXML
+    private MFXPasswordField txtPassword;
     @FXML
     private MFXComboBox<UserRole> comboPosition;
     @FXML
@@ -42,8 +42,9 @@ public class AddUserController extends AddController implements Initializable {
     @FXML
     private MFXButton btnSave;
 
-    private UserModel userModel;
-    private AlertManager alertManager;
+    private final UserModel userModel;
+    private final AlertManager alertManager;
+    private HashPasswordHelper hashPasswordHelper;
     private User userToUpdate;
     private UserController userController;
     private boolean isEditing;
@@ -54,22 +55,35 @@ public class AddUserController extends AddController implements Initializable {
     public AddUserController() {
         userModel = UserModel.getInstance();
         alertManager = AlertManager.getInstance();
+        hashPasswordHelper = new HashPasswordHelper();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         isEditing = false;
         isUpdating = false;
-
+        btnSave.setDisable(true);
         comboActions.setDisable(true);
         populateComboboxes();
+        assignListenersToTextFields();
         comboActions.getSelectionModel().selectedItemProperty().addListener(actionListener);
+        comboPosition.getSelectionModel().selectedItemProperty().addListener(positionListener);
+
+        // Bind the text of the label displaying an employee's role to the selected item of the combo box
+        lblPosition.textProperty().bind(Bindings.createStringBinding(() -> {
+            if (comboPosition.getSelectionModel().getSelectedItem() == null) {
+                return "";
+            }
+            return comboPosition.getSelectionModel().getSelectedItem().toString();
+        }, comboPosition.getSelectionModel().selectedItemProperty()));
     }
 
     @FXML
     private void btnSaveAction(ActionEvent actionEvent) {
         if (checkInput()) {
-            User user = new User(name, username, password, phoneNumber, userRole);
+            assignInputToVariables();
+            byte[] passwordHash = hashPasswordHelper.hashPassword(password);
+            User user = new User(name, username, passwordHash, phoneNumber, userRole);
             Task<TaskState> saveTask = new SaveTask<>(user, isEditing, userModel);
             if (isEditing) {
                 user.setUserID(userToUpdate.getUserID());
@@ -108,7 +122,20 @@ public class AddUserController extends AddController implements Initializable {
     private final ChangeListener<String> inputListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (isInputEmpty(txtName) || isInputEmpty(txtUsername) || (isInputEmpty(txtPassword) && !isEditing)) {
+            if (isInputEmpty(txtName) || isInputEmpty(txtUsername) || (isInputEmpty(txtPassword) && !isEditing)
+                    || comboPosition.getValue() == null) {
+                btnSave.setDisable(true);
+            } else {
+                btnSave.setDisable(false);
+            }
+        }
+    };
+
+    private final ChangeListener<UserRole> positionListener = new ChangeListener<UserRole>() {
+        @Override
+        public void changed(ObservableValue<? extends UserRole> observable, UserRole oldValue, UserRole newValue) {
+            if (isInputEmpty(txtName) || isInputEmpty(txtUsername) || (isInputEmpty(txtPassword) && !isEditing)
+                    || comboPosition.getValue() == null) {
                 btnSave.setDisable(true);
             } else {
                 btnSave.setDisable(false);
@@ -159,7 +186,7 @@ public class AddUserController extends AddController implements Initializable {
         userToUpdate = user;
         txtName.setText(user.getFullName());
         txtUsername.setText(user.getUsername());
-        txtPassword.setText(user.getPassword());
+        txtPassword.setPromptText("Leave empty to keep current password");
         comboPosition.getSelectionModel().selectItem(user.getUserRole());
         listViewDocuments.getItems().setAll(user.getAssignedDocuments());
     }
@@ -185,7 +212,7 @@ public class AddUserController extends AddController implements Initializable {
     }
 
     private void populateComboboxes() {
-        comboPosition.getItems().setAll(UserRole.values());
+        comboPosition.getItems().setAll(Arrays.stream(UserRole.values()).toList().subList(0, 4));
         comboActions.getItems().setAll(Action.EDIT, Action.DELETE);
     }
 

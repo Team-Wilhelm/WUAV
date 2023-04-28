@@ -44,9 +44,7 @@ public class DocumentController extends ViewController implements Initializable 
     private final DocumentModel documentModel = DocumentModel.getInstance();
     private DocumentCard lastFocusedCard;
 
-    public DocumentController() {
-
-    }
+    public DocumentController() {}
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -93,29 +91,29 @@ public class DocumentController extends ViewController implements Initializable 
 
     @Override
     public void refreshItems(List<?> documentsToDisplay) {
+        //TODO refresh all cards with given customer
         documentCards.clear();
 
         HashMap<Document, DocumentCard> loadedCards = documentModel.getCreatedDocumentCards();
-
         for (Document document : (List<Document>) documentsToDisplay) {
             DocumentCard documentCard = loadedCards.get(document);
-            if (loadedCards.get(document) == null) {
+            if (documentCard == null) {
                 documentCard = new DocumentCard(document);
                 documentModel.getCreatedDocumentCards().put(document, documentCard);
                 loadedCards.put(document, documentCard);
             }
 
-            final DocumentCard finalEventCard = documentCard;
+            final DocumentCard finalDocumentCard = documentCard;
             documentCard.focusedProperty().addListener((observable, oldValue, newValue) -> {
-                if (!newValue) lastFocusedCard = finalEventCard;
+                if (!newValue) lastFocusedCard = finalDocumentCard;
             });
 
             documentCard.setOnMouseClicked(e -> {
-                if (!finalEventCard.isFocused())
-                    finalEventCard.requestFocus();
+                if (!finalDocumentCard.isFocused())
+                    finalDocumentCard.requestFocus();
 
                 if (e.getClickCount() == 2) {
-                    lastFocusedCard = finalEventCard;
+                    lastFocusedCard = finalDocumentCard;
                     editDocument(scrollPane.getScene().getWindow());
                 }
             });
@@ -134,7 +132,7 @@ public class DocumentController extends ViewController implements Initializable 
                 AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
                 controller.setDocumentController(this);
                 controller.setDocumentToEdit(lastFocusedCard.getDocument());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {

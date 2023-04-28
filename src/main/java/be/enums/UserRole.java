@@ -1,10 +1,11 @@
 package be.enums;
 
 public enum UserRole {
-    ALL("All"),
-    SALESPERSON("Salesperson"),
     TECHNICIAN("Technician"),
+    SALESPERSON("Salesperson"),
     PROJECT_MANAGER("Project Manager"),
+    ADMINISTRATOR("Administrator"),
+    ALL("All")
     ;
 
     private final String name;

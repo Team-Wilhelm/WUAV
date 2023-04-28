@@ -89,7 +89,7 @@ public class UserModel implements IModel<User> {
     }
 
     public void setLoggedInUser(User loggedInUser) {
-        this.loggedInUser = loggedInUser;
+        UserModel.loggedInUser = loggedInUser;
     }
 
     public User getUserByUsername(String username){
