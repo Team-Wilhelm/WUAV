@@ -6,7 +6,6 @@ import bll.ManagerFactory;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -41,7 +40,7 @@ public class UserModel implements IModel<User> {
     }
 
     @Override
-    public String update(User user, CountDownLatch latch) {
+    public String update(User user) {
         return userManager.update(user);
     }
 

@@ -17,7 +17,6 @@ public class DocumentModel implements IModel<Document> {
 
     private DocumentModel() {
         documentManager = ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
-        allDocuments = new HashMap<>();
         createdDocumentCards = new HashMap<>();
         setAllDocuments();
         createDocumentCards();
@@ -42,7 +41,7 @@ public class DocumentModel implements IModel<Document> {
     }
 
     @Override
-    public String update(Document document, CountDownLatch latch) {
+    public String update(Document document) {
         return documentManager.update(document);
     }
 

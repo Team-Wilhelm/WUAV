@@ -13,7 +13,7 @@ public class Document {
     private Date dateOfCreation;
     private List<User> technicians;
     private List<Image> electricalDrawings, sitePhotos;
-    private String jobTitle, jobDescription, optionalNotes;
+    private String jobDescription, optionalNotes, jobTitle;
 
     public Document (){
         this.technicians = new ArrayList<>();
@@ -21,23 +21,17 @@ public class Document {
         this.sitePhotos = new ArrayList<>();
     }
 
-    public Document(Customer customer, String jobTitle, Date dateOfCreation){
-        this.customer = customer;
-        this.jobTitle = jobTitle;
-        this.dateOfCreation = dateOfCreation;
-    }
-
-    public Document(Customer customer, String jobTitle, String jobDescription, String optionalNotes, Date dateOfCreation) {
+    public Document(Customer customer, String jobDescription, String optionalNotes, String jobTitle, Date dateOfCreation) {
         this();
         this.customer = customer;
-        this.jobTitle = jobTitle;
         this.jobDescription = jobDescription;
         this.optionalNotes = optionalNotes;
+        this.jobTitle = jobTitle;
         this.dateOfCreation = dateOfCreation;
     }
 
-    public Document(UUID documentID, Customer customer, String jobTitle, String jobDescription, String optionalNotes, Date dateOfCreation) {
-       this(customer, jobTitle, jobDescription, optionalNotes, dateOfCreation);
+    public Document(UUID documentID, Customer customer, String jobDescription, String optionalNotes, String jobTitle, Date dateOfCreation) {
+       this(customer, jobDescription, optionalNotes, jobTitle, dateOfCreation);
          this.documentID = documentID;
     }
 

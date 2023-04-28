@@ -47,6 +47,15 @@ public class DocumentCard extends VBox {
         //Populate document card
         VBox.setVgrow(jobTitleBox, Priority.ALWAYS);
         this.getChildren().addAll(jobTitleBox, dateBox, nameBox);
+        this.getStyleClass().add("rounded");
+
+        this.setOnMouseClicked(e -> {
+            if (!this.isFocused())
+                this.requestFocus();
+        });
     }
 
+    public Document getDocument() {
+        return document;
+    }
 }

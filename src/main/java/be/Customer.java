@@ -25,7 +25,7 @@ public class Customer {
     }
 
     public Customer(UUID customerID, String customerName, String customerEmail, String customerPhoneNumber, Address customerAddress, CustomerType customerType, Date lastContract) {
-        this(customerEmail, customerName, customerPhoneNumber, customerAddress, customerType, lastContract);
+        this(customerName, customerEmail, customerPhoneNumber, customerAddress, customerType, lastContract);
         this.customerID = customerID;
     }
 

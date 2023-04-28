@@ -2,6 +2,7 @@ package dal;
 
 import be.Address;
 import be.Customer;
+import be.enums.CustomerType;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +14,6 @@ import java.util.UUID;
 
 public class CustomerDAO extends DAO implements IDAO<Customer> {
     private DBConnection dbConnection;
-
     public CustomerDAO() {
         dbConnection = DBConnection.getInstance();
     }
@@ -25,8 +25,8 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
                 "INSERT INTO CustomerAddress (StreetName, StreetNumber, Postcode, Town, Country) " +
                 "VALUES (?,?,?,?,?);" +
                 "SET @AddressID = SCOPE_IDENTITY();" +
-                "INSERT INTO Customer (CustomerName, CustomerEmail, CustomerPhoneNumber, AddressID, LastContract) " +
-                "VALUES (?,?,?,@AddressID,?)";
+                "INSERT INTO Customer (CustomerName, CustomerEmail, CustomerPhoneNumber, AddressID, LastContract, CustomerType) " +
+                "VALUES (?,?,?,@AddressID,?,?)";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
@@ -44,11 +44,12 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
             ps.setString(7, customer.getCustomerEmail());
             ps.setString(8, customer.getCustomerPhoneNumber());
             ps.setDate(9, customer.getLastContract());
+            ps.setString(10, customer.getCustomerType().toString());
 
             ps.executeUpdate();
 
             // Get the generated customerID from the database and set it as the customer's ID
-            sql = "SELECT CustomerID FROM Customer WHERE CustomerName = ? AND CustomerEmail = ? AND CustomerPhoneNumber = ?";
+            sql = "SELECT CustomerID, AddressID FROM Customer WHERE CustomerName = ? AND CustomerEmail = ? AND CustomerPhoneNumber = ?";
             ps = connection.prepareStatement(sql);
             ps.setString(1, customer.getCustomerName());
             ps.setString(2, customer.getCustomerEmail());
@@ -56,8 +57,8 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 customer.setCustomerID(UUID.fromString(rs.getString("CustomerID")));
+                customer.getCustomerAddress().setAddressID(rs.getInt("AddressID"));
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             result = e.getMessage();
@@ -74,7 +75,7 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
                 "SET StreetName = ?, StreetNumber = ?, Postcode = ?, Town = ?, Country = ? " +
                 "WHERE AddressID = ?;" +
                 "UPDATE Customer " +
-                "SET CustomerName = ?, CustomerEmail = ?, CustomerPhoneNumber = ?, LastContract = ? " +
+                "SET CustomerName = ?, CustomerEmail = ?, CustomerPhoneNumber = ?, LastContract = ? , CustomerType = ? " +
                 "WHERE CustomerID = ?";
         Connection connection = null;
         try {
@@ -94,7 +95,8 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
             ps.setString(8, customer.getCustomerEmail());
             ps.setString(9, customer.getCustomerPhoneNumber());
             ps.setDate(10, customer.getLastContract());
-            ps.setString(11, customer.getCustomerID().toString());
+            ps.setString(11, customer.getCustomerType().toString());
+            ps.setString(12, customer.getCustomerID().toString());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -158,20 +160,30 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
     }
 
     private Customer createCustomerFromResultSet(ResultSet rs) throws SQLException {
-        Customer customer = new Customer();
-        customer.setCustomerID(UUID.fromString(rs.getString("CustomerID")));
-        customer.setCustomerName(rs.getString("CustomerName"));
-        customer.setCustomerEmail(rs.getString("CustomerEmail"));
-        customer.setCustomerPhoneNumber(rs.getString("CustomerPhoneNumber"));
-        customer.setLastContract(rs.getDate("LastContract"));
-        customer.setCustomerAddress(new Address(
+        Address a = new Address(
                 rs.getInt("AddressID"),
                 rs.getString("StreetName"),
                 rs.getString("StreetNumber"),
                 rs.getString("Postcode"),
                 rs.getString("Town"),
                 rs.getString("Country")
-        ));
-        return customer;
+        );
+        return new Customer(
+                UUID.fromString(rs.getString("CustomerID")),
+                rs.getString("CustomerName"),
+                rs.getString("CustomerEmail"),
+                rs.getString("CustomerPhoneNumber"),
+                a,
+                CustomerType.valueOf(rs.getString("CustomerType")),
+                rs.getDate("LastContract")
+        );
+    }
+
+    public void addOrUpdateCustomer(Customer customer) {
+        if (customer.getCustomerID() == null) {
+            add(customer);
+        } else {
+            update(customer);
+        }
     }
 }
