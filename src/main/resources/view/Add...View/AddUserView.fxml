@@ -41,7 +41,7 @@
       <MFXTextField fx:id="txtPassword" floatingText="Password" maxWidth="1.7976931348623157E308" GridPane.rowIndex="6" />
       <MFXComboBox fx:id="comboPosition" floatingText="Position" GridPane.rowIndex="7" />
       <MFXComboBox fx:id="comboActions" floatingText="Actions" GridPane.columnIndex="2" />
-      <MFXButton fx:id="btnSave" text="Save" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+      <MFXButton fx:id="btnSave" onAction="#btnSaveAction" text="Save" GridPane.columnIndex="2" GridPane.rowIndex="7" />
       <MFXListView fx:id="listViewDocuments" depthLevel="LEVEL1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.rowSpan="6" />
    </children>
    <padding>

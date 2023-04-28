@@ -3,17 +3,24 @@ package gui.controller.AddControllers;
 import gui.controller.ViewControllers.ViewController;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
+import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
+import javafx.scene.control.TextArea;
 import javafx.stage.Window;
 import gui.util.AlertManager;
 
+import java.awt.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class AddController {
+    protected abstract void assignInputToVariables();
+    protected abstract void assignListenersToTextFields();
     private AlertManager alertManager = AlertManager.getInstance();
+
     protected void setUpSaveTask(Task<TaskState> task, ViewController controller, Window owner) {
         setUpTask(task, controller, owner);
 
@@ -80,5 +87,13 @@ public abstract class AddController {
 
     protected void closeWindow(ActionEvent actionEvent) {
         ((Node) actionEvent.getSource()).getScene().getWindow().hide();
+    }
+
+    protected boolean isInputEmpty(MFXTextField textField) {
+        return textField.getText().trim().isEmpty();
+    }
+
+    protected boolean isInputEmpty(TextArea textArea) {
+        return textArea.getText().trim().isEmpty();
     }
 }

@@ -6,6 +6,7 @@ import be.enums.UserRole;
 import gui.controller.ViewControllers.UserController;
 import gui.model.IModel;
 import gui.model.UserModel;
+import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.controls.MFXListView;
@@ -22,7 +23,7 @@ import javafx.scene.image.ImageView;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AddUserController implements Initializable {
+public class AddUserController extends AddController implements Initializable {
     @FXML
     private ImageView imgProfilePicture;
     @FXML
@@ -39,12 +40,42 @@ public class AddUserController implements Initializable {
     private MFXButton btnSave;
 
     private UserModel userModel;
+    private AlertManager alertManager;
     private User userToUpdate;
     private UserController userController;
     private boolean isEditing;
     private boolean isUpdating;
     private String name, username, password, phoneNumber;
     private UserRole userRole;
+
+    public AddUserController() {
+        userModel = UserModel.getInstance();
+        alertManager = AlertManager.getInstance();
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        isEditing = false;
+        isUpdating = false;
+
+        comboActions.setDisable(true);
+        populateComboboxes();
+        comboActions.getSelectionModel().selectedItemProperty().addListener(actionListener);
+    }
+
+    @FXML
+    private void btnSaveAction(ActionEvent actionEvent) {
+
+    }
+
+
+    private void editUser() {
+        disableFields(false);
+    }
+
+    private void deleteUser() {
+    }
+
     private enum Action {
         EDIT, DELETE;
 
@@ -58,20 +89,55 @@ public class AddUserController implements Initializable {
         }
     }
 
-    public AddUserController() {
-        userModel = UserModel.getInstance();
+    // region Listeners
+
+    /**
+     * Disables the save button if any of the required text fields are empty.
+     */
+    private final ChangeListener<String> inputListener = new ChangeListener<>() {
+        @Override
+        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+            if (isInputEmpty(txtName) || isInputEmpty(txtUsername) || (isInputEmpty(txtPassword) && !isEditing)) {
+                btnSave.setDisable(true);
+            } else {
+                btnSave.setDisable(false);
+            }
+        }
+    };
+
+    /**
+     * Listens for changes in the combo box and performs the selected action.
+     */
+    private ChangeListener<Action> actionListener = new ChangeListener() {
+        @Override
+        public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+            if (newValue != null) {
+                switch ((Action) newValue) {
+                    case EDIT -> editUser();
+                    case DELETE -> deleteUser();
+                }
+                comboActions.getSelectionModel().clearSelection();
+            }
+        }
+    };
+    // endregion
+
+    // region Utilities, helpers and setters
+    @Override
+    protected void assignInputToVariables() {
+        name = txtName.getText().trim();
+        username = txtUsername.getText().trim();
+        password = txtPassword.getText();
+        phoneNumber = txtPhoneNumber.getText().trim();
+        userRole = comboPosition.getSelectionModel().getSelectedItem();
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        isEditing = false;
-        isUpdating = false;
-        comboActions.setDisable(true);
-        comboActions.getSelectionModel().selectedItemProperty().addListener(actionListener);
-    }
-
-    public void setUserController(UserController userController) {
-        this.userController = userController;
+    protected void assignListenersToTextFields() {
+        txtName.textProperty().addListener(inputListener);
+        txtUsername.textProperty().addListener(inputListener);
+        txtPassword.textProperty().addListener(inputListener);
+        txtPhoneNumber.textProperty().addListener(inputListener);
     }
 
     public void setIsEditing(User user) {
@@ -87,29 +153,12 @@ public class AddUserController implements Initializable {
         listViewDocuments.getItems().setAll(user.getAssignedDocuments());
     }
 
-    private void populateComboboxes() {
-        comboPosition.getItems().setAll(UserRole.values());
-        comboActions.getItems().setAll(Action.EDIT, Action.DELETE);
-    }
-
-    private ChangeListener<Action> actionListener = new ChangeListener() {
-        @Override
-        public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-            if (newValue != null) {
-                switch ((Action) newValue) {
-                    case EDIT -> editUser();
-                    case DELETE -> deleteUser();
-                }
-                comboActions.getSelectionModel().clearSelection();
-            }
+    private boolean checkInput() {
+        if (userModel.getAll().values().stream().anyMatch(user -> user.getUsername().equals(username))) {
+            alertManager.showError("Username already exists", "Please choose another username", txtName.getScene().getWindow());
+            return false;
         }
-    };
-
-    private void editUser() {
-        disableFields(false);
-    }
-
-    private void deleteUser() {
+        return true;
     }
 
     private void disableFields(boolean disable) {
@@ -120,16 +169,14 @@ public class AddUserController implements Initializable {
         comboPosition.setDisable(disable);
     }
 
-    private boolean checkInput() {
-        if ()
-
+    public void setUserController(UserController userController) {
+        this.userController = userController;
     }
 
-    private void assignFieldsToVariables() {
-        name = txtName.getText().trim();
-        username = txtUsername.getText().trim();
-        password = txtPassword.getText();
-        phoneNumber = txtPhoneNumber.getText().trim();
-        userRole = comboPosition.getSelectionModel().getSelectedItem();
+    private void populateComboboxes() {
+        comboPosition.getItems().setAll(UserRole.values());
+        comboActions.getItems().setAll(Action.EDIT, Action.DELETE);
     }
+
+    //endregion
 }

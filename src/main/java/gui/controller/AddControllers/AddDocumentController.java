@@ -127,7 +127,23 @@ public class AddDocumentController extends AddController implements Initializabl
         executeTask(task);
     }
 
-    // UTILITIES & HELPERS
+    /**
+     * Disables the save button if any of the required text fields are empty.
+     */
+    private final ChangeListener<String> inputListener = new ChangeListener<>() {
+        @Override
+        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+            if (isInputEmpty(txtCity) || isInputEmpty(txtCountry) || isInputEmpty(txtEmail) || isInputEmpty(txtHouseNumber)
+                    || isInputEmpty(txtJobTitle) || isInputEmpty(txtName) || isInputEmpty(txtPhoneNumber)
+                    || isInputEmpty(txtPostcode) || isInputEmpty(txtStreetName) || isInputEmpty(txtJobDescription)) {
+                btnSave.setDisable(true);
+            } else {
+                btnSave.setDisable(false);
+            }
+        }
+    };
+
+    // region Utilities, helpers and setters
     public void setDocumentToEdit(Document document) {
         isEditing = true;
         documentToEdit = document;
@@ -154,7 +170,7 @@ public class AddDocumentController extends AddController implements Initializabl
         txtNotes.setText(document.getOptionalNotes());
     }
 
-    private void assignListenersToTextFields() {
+    protected void assignListenersToTextFields() {
         // Customer information
         txtName.textProperty().addListener(inputListener);
         txtEmail.textProperty().addListener(inputListener);
@@ -173,7 +189,7 @@ public class AddDocumentController extends AddController implements Initializabl
         txtNotes.textProperty().addListener(inputListener);
     }
 
-    private void assignInputToVariables() {
+    protected void assignInputToVariables() {
         // Customer information
         name = txtName.getText();
         email = txtEmail.getText();
@@ -193,19 +209,6 @@ public class AddDocumentController extends AddController implements Initializabl
         jobDescription = txtJobDescription.getText();
         notes = txtNotes.getText();
     }
-
-    private final ChangeListener<String> inputListener = new ChangeListener<>() {
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (txtCity.getText().isEmpty() || txtCountry.getText().isEmpty() || txtEmail.getText().isEmpty() || txtHouseNumber.getText().isEmpty()
-                    || txtJobTitle.getText().isEmpty() || txtName.getText().isEmpty() || txtPhoneNumber.getText().isEmpty()
-                    || txtPostcode.getText().isEmpty() || txtStreetName.getText().isEmpty() || txtJobDescription.getText().isEmpty()) {
-                btnSave.setDisable(true);
-            } else {
-                btnSave.setDisable(false);
-            }
-        }
-    };
 
     private void setUpListView() {
         listViewPictures.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
