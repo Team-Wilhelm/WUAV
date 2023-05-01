@@ -57,7 +57,7 @@
             <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" style="-fx-background-color: transparent;"
                         VBox.vgrow="ALWAYS" styleClass="background" vbarPolicy="ALWAYS" GridPane.rowSpan="3">
                 <content>
-                    <FlowPane fx:id="eventFlowPane" alignment="TOP_CENTER" columnHalignment="CENTER" hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" rowValignment="TOP" styleClass="background" vgap="20.0">
+                    <FlowPane fx:id="flowPane" alignment="TOP_CENTER" columnHalignment="CENTER" hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" rowValignment="TOP" styleClass="background" vgap="20.0">
                         <padding>
                             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                         </padding>

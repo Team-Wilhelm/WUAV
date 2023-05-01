@@ -31,6 +31,10 @@ import java.util.ResourceBundle;
 
 public class UserController extends ViewController implements Initializable {
     @FXML
+    public FlowPane flowPane;
+    @FXML
+    public ScrollPane scrollPane;
+    @FXML
     private MFXProgressSpinner progressSpinner;
     @FXML
     private Label progressLabel;
