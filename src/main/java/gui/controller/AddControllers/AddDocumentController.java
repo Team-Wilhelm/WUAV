@@ -5,6 +5,7 @@ import be.Customer;
 import be.Document;
 import be.User;
 import be.enums.CustomerType;
+import bll.PdfGenerator;
 import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
@@ -37,7 +38,7 @@ import java.util.ResourceBundle;
 
 public class AddDocumentController extends AddController implements Initializable {
     @FXML
-    private MFXButton btnCancel, btnDelete, btnSave, btnUploadPictures;
+    private MFXButton btnCancel, btnDelete, btnSave, btnUploadPictures, btnCreatePdf;
     @FXML
     private MFXFilterComboBox<User> comboTechnicians;
     @FXML
@@ -53,6 +54,7 @@ public class AddDocumentController extends AddController implements Initializabl
 
     private DocumentModel documentModel;
     private CustomerModel customerModel;
+    private PdfGenerator pdfGenerator;
     private boolean isEditing;
     private Document documentToEdit;
     private DocumentController documentController;
@@ -67,6 +69,7 @@ public class AddDocumentController extends AddController implements Initializabl
     public AddDocumentController() {
         documentModel = DocumentModel.getInstance();
         customerModel = CustomerModel.getInstance();
+        pdfGenerator = new PdfGenerator();
         pictures = new HashMap<>();
     }
 
@@ -75,6 +78,7 @@ public class AddDocumentController extends AddController implements Initializabl
         isEditing = false;
         btnSave.setDisable(true);
         btnDelete.setDisable(true);
+        btnCreatePdf.setDisable(true);
         assignListenersToTextFields();
         setUpListView();
         dateLastContract.setValue(LocalDate.now());
@@ -154,6 +158,7 @@ public class AddDocumentController extends AddController implements Initializabl
         documentToEdit = document;
         btnSave.setDisable(false);
         btnDelete.setDisable(false);
+        btnCreatePdf.setDisable(false);
 
         // Customer information
         txtName.setText(document.getCustomer().getCustomerName());
@@ -248,5 +253,9 @@ public class AddDocumentController extends AddController implements Initializabl
 
     public void setDocumentController(DocumentController documentController) {
         this.documentController = documentController;
+    }
+
+    public void createPdfAction(ActionEvent actionEvent) {
+        pdfGenerator.generatePdf(documentToEdit);
     }
 }
