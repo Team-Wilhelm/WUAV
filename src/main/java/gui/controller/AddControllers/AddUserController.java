@@ -10,6 +10,7 @@ import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
+import gui.util.ImageCropper;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
@@ -64,7 +65,8 @@ public class AddUserController extends AddController implements Initializable {
     private UserController userController;
     private boolean isEditing;
     private boolean isUpdating;
-    private String name, username, password, phoneNumber;
+    private String name, username, password, phoneNumber, profilePicturePath;
+    private Image profilePicture;
     private UserRole userRole;
 
     public AddUserController() {
@@ -79,7 +81,7 @@ public class AddUserController extends AddController implements Initializable {
         isUpdating = false;
         btnSave.setDisable(true);
         comboActions.setDisable(true);
-        //profilePictureDoubleClick();
+        profilePictureDoubleClick();
         populateComboboxes();
         assignListenersToTextFields();
         comboActions.getSelectionModel().selectedItemProperty().addListener(actionListener);
@@ -110,7 +112,7 @@ public class AddUserController extends AddController implements Initializable {
             // Save the user
             assignInputToVariables();
             byte[] passwordHash = hashPasswordHelper.hashPassword(password);
-            User user = new User(name, username, passwordHash, phoneNumber, userRole);
+            User user = new User(name, username, passwordHash, phoneNumber, userRole, profilePicturePath);
             Task<TaskState> saveTask = new SaveTask<>(user, isEditing, userModel);
             if (isEditing) {
                 user.setUserID(userToUpdate.getUserID());
@@ -225,6 +227,7 @@ public class AddUserController extends AddController implements Initializable {
         txtPassword.setPromptText("Leave empty to keep current password");
         comboPosition.getSelectionModel().selectItem(user.getUserRole());
         listViewDocuments.getItems().setAll(user.getAssignedDocuments());
+        imgProfilePicture.setImage(new Image(user.getProfilePicturePath()));
     }
 
     private boolean checkInput() {
@@ -252,47 +255,18 @@ public class AddUserController extends AddController implements Initializable {
         comboActions.getItems().setAll(Action.EDIT, Action.DELETE);
     }
 
-    /*private void profilePictureDoubleClick() {
+    private void profilePictureDoubleClick() {
+        // TODO only if editing ?
         imgProfilePicture.setOnMouseClicked(event -> {
-            if(event.getClickCount() == 2) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Choose profile picture");
-                fileChooser.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.jpeg"),
-                        new FileChooser.ExtensionFilter("All Files", "*.*"));
-                File selectedFile = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
-                if (selectedFile != null) {
-                    Image image = new Image(selectedFile.toURI().toString());
-                    GridPane root = new GridPane();
-                    root.setPadding(new Insets(10));
-
-                    ImageView imageView = new ImageView(image);
-                    StackPane imagePane = new StackPane(imageView);
-
-                    Rectangle cropRectangle = new Rectangle(300, 300);
-                    cropRectangle.setFill(null);
-                    cropRectangle.setStrokeWidth(2);
-                    cropRectangle.setStroke(javafx.scene.paint.Color.RED);
-
-                    cropRectangle.setOnMousePressed(this::startCrop);
-                    cropRectangle.setOnMouseDragged(this::resizeCrop);
-                    cropRectangle.setOnMouseReleased(this::endCrop);
-
-                    imagePane.getChildren().add(cropRectangle);
-                    root.add(imagePane, 0, 0);
-
-                    Stage stage = new Stage();
-                    stage.setTitle("Crop profile picture");
-                    stage.setScene(new Scene(root, image.getWidth(), image.getHeight()));
-                    stage.show();
-
-                    imgProfilePicture.setImage(image);
-                }
-            }
+            ImageCropper imageCropper = new ImageCropper(this);
+            imageCropper.chooseImage();
         });
     }
-
-     */
-
     //endregion
+
+    public void setProfilePicture(Image image, String profilePicturePath) {
+        profilePicture = image;
+        imgProfilePicture.setImage(profilePicture);
+        this.profilePicturePath = profilePicturePath;
+    }
 }

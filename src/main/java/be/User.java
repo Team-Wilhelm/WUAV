@@ -3,13 +3,15 @@ package be;
 import be.enums.UserRole;
 import javafx.scene.image.Image;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class User {
     private UUID userID;
-    private String fullName, username, phoneNumber;
+    private String fullName, username, phoneNumber, profilePicturePath;
     private byte[] password;
     private List<Document> assignedDocuments;
     private UserRole userRole;
@@ -19,18 +21,26 @@ public class User {
         assignedDocuments = new ArrayList<>();
     }
 
-    public User(String fullName, String username, byte[] password, String phoneNumber, UserRole userRole) {
+    public User(String fullName, String username, byte[] password, String phoneNumber, UserRole userRole, String profilePicturePath) {
         this.fullName = fullName;
         this.username = username;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.userRole = userRole;
         this.assignedDocuments = new ArrayList<>();
-        this.profilePicture = new Image("/img/09f63ad7-0b64-4b7e-bd4d-ef2d9939cfe6.jpg");
+        this.profilePicturePath = profilePicturePath;
+
+        if (profilePicturePath != null) {
+            File file = new File(profilePicturePath);
+            this.profilePicture = new Image(file.toURI().toString());
+        } else {
+            this.profilePicturePath = "/img/userIcon.png";
+            this.profilePicture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/userIcon.png")));
+        }
     }
 
-    public User(UUID userID, String fullName, String username, byte[] password, String phoneNumber, UserRole userRole) {
-        this(fullName, username, password, phoneNumber, userRole);
+    public User(UUID userID, String fullName, String username, byte[] password, String phoneNumber, UserRole userRole, String profilePicturePath) {
+        this(fullName, username, password, phoneNumber, userRole, profilePicturePath);
         this.userID = userID;
     }
 
@@ -104,5 +114,13 @@ public class User {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getProfilePicturePath() {
+        return profilePicturePath;
+    }
+
+    public void setProfilePicturePath(String profilePicturePath) {
+        this.profilePicturePath = profilePicturePath;
     }
 }

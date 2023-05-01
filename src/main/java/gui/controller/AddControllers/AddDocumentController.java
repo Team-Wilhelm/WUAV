@@ -232,6 +232,7 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     private void setUpListView() {
+        //TODO remove tickets
         listViewPictures.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getClickCount() == 2) {
                 if (!listViewPictures.getSelectionModel().getSelection().isEmpty()) {
