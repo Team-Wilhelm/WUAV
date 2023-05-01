@@ -108,7 +108,7 @@ public class PdfGenerator {
             technicianList.setVerticalAlignment(VerticalAlignment.BOTTOM);
             doc.add(technicianList);
 
-            //Create footer and add contents
+            //Create pagenumber header and website footer and add contents
             Paragraph footerText = new Paragraph("www.wuav.dk");
             footerText.setTextAlignment(TextAlignment.CENTER);
             Rectangle footer = new Rectangle(0, 0, pdfDoc.getDefaultPageSize().getWidth(), 50);
@@ -120,7 +120,9 @@ public class PdfGenerator {
                     pdfCanvas.rectangle(footer);
                     Canvas canvas = new Canvas(pdfCanvas, pdfDoc, footer);
                     canvas.add(footerText);
-                    canvas.setHorizontalAlignment(HorizontalAlignment.CENTER);
+                    if(numberOfPages>1) {
+                        canvas.add(new Paragraph(i + " of " + numberOfPages).setTextAlignment(TextAlignment.CENTER).setFixedPosition(0,pdfDoc.getDefaultPageSize().getTop()-50, pdfDoc.getDefaultPageSize().getWidth()));
+                    }
                     canvas.close();
                 }
             doc.close();
