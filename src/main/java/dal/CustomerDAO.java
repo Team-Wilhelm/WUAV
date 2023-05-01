@@ -59,7 +59,7 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
                 customer.setCustomerID(UUID.fromString(rs.getString("CustomerID")));
                 customer.getCustomerAddress().setAddressID(rs.getInt("AddressID"));
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             result = e.getMessage();
         } finally {

@@ -31,11 +31,11 @@ public class CustomerManager implements IManager<Customer> {
 
     @Override
     public Map<UUID, Customer> getAll() {
-        return null;
+        return dao.getAll();
     }
 
     @Override
     public Customer getById(UUID id) {
-        return null;
+        return dao.getById(id);
     }
 }

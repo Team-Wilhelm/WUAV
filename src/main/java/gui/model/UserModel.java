@@ -1,6 +1,7 @@
 package gui.model;
 
 import be.User;
+import be.cards.UserCard;
 import bll.IManager;
 import bll.ManagerFactory;
 
@@ -14,11 +15,14 @@ public class UserModel implements IModel<User> {
     private static UserModel instance;
     private IManager<User> userManager;
     private HashMap<UUID, User> allUsers;
-    private User loggedInUser;
+    private HashMap<User, UserCard> loadedCards;
+    private static User loggedInUser;
 
     private UserModel() {
         userManager = ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
-        allUsers = new HashMap<>();
+        loadedCards = new HashMap<>();
+        setAllUsersFromManager();
+        createUserCards();
     }
 
     public static UserModel getInstance() {
@@ -31,7 +35,6 @@ public class UserModel implements IModel<User> {
     @Override
     public CompletableFuture<String> add(User user) {
         String message = userManager.add(user);
-
         CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
         return future.thenApplyAsync(users -> {
             allUsers = (HashMap<UUID, User>) users;
@@ -40,18 +43,32 @@ public class UserModel implements IModel<User> {
     }
 
     @Override
-    public String update(User user) {
-        return userManager.update(user);
+    public CompletableFuture<String> update(User user) {
+        String message = userManager.update(user);
+        CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
+        return future.thenApplyAsync(users -> {
+            allUsers = (HashMap<UUID, User>) users;
+            return message;
+        });
     }
 
     @Override
-    public String delete(UUID id) {
-        return userManager.delete(id);
+    public CompletableFuture<String> delete(UUID id) {
+        String message = userManager.delete(id);
+        CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
+        return future.thenApplyAsync(users -> {
+            allUsers = (HashMap<UUID, User>) users;
+            return message;
+        });
     }
 
+    /**
+     * Get all users stored in the model
+     * @return a map of all users
+     */
     @Override
     public Map<UUID, User> getAll() {
-        return userManager.getAll();
+        return allUsers;
     }
 
     @Override
@@ -59,12 +76,19 @@ public class UserModel implements IModel<User> {
         return userManager.getById(id);
     }
 
+    /**
+     * Reloads all users from the database
+     */
+    public void setAllUsersFromManager() {
+        this.allUsers = (HashMap<UUID, User>) userManager.getAll();;
+    }
+
     public User getLoggedInUser() {
         return loggedInUser;
     }
 
     public void setLoggedInUser(User loggedInUser) {
-        this.loggedInUser = loggedInUser;
+        UserModel.loggedInUser = loggedInUser;
     }
 
     public User getUserByUsername(String username){
@@ -79,5 +103,18 @@ public class UserModel implements IModel<User> {
                         || user.getUserRole().toString().toLowerCase().contains(query.toLowerCase())
         ).forEach(filteredUsers::add);
         return filteredUsers;
+    }
+
+    public Map<User, UserCard> getLoadedCards() {
+        return loadedCards;
+    }
+
+    /**
+     * Creates a card for each user
+     */
+    public void createUserCards() {
+        for (User user : allUsers.values()) {
+            loadedCards.put(user, new UserCard(user));
+        }
     }
 }

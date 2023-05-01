@@ -32,7 +32,6 @@ public class DocumentModel implements IModel<Document> {
     @Override
     public CompletableFuture<String> add(Document document) {
         String message = documentManager.add(document);
-
         CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
         return future.thenApplyAsync(documents -> {
             allDocuments = (HashMap<UUID, Document>) documents;
@@ -41,13 +40,23 @@ public class DocumentModel implements IModel<Document> {
     }
 
     @Override
-    public String update(Document document) {
-        return documentManager.update(document);
+    public CompletableFuture<String> update(Document document) {
+        String message = documentManager.update(document);
+        CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
+        return future.thenApplyAsync(documents -> {
+            allDocuments = (HashMap<UUID, Document>) documents;
+            return message;
+        });
     }
 
     @Override
-    public String delete(UUID id) {
-        return documentManager.delete(id);
+    public CompletableFuture<String> delete(UUID id) {
+        String message = documentManager.delete(id);
+        CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
+        return future.thenApplyAsync(documents -> {
+            allDocuments = (HashMap<UUID, Document>) documents;
+            return message;
+        });
     }
 
     @Override

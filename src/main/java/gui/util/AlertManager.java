@@ -1,8 +1,5 @@
-package utils;
+package gui.util;
 
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.stage.Window;
 

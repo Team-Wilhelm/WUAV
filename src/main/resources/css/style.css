@@ -25,6 +25,19 @@
     -fx-scale-z: 105%;
 }
 
+.user-card {
+    -fx-background-color: white;
+    -fx-border-radius: 10px;
+    -fx-padding: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 1);
+}
+
+.user-card:hover{
+    -fx-scale-x: 105%;
+    -fx-scale-y: 105%;
+    -fx-scale-z: 105%;
+}
+
 .rounded{
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;

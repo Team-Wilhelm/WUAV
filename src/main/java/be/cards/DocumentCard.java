@@ -18,7 +18,7 @@ public class DocumentCard extends VBox {
 
         this.setPrefWidth(350);
         this.setPrefHeight(200);
-        this.getStyleClass().add("document-view");
+        this.getStyleClass().addAll("document-view", "rounded");
 
         //Create label and populate jobTitleBox
         HBox jobTitleBox = new HBox();
@@ -31,7 +31,7 @@ public class DocumentCard extends VBox {
 
         jobTitleBox.getChildren().add(jobTitle);
 
-        //Create labels and populate nameAndDate box
+        //Create labels and populate box respective boxes
         HBox dateBox = new HBox();
         dateBox.setAlignment(Pos.CENTER_LEFT);
         dateBox.setSpacing(10);

@@ -20,32 +20,26 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     @Override
     public String add(Document document) {
         String result = "saved";
-        String sql = "SELECT CustomerID FROM Customer WHERE CustomerID = ?";
+
+        // Check, if the customer is already in the database, if not, add them
+        CustomerDAO customerDAO = new CustomerDAO();
+        if (document.getCustomer().getCustomerID() == null) {
+            customerDAO.add(document.getCustomer());
+        } else {
+            customerDAO.update(document.getCustomer());
+        }
 
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setString(1, document.getCustomer().getCustomerID().toString());
-            ResultSet rs = ps.executeQuery();
-
-            // Check, if the customer is already in the database, if not, add them
-            UUID customerID;
-            if (rs.next()) {
-                customerID = UUID.fromString(rs.getString("CustomerID"));
-            } else {
-                CustomerDAO customerDAO = new CustomerDAO();
-                customerDAO.add(document.getCustomer());
-                customerID = document.getCustomer().getCustomerID();
-            }
 
             // Insert the document into the database
-            sql = "INSERT INTO Document (JobTitle, JobDescription, Notes, CustomerId, DateOfCreation) VALUES (?, ?, ?, ?, ?)";
-            ps = connection.prepareStatement(sql);
+            String sql = "INSERT INTO Document (JobTitle, JobDescription, Notes, CustomerId, DateOfCreation) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, document.getJobTitle());
             ps.setString(2, document.getJobDescription());
             ps.setString(3, document.getOptionalNotes());
-            ps.setString(4, customerID.toString());
+            ps.setString(4, document.getCustomer().getCustomerID().toString());
             ps.setDate(5, document.getDateOfCreation());
             ps.executeUpdate();
 
@@ -55,13 +49,14 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             ps.setString(1, document.getJobTitle());
             ps.setString(2, document.getJobDescription());
             ps.setString(3, document.getOptionalNotes());
-            ps.setString(4, customerID.toString());
+            ps.setString(4, document.getCustomer().getCustomerID().toString());
             ps.setDate(5, document.getDateOfCreation());
-            rs = ps.executeQuery();
+
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 document.setDocumentID(UUID.fromString(rs.getString("DocumentID")));
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             result = e.getMessage();
         } finally {

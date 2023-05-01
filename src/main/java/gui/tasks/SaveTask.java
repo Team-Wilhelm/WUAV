@@ -27,13 +27,14 @@ public class SaveTask<T> extends Task<TaskState> {
 
         else {
             updateMessage("Saving...");
-            String message;
-            if (isEditing)
-                message = model.update(objectToSave);
-            else {
-                CompletableFuture<String> future = model.add(objectToSave);
-                message = future.join();
+            CompletableFuture<String> future;
+            if (isEditing) {
+                future = model.update(objectToSave);
             }
+            else {
+                future = model.add(objectToSave);
+            }
+            String message = future.join();
 
             if (message.equals("saved") || message.equals("updated")) {
                 updateMessage("Saved successfully");
