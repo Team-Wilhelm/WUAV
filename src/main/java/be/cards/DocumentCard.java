@@ -1,12 +1,12 @@
 package be.cards;
 
 import be.Document;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 
 public class DocumentCard extends VBox {
     private Document document;
@@ -16,7 +16,7 @@ public class DocumentCard extends VBox {
         super();
         this.document = document;
 
-        this.setPrefWidth(200);
+        this.setPrefWidth(350);
         this.setPrefHeight(200);
         this.getStyleClass().add("document-view");
 
@@ -27,29 +27,50 @@ public class DocumentCard extends VBox {
         jobTitle = new Label(document.getJobTitle());
         jobTitle.maxWidthProperty().bind(jobTitleBox.prefWidthProperty());
         jobTitle.setWrapText(true);
+        jobTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #000000;");
+
+        jobTitleBox.getChildren().add(jobTitle);
 
         //Create labels and populate nameAndDate box
         HBox dateBox = new HBox();
         dateBox.setAlignment(Pos.CENTER_LEFT);
+        dateBox.setSpacing(10);
 
-        dateOfCreation = new Label("Created: " + document.getDateOfCreation().toString());
-        dateOfCreation.maxWidthProperty().bind(dateBox.prefWidthProperty());
+        dateOfCreation = new Label(document.getDateOfCreation().toString());
+        var imageDate = new ImageView(new Image("/img/material-symbols_calendar-month-outline-rounded.png"));
+        imageDate.setFitWidth(20);
+        imageDate.setFitHeight(20);
 
+        dateBox.getChildren().addAll( imageDate, dateOfCreation);
 
         HBox nameBox = new HBox();
         nameBox.setAlignment(Pos.CENTER_LEFT);
+        nameBox.setSpacing(10);
 
-        customerName = new Label("Customer: " + document.getCustomer().getCustomerName());
-        customerName.maxWidthProperty().bind(nameBox.prefWidthProperty());
+        customerName = new Label(document.getCustomer().getCustomerName());
+        var imageCustomer = new ImageView(new Image("/img/mdi_clipboard-account-outline.png"));
+        imageCustomer.setFitWidth(20);
+        imageCustomer.setFitHeight(20);
 
+        nameBox.getChildren().addAll(imageCustomer, customerName);
 
-        jobTitleBox.getChildren().add(jobTitle);
-        dateBox.getChildren().add(dateOfCreation);
-        nameBox.getChildren().add(customerName);
+        VBox image = new VBox();
+        image.getStyleClass().add("cardImage");
+        image.setPrefWidth(150);
+        image.setMaxWidth(150);
+        image.setMinWidth(150);
 
-        //Populate document card
-        VBox.setVgrow(jobTitleBox, Priority.ALWAYS);
-        this.getChildren().addAll(jobTitleBox, dateBox, nameBox);
+        VBox textContent = new VBox();
+        textContent.setPadding(new Insets(10));
+        textContent.getChildren().addAll(jobTitleBox, dateBox, nameBox);
+        textContent.setSpacing(10);
+
+        HBox card = new HBox();
+        card.getChildren().addAll(image, textContent);
+
+        VBox.setVgrow(card, Priority.ALWAYS);
+
+        this.getChildren().addAll(card);
         this.getStyleClass().add("rounded");
 
         this.setOnMouseClicked(e -> {

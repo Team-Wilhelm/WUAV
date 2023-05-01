@@ -2,6 +2,7 @@ package gui.controller.ViewControllers;
 
 import gui.model.UserModel;
 import gui.tasks.TaskState;
+import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -14,6 +15,8 @@ import java.util.ResourceBundle;
 
 public class UserController extends ViewController implements Initializable {
     @FXML
+    public MFXButton btnAddEmployee;
+    @FXML
     private MFXProgressSpinner progressSpinner;
     @FXML
     private Label progressLabel;
@@ -22,6 +25,7 @@ public class UserController extends ViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setProgressVisibility(false);
+        btnAddEmployee.getStyleClass().addAll("addButton", "rounded");
     }
 
     @Override

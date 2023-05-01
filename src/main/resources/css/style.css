@@ -16,7 +16,6 @@
 .document-view {
     -fx-background-color: white;
     -fx-border-radius: 10px;
-    -fx-padding: 10px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 1);
 }
 
@@ -29,4 +28,11 @@
 .rounded{
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
+}
+
+.cardImage{
+    -fx-background-image: url("https://whatfix.com/blog/wp-content/uploads/2021/09/Technical-Documentation-Guide-Whatfix.jpeg");
+    -fx-background-size: cover;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
 }
