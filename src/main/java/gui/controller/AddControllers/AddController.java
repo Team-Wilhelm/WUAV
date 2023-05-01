@@ -41,9 +41,9 @@ public abstract class AddController {
 
             if (task.getValue() == TaskState.DUPLICATE_DATA) {
                 alertManager.showError("Username already exists!", "Username already exists!", owner);
-            } else if (task.getValue() == TaskState.SUCCESSFUL && ((SaveTask<?>) task).isEditing()) {
-                controller.refreshLastFocusedCard();
-            } else if (task.getValue() == TaskState.SUCCESSFUL) {
+            } /*else if (task.getValue() == TaskState.SUCCESSFUL && ((SaveTask<?>) task).isEditing()) {
+                controller.refreshLastFocusedCard();*/
+            else if (task.getValue() == TaskState.SUCCESSFUL) {
                 controller.refreshItems();
             } else {
                 alertManager.showError("Oops...", "Something went wrong!", owner);
