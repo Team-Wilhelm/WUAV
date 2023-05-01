@@ -20,9 +20,8 @@ import com.itextpdf.layout.property.AreaBreakType;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
-
 import java.io.IOException;
-import java.net.MalformedURLException;
+
 
 
 public class PdfGenerator {
@@ -46,13 +45,6 @@ public class PdfGenerator {
             Paragraph lineBreak3 = new Paragraph("\n"+"\n"+"\n");
             AreaBreak pageBreak = new AreaBreak(AreaBreakType.NEXT_AREA);
 
-            //Add logo
-            //TODO why no be added?
-            Table logoTable = new Table(1);
-            Cell logoCell = new Cell();
-            logoCell.add(getLogo());
-            doc.add(logoTable);
-
             //Left side header, customer info
             Paragraph customerParagraph = new Paragraph(getCustomerInfo(document));
 
@@ -74,8 +66,22 @@ public class PdfGenerator {
             removeBorder(headerTable);
 
             doc.add(headerTable);
-            doc.add(lineBreak3);
+            doc.add(lineBreak);
 
+            //Add logo
+            //TODO fix image path
+            String imageFile = "C:\\Users\\maria\\Documents\\2nd semester CS\\WUAV\\src\\main\\resources\\img\\WUAV.png";
+            ImageData data = ImageDataFactory.create(imageFile);
+            Image logoImage = new Image(data);
+            logoImage.setHeight(50).setHorizontalAlignment(HorizontalAlignment.RIGHT);
+
+            Table logoTable = new Table(1);
+            logoTable.addCell(logoImage).setPageNumber(1);
+            removeBorder(logoTable);
+
+            doc.add(logoTable);
+
+            doc.add(lineBreak3);
 
             //Create job contents for document
             Paragraph date = new Paragraph(String.valueOf(document.getDateOfCreation()));
@@ -122,12 +128,6 @@ public class PdfGenerator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Image getLogo() throws MalformedURLException {
-        String imageFile = "src/main/resources/img/WUAV.png";
-        ImageData data = ImageDataFactory.create(imageFile);
-        return new Image(data);
     }
 
     private String getWUAVinfo() {

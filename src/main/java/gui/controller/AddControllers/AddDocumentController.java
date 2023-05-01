@@ -12,6 +12,7 @@ import gui.model.DocumentModel;
 import gui.model.IModel;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
+import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -34,6 +35,7 @@ import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class AddDocumentController extends AddController implements Initializable {
@@ -115,7 +117,6 @@ public class AddDocumentController extends AddController implements Initializabl
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
-        closeWindow(actionEvent);
         assignInputToVariables();
 
         Address address = new Address(streetName, houseNumber, postcode, city, country);
@@ -134,6 +135,9 @@ public class AddDocumentController extends AddController implements Initializabl
         Task<TaskState> task = new SaveTask<>(document, isEditing, documentModel);
         setUpSaveTask(task, documentController, txtCity.getScene().getWindow());
         executeTask(task);
+
+        documentToEdit = document;
+        btnCreatePdf.setDisable(false);
     }
 
     /**
@@ -220,6 +224,7 @@ public class AddDocumentController extends AddController implements Initializabl
         notes = txtNotes.getText();
     }
 
+    //TODO edit tickets out and add new alerttype
     private void setUpListView() {
         listViewPictures.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getClickCount() == 2) {
@@ -256,6 +261,24 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     public void createPdfAction(ActionEvent actionEvent) {
-        pdfGenerator.generatePdf(documentToEdit);
+        if(isInputChanged(documentToEdit)){
+            AlertManager.getInstance().showWarning("Unsaved changes", "Please save changes", txtCity.getScene().getWindow());
+        }
+        else pdfGenerator.generatePdf(documentToEdit);
+    }
+
+    private boolean isInputChanged(Document document){
+        Address customerAddress = document.getCustomer().getCustomerAddress();
+        return !txtCity.getText().trim().equals(customerAddress.getTown())
+                || !txtCountry.getText().trim().equals(customerAddress.getCountry())
+                || !txtEmail.getText().trim().equals(document.getCustomer().getCustomerEmail())
+                || !txtHouseNumber.getText().trim().equals(customerAddress.getStreetNumber())
+                || !txtJobTitle.getText().trim().equals(document.getJobTitle())
+                || !txtName.getText().trim().equals(document.getCustomer().getCustomerName())
+                || !txtPhoneNumber.getText().trim().equals(document.getCustomer().getCustomerPhoneNumber())
+                || !txtPostcode.getText().trim().equals(customerAddress.getPostcode())
+                || !txtStreetName.getText().trim().equals(customerAddress.getStreetName())
+                || !txtJobDescription.getText().trim().equals(document.getJobDescription())
+                || !txtNotes.getText().trim().equals(document.getOptionalNotes());
     }
 }
