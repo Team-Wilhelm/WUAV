@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 public abstract class AddController {
     protected abstract void assignInputToVariables();
     protected abstract void assignListenersToTextFields();
-    private AlertManager alertManager = AlertManager.getInstance();
+    private final AlertManager alertManager = AlertManager.getInstance();
 
     protected void setUpSaveTask(Task<TaskState> task, ViewController controller, Window owner) {
         setUpTask(task, controller, owner);
@@ -69,6 +69,32 @@ public abstract class AddController {
                     3000
             );
             alertManager.showError("Oops...", "Something went wrong!", owner);
+        });
+    }
+
+    protected void setUpDeleteTask(Task<TaskState> task, ViewController viewController, Window owner) {
+        setUpTask(task, viewController, owner);
+
+        task.setOnSucceeded(event -> {
+            // unbind the progress label and spinner from the task and set spinner to 100%
+            viewController.unbindProgress();
+
+            // after 3 seconds, the progress bar will be hidden
+            new java.util.Timer().schedule(
+                    new java.util.TimerTask() {
+                        @Override
+                        public void run() {
+                            viewController.setProgressVisibility(false);
+                        }
+                    },
+                    3000
+            );
+
+            if (task.getValue() == TaskState.SUCCESSFUL) {
+                viewController.refreshItems();
+            } else {
+                alertManager.showError("Oops...", "Something went wrong!", owner);
+            }
         });
     }
 

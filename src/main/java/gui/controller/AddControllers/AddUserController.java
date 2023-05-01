@@ -4,7 +4,9 @@ import be.Document;
 import be.User;
 import be.enums.UserRole;
 import gui.controller.ViewControllers.UserController;
+import gui.model.IModel;
 import gui.model.UserModel;
+import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
@@ -19,6 +21,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -32,6 +35,7 @@ import utils.HashPasswordHelper;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Stack;
 
@@ -93,6 +97,17 @@ public class AddUserController extends AddController implements Initializable {
     @FXML
     private void btnSaveAction(ActionEvent actionEvent) {
         if (checkInput()) {
+            if (!isUpdating) {
+                closeWindow(actionEvent);
+            }
+
+            // If the user is updating, the save button is disabled after the save is complete
+            isUpdating = false;
+            btnSave.setDisable(true);
+            disableFields(true);
+            comboActions.getSelectionModel().clearSelection();
+
+            // Save the user
             assignInputToVariables();
             byte[] passwordHash = hashPasswordHelper.hashPassword(password);
             User user = new User(name, username, passwordHash, phoneNumber, userRole);
@@ -107,10 +122,19 @@ public class AddUserController extends AddController implements Initializable {
 
 
     private void editUser() {
+        isUpdating = true;
         disableFields(false);
+        btnSave.setDisable(false);
     }
 
-    private void deleteUser() {
+    private void deleteUser(ActionEvent actionEvent) {
+        Optional<ButtonType> result = alertManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", txtName.getScene().getWindow());
+        if (result.isPresent() && result.get().equals(ButtonType.OK)) {
+            Task<TaskState> deleteTask = new DeleteTask<>(userToUpdate.getUserID(), userModel);
+            setUpDeleteTask(deleteTask, userController, txtName.getScene().getWindow());
+            executeTask(deleteTask);
+        }
+        closeWindow(actionEvent);
     }
 
     private enum Action {
@@ -164,7 +188,7 @@ public class AddUserController extends AddController implements Initializable {
             if (newValue != null) {
                 switch ((Action) newValue) {
                     case EDIT -> editUser();
-                    case DELETE -> deleteUser();
+                    case DELETE -> deleteUser(new ActionEvent(txtName, txtName));
                 }
                 comboActions.getSelectionModel().clearSelection();
             }
