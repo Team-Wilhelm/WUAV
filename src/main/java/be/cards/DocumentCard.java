@@ -5,7 +5,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 public class DocumentCard extends VBox {
@@ -18,7 +17,7 @@ public class DocumentCard extends VBox {
 
         this.setPrefWidth(200);
         this.setPrefHeight(200);
-        this.getStyleClass().add("document-view");
+        this.getStyleClass().addAll("document-view", "rounded");
 
         //Create label and populate jobTitleBox
         HBox jobTitleBox = new HBox();
@@ -28,20 +27,18 @@ public class DocumentCard extends VBox {
         jobTitle.maxWidthProperty().bind(jobTitleBox.prefWidthProperty());
         jobTitle.setWrapText(true);
 
-        //Create labels and populate nameAndDate box
+        //Create labels and populate box respective boxes
         HBox dateBox = new HBox();
         dateBox.setAlignment(Pos.CENTER_LEFT);
 
         dateOfCreation = new Label("Created: " + document.getDateOfCreation().toString());
         dateOfCreation.maxWidthProperty().bind(dateBox.prefWidthProperty());
 
-
         HBox nameBox = new HBox();
         nameBox.setAlignment(Pos.CENTER_LEFT);
 
         customerName = new Label("Customer: " + document.getCustomer().getCustomerName());
         customerName.maxWidthProperty().bind(nameBox.prefWidthProperty());
-
 
         jobTitleBox.getChildren().add(jobTitle);
         dateBox.getChildren().add(dateOfCreation);
