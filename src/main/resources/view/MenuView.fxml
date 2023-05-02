@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.layout.Region?>
+<?import javafx.geometry.Insets?>
 <GridPane fx:id="gridPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="1350.0" styleClass="background" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.MenuController">
     <columnConstraints>
         <ColumnConstraints minWidth="10.0" percentWidth="15.0" />
@@ -25,7 +26,10 @@
         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
     </rowConstraints>
-    <VBox GridPane.hgrow="ALWAYS" GridPane.rowSpan="7" styleClass="menu">
+    <VBox GridPane.hgrow="ALWAYS" GridPane.rowSpan="7" styleClass="menu" spacing="10">
+        <padding>
+            <Insets bottom="15" left="15" right="15" top="0" />
+        </padding>
         <HBox alignment="CENTER">
             <ImageView fitHeight="150" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
                 <Image url="@../img/Doc.png" />
@@ -34,22 +38,22 @@
         <Region prefHeight="100.0" VBox.vgrow="NEVER" />
 
         <HBox>
-            <MFXButton fx:id="btnEmployees" onAction="#btnEmployeesAction"
+            <MFXButton fx:id="btnEmployees" onAction="#btnEmployeesAction" alignment="CENTER_LEFT"
                        prefWidth="200.0" text="Employees" HBox.hgrow="ALWAYS" graphicTextGap="20">
                 <graphic>
                     <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="https://www.wuav.dk/wp-content/uploads/2022/03/LED-storskraeem-pyloner_sort.png" />
+                        <Image url="/img/mdi_account-circle-outline.png" />
                     </ImageView>
                 </graphic>
             </MFXButton>
         </HBox>
 
         <HBox>
-            <MFXButton fx:id="btnDocuments" onAction="#btnDocumentAction"
+            <MFXButton fx:id="btnDocuments" onAction="#btnDocumentAction" alignment="CENTER_LEFT"
                        prefWidth="200.0" text="Documents" HBox.hgrow="ALWAYS" graphicTextGap="20">
                 <graphic>
                     <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="https://www.wuav.dk/wp-content/uploads/2022/03/LED-storskraeem-pyloner_sort.png" />
+                        <Image url="/img/mdi_paper-outline.png" />
                     </ImageView>
                 </graphic>
             </MFXButton>
@@ -57,11 +61,11 @@
 
         <Region prefHeight="200.0" VBox.vgrow="ALWAYS" />
         <HBox>
-            <MFXButton fx:id="btnMyProfile"
+            <MFXButton fx:id="btnMyProfile" alignment="CENTER_LEFT"
                        prefWidth="200.0" text="My profile" HBox.hgrow="ALWAYS" graphicTextGap="20">
                 <graphic>
                     <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="https://www.wuav.dk/wp-content/uploads/2022/03/LED-storskraeem-pyloner_sort.png" />
+                        <Image url="/img/mdi_card-account-details-outline.png" />
                     </ImageView>
                 </graphic>
             </MFXButton>

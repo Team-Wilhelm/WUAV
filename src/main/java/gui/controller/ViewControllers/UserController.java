@@ -31,9 +31,9 @@ import java.util.ResourceBundle;
 
 public class UserController extends ViewController implements Initializable {
     @FXML
-    private ScrollPane scrollPane;
+    public FlowPane flowPane;
     @FXML
-    private FlowPane flowPane;
+    public ScrollPane scrollPane;
     @FXML
     private MFXProgressSpinner progressSpinner;
     @FXML
@@ -48,6 +48,7 @@ public class UserController extends ViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setProgressVisibility(false);
+        btnAddEmployee.getStyleClass().addAll("addButton", "rounded");
 
         Bindings.bindContent(flowPane.getChildren(), userCards);
         userCards.setAll(userModel.getLoadedCards().values());
