@@ -35,11 +35,11 @@
       <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <MFXTextField fx:id="txtJobTitle" floatingText="Job title" maxWidth="1.7976931348623157E308" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-      <TextArea fx:id="txtJobDescription" prefHeight="200.0" prefWidth="200.0" promptText="Job description" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
-      <TextArea fx:id="txtNotes" prefHeight="200.0" prefWidth="200.0" promptText="Notes" GridPane.columnSpan="2" GridPane.rowIndex="5" GridPane.rowSpan="2" />
-      <MFXListView fx:id="listViewPictures" depthLevel="LEVEL1" maxWidth="1.7976931348623157E308" prefWidth="517.0" GridPane.columnSpan="2" GridPane.rowIndex="7" GridPane.rowSpan="2" />
-      <MFXButton fx:id="btnDelete" onAction="#deleteAction" maxWidth="1.7976931348623157E308" text="Delete" GridPane.rowIndex="9">
+      <MFXTextField fx:id="txtJobTitle" floatingText="Job title" maxWidth="1.7976931348623157E308" GridPane.columnSpan="3" GridPane.rowIndex="1" />
+      <TextArea fx:id="txtJobDescription" prefHeight="200.0" prefWidth="200.0" promptText="Job description" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.rowSpan="3" />
+      <TextArea fx:id="txtNotes" prefHeight="200.0" prefWidth="200.0" promptText="Notes" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.rowSpan="2" />
+      <MFXListView fx:id="listViewPictures" depthLevel="LEVEL1" maxWidth="1.7976931348623157E308" prefWidth="517.0" GridPane.columnSpan="3" GridPane.rowIndex="7" GridPane.rowSpan="2" />
+      <MFXButton fx:id="btnDelete" maxWidth="1.7976931348623157E308" onAction="#deleteAction" text="Delete" GridPane.rowIndex="9">
          <GridPane.margin>
             <Insets />
          </GridPane.margin>

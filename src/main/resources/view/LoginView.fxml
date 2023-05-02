@@ -22,7 +22,7 @@
                                     <children>
                                         <MFXTextField fx:id="usernameInput" floatingText="Username" prefHeight="40.0" prefWidth="200.0" />
                                         <MFXPasswordField fx:id="passwordInput" floatingText="Password" prefHeight="40.0" prefWidth="200.0" />
-                                        <MFXButton onAction="#loginUser" prefWidth="200.0" text="Log In">
+                                        <MFXButton fx:id="btnLogin" onAction="#loginUser" prefWidth="200.0" text="Log In">
                                  <styleClass>
                                     <String fx:value="addButton" />
                                     <String fx:value="rounded" />

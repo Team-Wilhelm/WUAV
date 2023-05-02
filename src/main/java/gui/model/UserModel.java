@@ -117,4 +117,10 @@ public class UserModel implements IModel<User> {
             loadedCards.put(user, new UserCard(user));
         }
     }
+
+    public boolean logIn(String username, byte[] password){
+        //TODO fix this business,  why manager not managering?
+        //return userManager.logIn(username, password);
+        return false;
+    }
 }
