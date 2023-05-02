@@ -19,7 +19,7 @@ public class SaveTask<T> extends Task<TaskState> {
 
 
     @Override
-    protected TaskState call() throws Exception {
+    protected TaskState call() {
         if (isCancelled()) {
             updateMessage("Saving was not successful");
             return TaskState.NOT_SUCCESSFUL;

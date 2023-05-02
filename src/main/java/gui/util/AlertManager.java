@@ -1,7 +1,11 @@
 package gui.util;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Window;
+
+import java.util.Optional;
 
 public class AlertManager {
     private Alert alert;
@@ -37,5 +41,14 @@ public class AlertManager {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    public Optional<ButtonType> showConfirmation(String header, String content, Window window) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.initOwner(window);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        return alert.showAndWait();
     }
 }

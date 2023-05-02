@@ -43,13 +43,12 @@ public class UserCard extends HBox {
         // Picture of the event coordinator
         userIcon = user.getProfilePicture();
         ImageView imageView = new ImageView(userIcon);
-        imageView.fitWidthProperty().bind(left.widthProperty());
-        imageView.fitHeightProperty().bind(left.widthProperty());
+        imageView.fitWidthProperty().bind(left.maxWidthProperty());
+        imageView.fitHeightProperty().bind(imageView.fitWidthProperty());
         imageView.setPreserveRatio(true);
 
         Region[] regions = {new Region(), new Region()};
         for (Region region: regions) {
-            region.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
             region.maxWidthProperty().bind(imageView.fitWidthProperty());
             region.maxHeightProperty().bind(left.heightProperty().subtract(imageView.fitHeightProperty().divide(2)));
             VBox.setVgrow(region, Priority.ALWAYS);
