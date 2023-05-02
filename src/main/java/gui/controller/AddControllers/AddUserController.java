@@ -78,7 +78,7 @@ public class AddUserController extends AddController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         isEditing = false;
-        isUpdating = false;
+        isUpdating = true;
         btnSave.setDisable(true);
         comboActions.setDisable(true);
         profilePictureDoubleClick();
@@ -220,6 +220,7 @@ public class AddUserController extends AddController implements Initializable {
         disableFields(true);
         comboActions.setDisable(false);
         isEditing = true;
+        isUpdating = false;
 
         userToUpdate = user;
         txtName.setText(user.getFullName());
@@ -258,8 +259,10 @@ public class AddUserController extends AddController implements Initializable {
     private void profilePictureDoubleClick() {
         // TODO only if editing ?
         imgProfilePicture.setOnMouseClicked(event -> {
-            ImageCropper imageCropper = new ImageCropper(this);
-            imageCropper.chooseImage();
+            if (event.getClickCount() == 2 && isUpdating) {
+                ImageCropper imageCropper = new ImageCropper(this);
+                imageCropper.chooseImage(userToUpdate);
+            }
         });
     }
     //endregion

@@ -4,6 +4,7 @@ import be.User;
 import be.enums.UserRole;
 import utils.BlobService;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,8 +41,13 @@ public class UserDAO extends DAO implements IDAO<User> {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 user.setUserID(UUID.fromString(rs.getString("UserID")));
-                System.out.println("User ID: " + user.getUserID());
             }
+
+            File file = new File(user.getProfilePicturePath());
+            File newFile = new File(System.getProperty("user.home") + "/Downloads/" +
+                    user.getUserID() + "cropped.png");
+            file.renameTo(newFile);
+            user.setProfilePicturePath(newFile.getAbsolutePath());
 
             sql = "INSERT INTO SystemUser (ProfilePicture) VALUES (?) WHERE UserID = ?";
             ps = connection.prepareStatement(sql);
@@ -158,8 +164,8 @@ public class UserDAO extends DAO implements IDAO<User> {
     private String saveToBlobService(User user) {
         String profilePicture = user.getProfilePicturePath();
         try {
-            //TODO save to blob service
-            String filePath = user.getProfilePicturePath().substring(0, user.getProfilePicturePath().lastIndexOf("\\") + 1);
+            String filePath = user.getProfilePicturePath().substring(0, user.getProfilePicturePath().lastIndexOf("\\"));
+            System.out.println(filePath);
             BlobService.getInstance().UploadFile(filePath, "profilePicture", user.getUserID());
         } catch (Exception e) {
             e.printStackTrace();

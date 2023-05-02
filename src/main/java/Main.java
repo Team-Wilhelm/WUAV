@@ -32,12 +32,5 @@ public class Main extends Application {
         Document document = documentModel.getAll().values().stream().findFirst().get();
         pdfGenerator.generatePdf(document);
          */
-
-
-        //Address a = new Address("Rainbow road", "77", "1234", "Night city", "Wonderland");
-        //Customer c = new Customer("Justin Timbersea", "justin@hotmail.com", "12345678", a, CustomerType.PRIVATE, Date.valueOf(LocalDate.now()));
-        //CustomerDAO customerDAO = new CustomerDAO();
-        //customerDAO.add(c);
-        //System.out.println(customerDAO.getById(UUID.fromString("AB99E9BB-7BC8-461D-AA78-ADA1F38ECBD9")).getCustomerName());
     }
 }
