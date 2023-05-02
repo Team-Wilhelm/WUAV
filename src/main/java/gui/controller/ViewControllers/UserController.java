@@ -9,6 +9,7 @@ import gui.tasks.TaskState;
 import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
+import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,6 +41,8 @@ public class UserController extends ViewController implements Initializable {
     private Label progressLabel;
     @FXML
     private MFXButton btnAddEmployee;
+    @FXML
+    private MFXTextField searchBar;
 
     private ObservableList<UserCard> userCards = FXCollections.observableArrayList();
     private UserModel userModel = UserModel.getInstance();
@@ -54,6 +57,9 @@ public class UserController extends ViewController implements Initializable {
 
         flowPane.prefHeightProperty().bind(scrollPane.heightProperty());
         flowPane.prefWidthProperty().bind(scrollPane.widthProperty());
+
+        searchBar.textProperty().addListener((observable, oldValue, newValue) ->
+                refreshItems(userModel.searchUsers(searchBar.getText().toLowerCase().trim())));
 
         refreshItems();
         btnAddEmployee.getStyleClass().addAll("addButton", "rounded");
