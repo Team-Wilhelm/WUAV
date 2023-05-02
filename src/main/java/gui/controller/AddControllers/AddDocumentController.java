@@ -7,7 +7,6 @@ import be.User;
 import be.enums.CustomerType;
 import be.enums.UserRole;
 import gui.controller.ViewControllers.DocumentController;
-import gui.controller.ViewControllers.UserController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
 import gui.model.UserModel;
@@ -19,6 +18,7 @@ import io.github.palexdev.materialfx.controls.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -63,8 +63,8 @@ public class AddDocumentController extends AddController implements Initializabl
     private Document documentToEdit;
     private DocumentController documentController;
     private HashMap<Image, String> pictures;
-    private List<User> technicians;
     private AlertManager alertManager;
+    private ObservableList<User> allTechnicians = FXCollections.observableArrayList();
 
     // Document and customer information
     private UUID temporaryId;
@@ -72,6 +72,7 @@ public class AddDocumentController extends AddController implements Initializabl
     private String jobDescription, notes;
     private CustomerType customerType;
     private Date lastContract;
+    private List<User> technicians;
 
     public AddDocumentController() {
         documentModel = DocumentModel.getInstance();
@@ -165,11 +166,11 @@ public class AddDocumentController extends AddController implements Initializabl
 
     public void assignUserToDocument(User technician) {
         if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
-            documentModel.assignUserToDocument(technician, documentToEdit, true);
             technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
+            documentModel.assignUserToDocument(technician, documentToEdit, true);
         } else {
-            documentModel.assignUserToDocument(technician, documentToEdit, false);
             technician.getAssignedDocuments().remove(documentToEdit.getDocumentID());
+            documentModel.assignUserToDocument(technician, documentToEdit, false);
         }
     }
 
@@ -294,10 +295,11 @@ public class AddDocumentController extends AddController implements Initializabl
     /**
      * Assigns the user to the document in the database.
      */
-    private ChangeListener<User> technicianListenerIsEditing = (observable, oldValue, newValue) -> {
+    private final ChangeListener<User> technicianListenerIsEditing = (observable, oldValue, newValue) -> {
         if (newValue != null) {
             assignUserToDocument(newValue);
-            setComboBoxItems();
+            comboTechnicians.getSelectionModel().clearSelection();
+            populateComboBox();
         }
     };
 
@@ -305,7 +307,7 @@ public class AddDocumentController extends AddController implements Initializabl
      * Assigns the user to the document and adds them to the list of technicians,
      * saving them in a batch when saving the document.
      */
-    private ChangeListener<User> technicianListenerNotEditing = (observable, oldValue, newValue) -> {
+    private final ChangeListener<User> technicianListenerNotEditing = (observable, oldValue, newValue) -> {
         if (newValue != null) {
             if (!technicians.contains(newValue)) {
                 newValue.getAssignedDocuments().put(temporaryId, documentToEdit);
@@ -314,7 +316,7 @@ public class AddDocumentController extends AddController implements Initializabl
                 technicians.remove(newValue);
                 newValue.getAssignedDocuments().remove(temporaryId);
             }
-            setComboBoxItems();
+            populateComboBox();
         }
     };
 
@@ -342,18 +344,18 @@ public class AddDocumentController extends AddController implements Initializabl
             }
         });
 
-        setComboBoxItems();
+        populateComboBox();
     }
 
     public void setDocumentController(DocumentController documentController) {
         this.documentController = documentController;
     }
 
-    private void setComboBoxItems() {
-        comboTechnicians.clear();
-        comboTechnicians.setItems(UserModel.getInstance().getAll().values().stream().filter(user ->
-                user.getUserRole() == UserRole.TECHNICIAN).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-
+    private void populateComboBox() {
+        allTechnicians.clear();
+        allTechnicians.setAll(UserModel.getInstance().getAll().values().stream().filter(user ->
+                user.getUserRole() == UserRole.TECHNICIAN).collect(Collectors.toList()));
+        comboTechnicians.setItems(allTechnicians);
     }
     // endregion
 }

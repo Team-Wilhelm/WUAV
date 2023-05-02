@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class UserDAO extends DAO implements IDAO<User> {
-    private DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     public UserDAO() {
         dbConnection = DBConnection.getInstance();
@@ -53,10 +53,6 @@ public class UserDAO extends DAO implements IDAO<User> {
             ps.setString(1, saveToBlobService(user));
             ps.setString(2, user.getUserID().toString());
             ps.executeUpdate();
-
-            //TODO assignedDocuments
-            //sql = "INSERT INTO UserDocument (UserID, DocumentID) VALUES (?, ?)";
-
         } catch (Exception e) {
             e.printStackTrace();
             result = e.getMessage();
@@ -127,7 +123,6 @@ public class UserDAO extends DAO implements IDAO<User> {
                         documentIDs.add(UUID.fromString(documentIdStr));
                     }
                 }
-                System.out.println(documentIDs);
                 User user = getUserFromResultSet(resultSet, documentIDs);
                 users.put(user.getUserID(), user);
             }
