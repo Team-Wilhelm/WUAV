@@ -316,12 +316,13 @@ public class AddDocumentController extends AddController implements Initializabl
                 technicians.remove(newValue);
                 newValue.getAssignedDocuments().remove(temporaryId);
             }
+            comboTechnicians.getSelectionModel().clearSelection();
             populateComboBox();
         }
     };
 
     private void setUpComboBox() {
-        comboTechnicians.getSelectionModel().selectedItemProperty().removeListener(technicianListenerNotEditing);
+        comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerNotEditing);
 
         comboTechnicians.setConverter(new StringConverter<>() {
             @Override

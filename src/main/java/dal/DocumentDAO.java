@@ -186,29 +186,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         }
     }
 
-    public void assignMultipleUsersToDocument(List<User> users, Document document, boolean isAssigning){
-        String sql = "INSERT INTO User_Document_Link (UserID, DocumentID) VALUES (?, ?);";
-        if (!isAssigning) {
-            sql = "DELETE FROM User_Document_Link WHERE UserID = ? AND DocumentID =?;";
-        }
-
-        Connection connection = null;
-        try {
-            connection = dbConnection.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql);
-            for (User user : users) {
-                statement.setString(1, user.getUserID().toString());
-                statement.setString(2, document.getDocumentID().toString());
-                statement.addBatch();
-            }
-            statement.executeBatch();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            dbConnection.releaseConnection(connection);
-        }
-    }
-
     public HashMap<UUID, Document> getDocumentsByIDs(List<UUID> documentIDs) {
         HashMap<UUID, Document> documents = new HashMap<>();
         if (documentIDs.isEmpty() || documentIDs == null) {
