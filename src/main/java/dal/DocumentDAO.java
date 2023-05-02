@@ -1,17 +1,18 @@
 package dal;
 
 import be.Document;
+import be.User;
+import gui.model.UserModel;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DocumentDAO extends DAO implements IDAO<Document> {
-    private DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     public DocumentDAO() {
         dbConnection = DBConnection.getInstance();
@@ -56,6 +57,16 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             if (rs.next()) {
                 document.setDocumentID(UUID.fromString(rs.getString("DocumentID")));
             }
+
+            // Link the document to the technicians
+            sql = "INSERT INTO User_Document_Link (UserID, DocumentID) VALUES (?, ?)";
+            ps = connection.prepareStatement(sql);
+            for (User technician : document.getTechnicians()) {
+                ps.setString(1, technician.getUserID().toString());
+                ps.setString(2, document.getDocumentID().toString());
+                ps.addBatch();
+            }
+            ps.executeBatch();
         } catch (Exception e) {
             e.printStackTrace();
             result = e.getMessage();
@@ -72,9 +83,11 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 "WHERE DocumentID = ?";
         Connection connection = null;
         try {
+            // Check, if the customer is already in the database and update them, if not, add them
             new CustomerDAO().addOrUpdateCustomer(document.getCustomer());
-
             connection = dbConnection.getConnection();
+
+            // Update the document
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, document.getJobTitle());
             ps.setString(2, document.getJobDescription());
@@ -103,8 +116,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     @Override
     public Map<UUID, Document> getAll() {
-        HashMap<UUID, Document> documents = new HashMap<>();
         String sql = "SELECT * FROM Document WHERE Deleted = 0";
+        HashMap<UUID, Document> documents = new HashMap<>();
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
@@ -152,4 +165,79 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 rs.getDate("DateOfCreation")
             );
     }
+
+    public void assignUserToDocument(User user, Document document, boolean isAssigning){
+        String sql = "INSERT INTO User_Document_Link (UserID, DocumentID) VALUES (?, ?);";
+        if (!isAssigning) {
+            sql = "DELETE FROM User_Document_Link WHERE UserID = ? AND DocumentID =?;";
+        }
+
+        Connection connection = null;
+        try {
+            connection = dbConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, user.getUserID().toString());
+            statement.setString(2, document.getDocumentID().toString());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            dbConnection.releaseConnection(connection);
+        }
+    }
+
+    public void assignMultipleUsersToDocument(List<User> users, Document document, boolean isAssigning){
+        String sql = "INSERT INTO User_Document_Link (UserID, DocumentID) VALUES (?, ?);";
+        if (!isAssigning) {
+            sql = "DELETE FROM User_Document_Link WHERE UserID = ? AND DocumentID =?;";
+        }
+
+        Connection connection = null;
+        try {
+            connection = dbConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            for (User user : users) {
+                statement.setString(1, user.getUserID().toString());
+                statement.setString(2, document.getDocumentID().toString());
+                statement.addBatch();
+            }
+            statement.executeBatch();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            dbConnection.releaseConnection(connection);
+        }
+    }
+
+    public HashMap<UUID, Document> getDocumentsByIDs(List<UUID> documentIDs) {
+        HashMap<UUID, Document> documents = new HashMap<>();
+        if (documentIDs.isEmpty() || documentIDs == null) {
+            return documents;
+        }
+
+        // create comma-separated string of document IDs
+        String sql = "SELECT * FROM Document WHERE DocumentID IN ("
+                + String.join(",", Collections.nCopies(documentIDs.size(), "?"))
+                + ")";
+        Connection connection = null;
+        try {
+            connection = dbConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            for (int i = 0; i < documentIDs.size(); i++) {
+                statement.setString(i + 1, documentIDs.get(i).toString());
+            }
+
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                Document document = createDocumentFromResultSet(rs);
+                documents.put(document.getDocumentID(), document);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbConnection.releaseConnection(connection);
+        }
+        return documents;
+    }
 }
+

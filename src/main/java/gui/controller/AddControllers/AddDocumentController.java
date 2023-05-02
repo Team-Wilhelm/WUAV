@@ -5,10 +5,12 @@ import be.Customer;
 import be.Document;
 import be.User;
 import be.enums.CustomerType;
+import be.enums.UserRole;
 import gui.controller.ViewControllers.DocumentController;
+import gui.controller.ViewControllers.UserController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
-import gui.model.IModel;
+import gui.model.UserModel;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
@@ -16,12 +18,12 @@ import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
@@ -35,9 +37,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AddDocumentController extends AddController implements Initializable {
     @FXML
@@ -61,9 +63,11 @@ public class AddDocumentController extends AddController implements Initializabl
     private Document documentToEdit;
     private DocumentController documentController;
     private HashMap<Image, String> pictures;
+    private List<User> technicians;
     private AlertManager alertManager;
 
     // Document and customer information
+    private UUID temporaryId;
     private String city, country, email, houseNumber, jobTitle, name, phoneNumber, postcode, streetName;
     private String jobDescription, notes;
     private CustomerType customerType;
@@ -74,15 +78,25 @@ public class AddDocumentController extends AddController implements Initializabl
         customerModel = CustomerModel.getInstance();
         pictures = new HashMap<>();
         alertManager = AlertManager.getInstance();
+        technicians = new ArrayList<>();
+        temporaryId = UUID.randomUUID();
+
+        if (UserModel.getInstance().getLoggedInUser() != null
+                && UserModel.getInstance().getLoggedInUser().getUserRole() == UserRole.TECHNICIAN)
+            technicians.add(UserModel.getInstance().getLoggedInUser());
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Disable the save button until the user has filled in the required fields
+        // Disable the delete button until the user has selected a document to delete
         isEditing = false;
         btnSave.setDisable(true);
         btnDelete.setDisable(true);
+
         assignListenersToTextFields();
         setUpListView();
+        setUpComboBox();
         dateLastContract.setValue(LocalDate.now());
     }
 
@@ -126,6 +140,7 @@ public class AddDocumentController extends AddController implements Initializabl
                 .findFirst()
                 .orElse(new Customer(name, email, phoneNumber, address, customerType, lastContract));
         Document document = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
+        document.setTechnicians(technicians);
 
         if (isEditing) {
             document.setDocumentID(documentToEdit.getDocumentID());
@@ -146,6 +161,16 @@ public class AddDocumentController extends AddController implements Initializabl
             executeTask(deleteTask);
         }
         closeWindow(actionEvent);
+    }
+
+    public void assignUserToDocument(User technician) {
+        if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
+            documentModel.assignUserToDocument(technician, documentToEdit, true);
+            technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
+        } else {
+            documentModel.assignUserToDocument(technician, documentToEdit, false);
+            technician.getAssignedDocuments().remove(documentToEdit.getDocumentID());
+        }
     }
 
     /**
@@ -189,6 +214,10 @@ public class AddDocumentController extends AddController implements Initializabl
         txtJobTitle.setText(document.getJobTitle());
         txtJobDescription.setText(document.getJobDescription());
         txtNotes.setText(document.getOptionalNotes());
+
+        // Switch the listeners to editing mode
+        comboTechnicians.getSelectionModel().selectedItemProperty().removeListener(technicianListenerNotEditing);
+        comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerIsEditing);
     }
 
     protected void assignListenersToTextFields() {
@@ -232,19 +261,18 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     private void setUpListView() {
-        //TODO remove tickets
         listViewPictures.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getClickCount() == 2) {
                 if (!listViewPictures.getSelectionModel().getSelection().isEmpty()) {
-                    Image ticket = listViewPictures.getSelectionModel().getSelectedValues().get(0);
+                    Image image = listViewPictures.getSelectionModel().getSelectedValues().get(0);
                     try {
-                        Desktop.getDesktop().open(new File(pictures.get(ticket)));
+                        Desktop.getDesktop().open(new File(pictures.get(image)));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
                 else {
-                    new Alert(Alert.AlertType.ERROR, "Please select a ticket!").showAndWait();
+                    alertManager.showWarning("No image selected", "Please select an image to open", txtName.getScene().getWindow());
                 }
             }
         });
@@ -263,7 +291,69 @@ public class AddDocumentController extends AddController implements Initializabl
         });
     }
 
+    /**
+     * Assigns the user to the document in the database.
+     */
+    private ChangeListener<User> technicianListenerIsEditing = (observable, oldValue, newValue) -> {
+        if (newValue != null) {
+            assignUserToDocument(newValue);
+            setComboBoxItems();
+        }
+    };
+
+    /**
+     * Assigns the user to the document and adds them to the list of technicians,
+     * saving them in a batch when saving the document.
+     */
+    private ChangeListener<User> technicianListenerNotEditing = (observable, oldValue, newValue) -> {
+        if (newValue != null) {
+            if (!technicians.contains(newValue)) {
+                newValue.getAssignedDocuments().put(temporaryId, documentToEdit);
+                technicians.add(newValue);
+            } else {
+                technicians.remove(newValue);
+                newValue.getAssignedDocuments().remove(temporaryId);
+            }
+            setComboBoxItems();
+        }
+    };
+
+    private void setUpComboBox() {
+        comboTechnicians.getSelectionModel().selectedItemProperty().removeListener(technicianListenerNotEditing);
+
+        comboTechnicians.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(User object) {
+                if (object != null) {
+                    if (isEditing) {
+                        return object.getAssignation(object.getAssignedDocuments().get(documentToEdit.getDocumentID()))
+                                + " " + object.getFullName() + " (" + object.getUsername() + ")";
+                    } else {
+                        if (technicians.contains(object))
+                            return "ASSIGNED:" + object.getFullName() + " (" + object.getUsername() + ")";
+                    }  return object.getFullName() + " (" + object.getUsername() + ")";
+                }
+                return null;
+            }
+
+            @Override
+            public User fromString(String string) {
+                return null;
+            }
+        });
+
+        setComboBoxItems();
+    }
+
     public void setDocumentController(DocumentController documentController) {
         this.documentController = documentController;
     }
+
+    private void setComboBoxItems() {
+        comboTechnicians.clear();
+        comboTechnicians.setItems(UserModel.getInstance().getAll().values().stream().filter(user ->
+                user.getUserRole() == UserRole.TECHNICIAN).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
+    }
+    // endregion
 }

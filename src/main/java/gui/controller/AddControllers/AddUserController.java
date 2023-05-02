@@ -139,6 +139,15 @@ public class AddUserController extends AddController implements Initializable {
         closeWindow(actionEvent);
     }
 
+    private void profilePictureDoubleClick() {
+        imgProfilePicture.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && isUpdating) {
+                ImageCropper imageCropper = new ImageCropper(this);
+                imageCropper.chooseImage(userToUpdate);
+            }
+        });
+    }
+
     private enum Action {
         EDIT, DELETE;
 
@@ -227,7 +236,7 @@ public class AddUserController extends AddController implements Initializable {
         txtUsername.setText(user.getUsername());
         txtPassword.setPromptText("Leave empty to keep current password");
         comboPosition.getSelectionModel().selectItem(user.getUserRole());
-        listViewDocuments.getItems().setAll(user.getAssignedDocuments());
+        listViewDocuments.getItems().setAll(user.getAssignedDocuments().values());
         imgProfilePicture.setImage(new Image(user.getProfilePicturePath()));
     }
 
@@ -256,20 +265,10 @@ public class AddUserController extends AddController implements Initializable {
         comboActions.getItems().setAll(Action.EDIT, Action.DELETE);
     }
 
-    private void profilePictureDoubleClick() {
-        // TODO only if editing ?
-        imgProfilePicture.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2 && isUpdating) {
-                ImageCropper imageCropper = new ImageCropper(this);
-                imageCropper.chooseImage(userToUpdate);
-            }
-        });
-    }
-    //endregion
-
     public void setProfilePicture(Image image, String profilePicturePath) {
         profilePicture = image;
         imgProfilePicture.setImage(profilePicture);
         this.profilePicturePath = profilePicturePath;
     }
+    //endregion
 }

@@ -9,9 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class UserDAO extends DAO implements IDAO<User> {
     private DBConnection dbConnection;
@@ -28,6 +26,7 @@ public class UserDAO extends DAO implements IDAO<User> {
 
         Connection connection = null;
         try {
+            // Insert the user into the database
             connection = dbConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             fillPreparedStatement(ps, user);
@@ -102,14 +101,34 @@ public class UserDAO extends DAO implements IDAO<User> {
     @Override
     public Map<UUID, User> getAll() {
         HashMap<UUID, User> users = new HashMap<>();
-        String sql = "SELECT * FROM SystemUser WHERE Deleted = 0";
+        // STUFF() is used to concatenate the document IDs into a single string
+        // FOR XML PATH('') is used to remove the XML tags from the string
+        // CONVERT(VARCHAR(36) is used to convert the UUID to a string
+        String sql = "SELECT SystemUser.*, " +
+                "STUFF((" +
+                    "SELECT ',' + CONVERT(VARCHAR(36), User_Document_Link.DocumentID, 1) " +
+                    "FROM User_Document_Link " +
+                    "WHERE SystemUser.UserID = User_Document_Link.UserID " +
+                    "FOR XML PATH('')), 1, 1, '') AS DocumentIDs " +
+                "FROM SystemUser " +
+                "WHERE SystemUser.Deleted = 0";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
+
             while (resultSet.next()) {
-                User user = getUserFromResultSet(resultSet);
+                List<UUID> documentIDs = new ArrayList<>();
+                String documentIdsStr = resultSet.getString("DocumentIDs");
+                if (documentIdsStr != null) {
+                    String[] documentIdsArr = documentIdsStr.split(",");
+                    for (String documentIdStr : documentIdsArr) {
+                        documentIDs.add(UUID.fromString(documentIdStr));
+                    }
+                }
+                System.out.println(documentIDs);
+                User user = getUserFromResultSet(resultSet, documentIDs);
                 users.put(user.getUserID(), user);
             }
         } catch (Exception e) {
@@ -122,16 +141,23 @@ public class UserDAO extends DAO implements IDAO<User> {
 
     @Override
     public User getById(UUID id) {
-        String sql = "SELECT * FROM SystemUser WHERE UserID = ?";
+        String sql = "SELECT * FROM SystemUser LEFT JOIN User_Document_Link " +
+                "ON SystemUser.UserID = User_Document_Link.UserID " +
+                "WHERE UserID = ?";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, id.toString());
             ResultSet resultSet = ps.executeQuery();
-            if (resultSet.next()) {
-                return getUserFromResultSet(resultSet);
+
+            // Get a list of document IDs assigned to the user
+            List<UUID> documentIDs = new ArrayList<>();
+            while (resultSet.next()) {
+                documentIDs.add(UUID.fromString(resultSet.getString("DocumentID")));
             }
+
+            return getUserFromResultSet(resultSet, documentIDs);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -140,7 +166,7 @@ public class UserDAO extends DAO implements IDAO<User> {
         return null;
     }
 
-    private User getUserFromResultSet(ResultSet resultSet) throws SQLException {
+    private User getUserFromResultSet(ResultSet resultSet, List<UUID> documentIDs) throws SQLException {
         User user = new User(
                 UUID.fromString(resultSet.getString("UserID")),
                 resultSet.getString("FullName"),
@@ -150,6 +176,7 @@ public class UserDAO extends DAO implements IDAO<User> {
                 UserRole.fromString(resultSet.getString("UserRole")),
                 resultSet.getString("ProfilePicture")
         );
+        user.setAssignedDocuments(new DocumentDAO().getDocumentsByIDs(documentIDs));
         return user;
     }
 
