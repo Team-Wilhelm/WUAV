@@ -141,7 +141,7 @@ public class UserDAO extends DAO implements IDAO<User> {
     }
 
     public boolean logIn(String username, byte[] password) {
-        String sql = "SELECT * FROM [User] WHERE Username=? AND UserPassword=?";
+        String sql = "SELECT * FROM [SystemUser] WHERE Username=? AND UserPassword=?";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();

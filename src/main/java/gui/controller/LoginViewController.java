@@ -19,6 +19,7 @@ import utils.HashPasswordHelper;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import static javafx.scene.input.KeyCode.ENTER;
