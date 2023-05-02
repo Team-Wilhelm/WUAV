@@ -27,7 +27,7 @@
                 <Insets right="15" bottom="10" top="5"/>
             </padding>
 
-            <MFXButton fx:id="btnAddEmployee" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="addButton, rounded" text="+ Add employee">
+            <MFXButton fx:id="btnAddEmployee" onAction="#addEmployeeAction" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="addButton, rounded" text="+ Add employee">
                 <GridPane.margin>
                     <Insets left="15.0" right="15.0" />
                 </GridPane.margin>

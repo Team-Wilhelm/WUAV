@@ -42,7 +42,7 @@ public class UserController extends ViewController implements Initializable {
     private MFXButton btnAddEmployee;
 
     private ObservableList<UserCard> userCards = FXCollections.observableArrayList();
-    private UserModel userModel = UserModel.getInstance();
+    private final UserModel userModel = UserModel.getInstance();
     private UserCard lastFocusedCard;
 
     @Override
@@ -136,7 +136,8 @@ public class UserController extends ViewController implements Initializable {
         refreshItems(List.copyOf(userModel.getAll().values()));
     }
 
-    public void addEmployeeAction(ActionEvent actionEvent) throws IOException {
+    @FXML
+    private void addEmployeeAction(ActionEvent actionEvent) throws IOException {
         FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
         AddUserController controller = loader.getController();
         controller.setUserController(this);

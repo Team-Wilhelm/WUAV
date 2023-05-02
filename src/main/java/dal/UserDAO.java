@@ -184,15 +184,15 @@ public class UserDAO extends DAO implements IDAO<User> {
     }
 
     private String saveToBlobService(User user) {
-        String profilePicture = user.getProfilePicturePath();
+        String profilePicture;
         try {
             String filePath = user.getProfilePicturePath().substring(0, user.getProfilePicturePath().lastIndexOf("\\"));
-            System.out.println(filePath);
-            BlobService.getInstance().UploadFile(filePath, "profilePicture", user.getUserID());
+            profilePicture = BlobService.getInstance().UploadFile(filePath, user.getUserID() + "_cropped.png", user.getUserID());
         } catch (Exception e) {
             e.printStackTrace();
             profilePicture = user.getProfilePicturePath();
         }
+        System.out.println(profilePicture);
         return profilePicture;
     }
 }
