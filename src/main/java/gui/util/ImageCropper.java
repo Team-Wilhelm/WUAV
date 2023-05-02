@@ -1,5 +1,6 @@
 package gui.util;
 
+import be.User;
 import gui.controller.AddControllers.AddUserController;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.embed.swing.SwingFXUtils;
@@ -30,6 +31,7 @@ public class ImageCropper {
     private final int CROP_HEIGHT = 300;
     private int imageWidth, imageHeight;
     private final AddUserController controller;
+    private User user;
 
     // JavaFX components
     private final ImageView imageView;
@@ -77,9 +79,11 @@ public class ImageCropper {
 
     private void confirmCrop() {
         String home = System.getProperty("user.home");
-        File file = new File(home + "/Downloads/" + imagePath.substring(
+        String path = home + "/Downloads/";
+        path = user != null ? (path + user.getUserID() + "_cropped.png") : path + imagePath.substring(
                 imagePath.lastIndexOf("\\") + 1, imagePath.lastIndexOf("."))
-                + "_cropped" + ".png");
+                + "_cropped"  + ".png";
+        File file = new File(path);
         try {
             ImageIO.write(SwingFXUtils.fromFXImage(croppedImage, null), "png", file);
             controller.setProfilePicture(croppedImage, file.getAbsolutePath());
@@ -122,6 +126,11 @@ public class ImageCropper {
 
         setGridPaneChildren(true);
         stage.centerOnScreen();
+    }
+
+    public void chooseImage(User user) {
+        chooseImage();
+        this.user = user;
     }
 
     public void chooseImage() {
