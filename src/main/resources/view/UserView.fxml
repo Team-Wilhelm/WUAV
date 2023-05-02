@@ -14,58 +14,54 @@
 
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.Region?>
-<GridPane fx:id="gridPane" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="600.0" prefHeight="600.0" prefWidth="900.0" styleClass="background" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.ViewControllers.UserController">
+<GridPane alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="600.0" prefHeight="600.0" prefWidth="900.0" styleClass="background" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.ViewControllers.UserController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" percentWidth="100" prefWidth="100.0" />
     </columnConstraints>
     <rowConstraints>
         <RowConstraints minHeight="10.0" percentHeight="100.0" prefHeight="30.0" vgrow="SOMETIMES" />
     </rowConstraints>
-    <children>
-        <VBox GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
-            <HBox spacing="15">
+    <VBox GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+        <HBox spacing="15">
+            <padding>
+                <Insets right="15" bottom="10" top="5"/>
+            </padding>
+
+            <MFXButton fx:id="btnAddEmployee" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="addButton, rounded" text="+ Add employee">
+                <GridPane.margin>
+                    <Insets left="15.0" right="15.0" />
+                </GridPane.margin>
+            </MFXButton>
+
+            <MFXProgressSpinner fx:id="progressSpinner" prefHeight="30.0" prefWidth="30.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+                <GridPane.margin>
+                    <Insets bottom="15.0" right="15.0" />
+                </GridPane.margin>
+            </MFXProgressSpinner>
+            <Label fx:id="progressLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+                <GridPane.margin>
+                    <Insets bottom="15.0" right="15.0" />
+                </GridPane.margin>
+            </Label>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <MFXTextField fx:id="searchBar" floatingText="Search for employees" maxWidth="1.7976931348623157E308" prefWidth="300" GridPane.columnIndex="1" GridPane.columnSpan="2147483647">
+                <GridPane.margin>
+                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                </GridPane.margin>
+            </MFXTextField>
+        </HBox>
+
+        <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" style="-fx-background-color: transparent;"
+                    VBox.vgrow="ALWAYS" styleClass="background" vbarPolicy="ALWAYS" GridPane.rowSpan="3">
+            <FlowPane fx:id="flowPane" alignment="TOP_CENTER" columnHalignment="CENTER" hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" rowValignment="TOP" styleClass="background" vgap="20.0">
                 <padding>
-                    <Insets right="15" bottom="10" top="5"/>
+                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                 </padding>
-
-                <MFXButton fx:id="btnAddEmployee" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="createButton" text="+ Add employee">
-                    <GridPane.margin>
-                        <Insets left="15.0" right="15.0" />
-                    </GridPane.margin>
-                </MFXButton>
-
-                <MFXProgressSpinner fx:id="progressSpinner" prefHeight="30.0" prefWidth="30.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
-                    <GridPane.margin>
-                        <Insets bottom="15.0" right="15.0" />
-                    </GridPane.margin>
-                </MFXProgressSpinner>
-                <Label fx:id="progressLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
-                    <GridPane.margin>
-                        <Insets bottom="15.0" right="15.0" />
-                    </GridPane.margin>
-                </Label>
-
-                <Region HBox.hgrow="ALWAYS" />
-
-                <MFXTextField fx:id="searchBar" floatingText="Search for documents" maxWidth="1.7976931348623157E308" prefWidth="300" GridPane.columnIndex="1" GridPane.columnSpan="2147483647">
-                    <GridPane.margin>
-                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                    </GridPane.margin>
-                </MFXTextField>
-            </HBox>
-
-            <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" style="-fx-background-color: transparent;"
-                        VBox.vgrow="ALWAYS" styleClass="background" vbarPolicy="ALWAYS" GridPane.rowSpan="3">
-                <content>
-                    <FlowPane fx:id="flowPane" alignment="TOP_CENTER" columnHalignment="CENTER" hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" rowValignment="TOP" styleClass="background" vgap="20.0">
-                        <padding>
-                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                        </padding>
-                    </FlowPane>
-                </content>
-            </ScrollPane>
-        </VBox>
-    </children>
+            </FlowPane>
+        </ScrollPane>
+    </VBox>
     <padding>
         <Insets bottom="10.0" top="10.0" />
     </padding>
