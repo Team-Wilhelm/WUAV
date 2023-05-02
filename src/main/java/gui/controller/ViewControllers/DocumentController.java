@@ -37,10 +37,7 @@ public class DocumentController extends ViewController implements Initializable 
     private MFXProgressSpinner progressSpinner;
     @FXML
     private Label progressLabel;
-    @FXML
-    private MFXButton btnAddDocument;
-
-    private ObservableList<DocumentCard> documentCards = FXCollections.observableArrayList();
+    private final ObservableList<DocumentCard> documentCards = FXCollections.observableArrayList();
     private final DocumentModel documentModel = DocumentModel.getInstance();
     private DocumentCard lastFocusedCard;
 
@@ -56,7 +53,6 @@ public class DocumentController extends ViewController implements Initializable 
 
         setProgressVisibility(false);
         refreshItems();
-        btnAddDocument.getStyleClass().addAll("addButton", "rounded");
     }
 
     //region progress methods
@@ -140,7 +136,7 @@ public class DocumentController extends ViewController implements Initializable 
         }
     }
 
-    public void addDocumentAction(ActionEvent actionEvent) throws IOException {
+    public void addDocumentAction() throws IOException {
         ((AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController()).setDocumentController(this);
     }
 }

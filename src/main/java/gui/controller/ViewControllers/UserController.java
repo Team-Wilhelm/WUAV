@@ -48,7 +48,6 @@ public class UserController extends ViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setProgressVisibility(false);
-        btnAddEmployee.getStyleClass().addAll("addButton", "rounded");
 
         Bindings.bindContent(flowPane.getChildren(), userCards);
         userCards.setAll(userModel.getLoadedCards().values());
@@ -57,7 +56,6 @@ public class UserController extends ViewController implements Initializable {
         flowPane.prefWidthProperty().bind(scrollPane.widthProperty());
 
         refreshItems();
-        btnAddEmployee.getStyleClass().addAll("addButton", "rounded");
     }
 
     @Override
