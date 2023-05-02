@@ -63,7 +63,6 @@ public class DocumentController extends ViewController implements Initializable 
                 refreshItems(documentModel.searchDocuments(searchBar.getText().toLowerCase().trim())));
 
         refreshItems();
-
         btnAddDocument.getStyleClass().addAll("addButton", "rounded");
     }
 
@@ -148,7 +147,7 @@ public class DocumentController extends ViewController implements Initializable 
         }
     }
 
-    public void addDocumentAction(ActionEvent actionEvent) throws IOException {
+    public void addDocumentAction() throws IOException {
         ((AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController()).setDocumentController(this);
     }
 }

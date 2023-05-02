@@ -10,6 +10,7 @@ import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
 import gui.model.IModel;
+import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
@@ -22,6 +23,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -36,6 +38,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class AddDocumentController extends AddController implements Initializable {
@@ -61,6 +64,7 @@ public class AddDocumentController extends AddController implements Initializabl
     private Document documentToEdit;
     private DocumentController documentController;
     private HashMap<Image, String> pictures;
+    private AlertManager alertManager;
 
     // Document and customer information
     private String city, country, email, houseNumber, jobTitle, name, phoneNumber, postcode, streetName;
@@ -73,6 +77,7 @@ public class AddDocumentController extends AddController implements Initializabl
         customerModel = CustomerModel.getInstance();
         pdfGenerator = new PdfGenerator();
         pictures = new HashMap<>();
+        alertManager = AlertManager.getInstance();
     }
 
     @Override
@@ -138,6 +143,16 @@ public class AddDocumentController extends AddController implements Initializabl
 
         documentToEdit = document;
         btnCreatePdf.setDisable(false);
+    }
+
+    public void deleteAction(ActionEvent actionEvent) {
+        Optional<ButtonType> result = alertManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", txtName.getScene().getWindow());
+        if (result.isPresent() && result.get().equals(ButtonType.OK)) {
+            Task<TaskState> deleteTask = new DeleteTask<>(documentToEdit.getDocumentID(), documentModel);
+            setUpDeleteTask(deleteTask, documentController, txtName.getScene().getWindow());
+            executeTask(deleteTask);
+        }
+        closeWindow(actionEvent);
     }
 
     /**
@@ -226,6 +241,7 @@ public class AddDocumentController extends AddController implements Initializabl
 
     //TODO edit tickets out and add new alerttype
     private void setUpListView() {
+        //TODO remove tickets
         listViewPictures.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getClickCount() == 2) {
                 if (!listViewPictures.getSelectionModel().getSelection().isEmpty()) {

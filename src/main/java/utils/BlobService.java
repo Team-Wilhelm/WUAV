@@ -1,9 +1,16 @@
 package utils;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Locale;
 
 import com.azure.storage.blob.*;
 
+import java.util.Properties;
 import java.util.UUID;
 
 public class BlobService {
@@ -11,13 +18,21 @@ public class BlobService {
     private final BlobServiceClient blobServiceClient;
     private final String containerName = "wuav";
     private BlobService() {
-        String connectStr = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
+        Properties prop = new Properties();
+        InputStream input = startup.class.getClassLoader().getResourceAsStream("config.properties");
+        try {
+            prop.load(input);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String connectStr = prop.getProperty("AZURE_STORAGE_CONNECTION_STRING");
+
         blobServiceClient = new BlobServiceClientBuilder()
                 .connectionString(connectStr)
                 .buildClient();
     }
-    public static BlobService getInstance()
-    {
+    public static BlobService getInstance() {
         if (instance == null)
             instance = new BlobService();
 
@@ -50,7 +65,7 @@ public class BlobService {
 
     /**
      * Deletes a blob from the storage
-     * @param blobUrl The url of the blob to delete
+     * @param blobUrl The url of the b lob to delete
      * @return True if the blob was deleted, false if not
      */
 
@@ -62,12 +77,15 @@ public class BlobService {
 }
 
 class startup{
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // This is just a test
         // The file test.txt needs to be in the folder C:\Users\matej\EASV\CSe22\2ndSemester\WUAV\src\test
         // TODO: Make this into unit tests
         BlobService blobService = BlobService.getInstance();
-        var url = blobService.UploadFile("C:\\Users\\matej\\EASV\\CSe22\\2ndSemester\\WUAV\\src\\test", "test.txt", UUID.randomUUID());
+        Path currentRelativePath = Paths.get("");
+        String s = currentRelativePath.toAbsolutePath().toString();
+
+        var url = blobService.UploadFile(s+"\\src\\test", "test.txt", UUID.randomUUID());
         var out = blobService.DeleteBlob(url);
         System.out.println(out);
     }
