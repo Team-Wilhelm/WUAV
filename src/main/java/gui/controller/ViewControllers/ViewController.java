@@ -29,7 +29,7 @@ public abstract class ViewController {
         Scene scene = new Scene(fxmlLoader.load());
         stage.setScene(scene);
         stage.setTitle("WUAV Documentation Management System");
-        stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/img/WUAV.png"))));
+        stage.getIcons().add(new Image("/img/WUAV.png"));
         stage.centerOnScreen();
         stage.initModality(modalityType);
         stage.show();

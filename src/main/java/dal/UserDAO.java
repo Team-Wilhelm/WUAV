@@ -161,6 +161,23 @@ public class UserDAO extends DAO implements IDAO<User> {
         return null;
     }
 
+    public boolean logIn(String username, byte[] password) {
+        String sql = "SELECT * FROM [SystemUser] WHERE Username=? AND UserPassword=?";
+        Connection connection = null;
+        try {
+            connection = dbConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, username);
+            statement.setBytes(2, password);
+            return statement.executeQuery().next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbConnection.releaseConnection(connection);
+        }
+        return false;
+    }
+
     private User getUserFromResultSet(ResultSet resultSet, List<UUID> documentIDs) throws SQLException {
         User user = new User(
                 UUID.fromString(resultSet.getString("UserID")),
