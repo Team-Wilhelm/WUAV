@@ -26,7 +26,7 @@ public class UserCard extends VBox {
         this.getStyleClass().addAll("user-card");
 
         // Profile image
-        ImageView profileImage = new ImageView(new Image("https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8cHJvZmlsZXxlbnwwfHwwfHw%3D&w=1000&q=80"));
+        ImageView profileImage = new ImageView(new Image(user.getProfilePicturePath()));
         profileImage.setFitWidth(width);
         profileImage.setFitHeight(width);
 

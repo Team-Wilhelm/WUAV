@@ -26,15 +26,9 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.userRole = userRole;
         this.assignedDocuments = new HashMap<>();
-        this.profilePicturePath = profilePicturePath;
 
-        if (profilePicturePath != null) {
-            File file = new File(profilePicturePath);
-            this.profilePicture = new Image(file.toURI().toString());
-        } else {
-            this.profilePicturePath = "/img/userIcon.png";
-            this.profilePicture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/userIcon.png")));
-        }
+        this.profilePicturePath = Objects.requireNonNullElse(profilePicturePath, "/img/userIcon.png");
+        this.profilePicture = new Image(profilePicturePath);
     }
 
     public User(UUID userID, String fullName, String username, byte[][] password, String phoneNumber, UserRole userRole, String profilePicturePath) {
