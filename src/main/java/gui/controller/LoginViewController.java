@@ -32,7 +32,6 @@ public class LoginViewController implements Initializable {
     private MFXTextField usernameInput;
     @FXML
     private MFXPasswordField passwordInput;
-
     private Parent root;
     private Stage stage;
     private final UserModel userModel = UserModel.getInstance();

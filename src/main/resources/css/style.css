@@ -44,10 +44,12 @@
 }
 
 .loginHalf{
-    -fx-background-image: url("/img/09f63ad7-0b64-4b7e-bd4d-ef2d9939cfe6.jpg");
+    -fx-background-image: url("/img/loginImage.png");
     -fx-background-size: cover;
     -fx-background-position-x: center;
+
 }
+
 
 .cardImage {
     -fx-background-image: url("https://whatfix.com/blog/wp-content/uploads/2021/09/Technical-Documentation-Guide-Whatfix.jpeg");
