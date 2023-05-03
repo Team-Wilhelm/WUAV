@@ -20,13 +20,16 @@ import com.itextpdf.layout.property.AreaBreakType;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
-import java.io.IOException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 
 public class PdfGenerator {
     private static PdfFont FONT;
     private static final int FONT_SIZE = 12;
+
 
     public void generatePdf(Document document){
         try {
@@ -70,8 +73,8 @@ public class PdfGenerator {
 
             //Add logo
             //TODO fix image path
-            String imageFile = "C:\\Users\\maria\\Documents\\2nd semester CS\\WUAV\\src\\main\\resources\\img\\WUAV.png";
-            ImageData data = ImageDataFactory.create(imageFile);
+            //String imageFile = "C:\\Users\\maria\\Documents\\2nd semester CS\\WUAV\\src\\main\\resources\\img\\WUAV.png";
+            ImageData data = ImageDataFactory.create(getLogo());
             Image logoImage = new Image(data);
             logoImage.setHeight(50).setHorizontalAlignment(HorizontalAlignment.RIGHT);
 
@@ -130,6 +133,10 @@ public class PdfGenerator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String getLogo(){
+        return "https://easvprojects.blob.core.windows.net/wuav/9e112cc6-1487-426a-9bdc-2a4fd7b91861/7e7d9e00-507b-47ee-989b-8686859b41aa-wuav.png";
     }
 
     private String getWUAVinfo() {
