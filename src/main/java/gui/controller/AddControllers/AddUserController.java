@@ -111,7 +111,7 @@ public class AddUserController extends AddController implements Initializable {
 
             // Save the user
             assignInputToVariables();
-            byte[] passwordHash = hashPasswordHelper.hashPassword(password);
+            byte[][] passwordHash = hashPasswordHelper.hashPassword(password);
             User user = new User(name, username, passwordHash, phoneNumber, userRole, profilePicturePath);
             Task<TaskState> saveTask = new SaveTask<>(user, isEditing, userModel);
             if (isEditing) {
@@ -137,6 +137,15 @@ public class AddUserController extends AddController implements Initializable {
             executeTask(deleteTask);
         }
         closeWindow(actionEvent);
+    }
+
+    private void profilePictureDoubleClick() {
+        imgProfilePicture.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && isUpdating) {
+                ImageCropper imageCropper = new ImageCropper(this);
+                imageCropper.chooseImage(userToUpdate);
+            }
+        });
     }
 
     private enum Action {
@@ -227,7 +236,7 @@ public class AddUserController extends AddController implements Initializable {
         txtUsername.setText(user.getUsername());
         txtPassword.setPromptText("Leave empty to keep current password");
         comboPosition.getSelectionModel().selectItem(user.getUserRole());
-        listViewDocuments.getItems().setAll(user.getAssignedDocuments());
+        listViewDocuments.getItems().setAll(user.getAssignedDocuments().values());
         imgProfilePicture.setImage(new Image(user.getProfilePicturePath()));
     }
 
@@ -256,20 +265,10 @@ public class AddUserController extends AddController implements Initializable {
         comboActions.getItems().setAll(Action.EDIT, Action.DELETE);
     }
 
-    private void profilePictureDoubleClick() {
-        // TODO only if editing ?
-        imgProfilePicture.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2 && isUpdating) {
-                ImageCropper imageCropper = new ImageCropper(this);
-                imageCropper.chooseImage(userToUpdate);
-            }
-        });
-    }
-    //endregion
-
     public void setProfilePicture(Image image, String profilePicturePath) {
         profilePicture = image;
         imgProfilePicture.setImage(profilePicture);
         this.profilePicturePath = profilePicturePath;
     }
+    //endregion
 }

@@ -4,6 +4,7 @@ import be.User;
 import be.cards.UserCard;
 import bll.IManager;
 import bll.ManagerFactory;
+import bll.UserManager;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -13,13 +14,13 @@ import java.util.UUID;
 
 public class UserModel implements IModel<User> {
     private static UserModel instance;
-    private IManager<User> userManager;
+    private UserManager userManager;
     private HashMap<UUID, User> allUsers;
     private HashMap<User, UserCard> loadedCards;
     private static User loggedInUser;
 
     private UserModel() {
-        userManager = ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
+        userManager = (UserManager) ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
         loadedCards = new HashMap<>();
         setAllUsersFromManager();
         createUserCards();
@@ -116,5 +117,9 @@ public class UserModel implements IModel<User> {
         for (User user : allUsers.values()) {
             loadedCards.put(user, new UserCard(user));
         }
+    }
+
+    public boolean logIn(String username, byte[] password){
+        return userManager.logIn(username, password);
     }
 }

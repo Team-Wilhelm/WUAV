@@ -38,4 +38,8 @@ public class UserManager implements IManager<User> {
     public User getById(UUID id) {
         return dao.getById(id);
     }
+
+    public boolean logIn(String username, byte[] password){
+        return dao.logIn(username, password);
+    }
 }

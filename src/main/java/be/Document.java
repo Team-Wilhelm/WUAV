@@ -113,7 +113,6 @@ public class Document {
         if (o == null || getClass() != o.getClass()) return false;
 
         Document document = (Document) o;
-
         return documentID.equals(document.documentID);
     }
 

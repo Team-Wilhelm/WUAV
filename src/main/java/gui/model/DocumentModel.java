@@ -1,7 +1,9 @@
 package gui.model;
 
 import be.Document;
+import be.User;
 import be.cards.DocumentCard;
+import bll.DocumentManager;
 import bll.IManager;
 import bll.ManagerFactory;
 
@@ -11,12 +13,12 @@ import java.util.concurrent.CountDownLatch;
 
 public class DocumentModel implements IModel<Document> {
     private static DocumentModel instance;
-    private IManager<Document> documentManager;
+    private DocumentManager documentManager;
     private HashMap<UUID, Document> allDocuments;
     private HashMap<Document, DocumentCard> createdDocumentCards;
 
     private DocumentModel() {
-        documentManager = ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
+        documentManager = (DocumentManager) ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
         createdDocumentCards = new HashMap<>();
         setAllDocuments();
         createDocumentCards();
@@ -86,6 +88,10 @@ public class DocumentModel implements IModel<Document> {
         }
     }
 
+    public void assignUserToDocument(User user, Document document, boolean isAssigning){
+        documentManager.assignUserToDocument(user, document, isAssigning);
+    }
+
 
     public List<Document> searchDocuments(String query) {
         List<Document> filteredDocuments = new ArrayList<>();
@@ -94,8 +100,8 @@ public class DocumentModel implements IModel<Document> {
                                 || document.getCustomer().getCustomerEmail().toLowerCase().contains(query.toLowerCase())
                                 || document.getCustomer().getCustomerPhoneNumber().toLowerCase().contains(query.toLowerCase())
                                 || document.getDateOfCreation().toString().toLowerCase().contains(query.toLowerCase())
-                                || document.getTechnicians().stream().allMatch(user -> user.getFullName().toLowerCase().contains(query.toLowerCase()))
-                                || document.getTechnicians().stream().allMatch(user -> user.getUsername().toLowerCase().contains(query.toLowerCase()))
+                                //|| document.getTechnicians().stream().allMatch(user -> user.getFullName().toLowerCase().contains(query.toLowerCase()))
+                                //|| document.getTechnicians().stream().allMatch(user -> user.getUsername().toLowerCase().contains(query.toLowerCase()))
                         ).forEach(filteredDocuments::add);
         return filteredDocuments;
     }
