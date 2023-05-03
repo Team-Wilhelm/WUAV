@@ -26,6 +26,7 @@ import utils.HashPasswordHelper;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -204,7 +205,8 @@ public class AddUserController extends AddController implements Initializable {
     }
 
     private boolean checkInput() {
-        if (userModel.getAll().values().stream().anyMatch(user -> user.getUsername().equals(username))) {
+        if (userModel.getAll().values().stream().anyMatch(user -> user.getUsername().equals(username))
+                && !Objects.equals(userToUpdate.getUsername(), username)) {
             alertManager.showError("Username already exists", "Please choose another username", txtName.getScene().getWindow());
             return false;
         }

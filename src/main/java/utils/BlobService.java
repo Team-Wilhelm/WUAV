@@ -44,7 +44,7 @@ public class BlobService {
      * @param customerId The id of the customer
      * @return The url of the blob
      */
-    public String UploadFile(String filePath, String fileName, UUID customerId) {
+    public String UploadFile(String filePath, String fileName, UUID customerId) throws Exception {
 
         // Create the container and return a container client object
         BlobContainerClient containerClient = this.blobServiceClient.getBlobContainerClient(containerName);
@@ -54,10 +54,17 @@ public class BlobService {
 
         // Get a reference to a blob
         BlobClient blobClient = containerClient.getBlobClient(uploadPath);
+        System.out.println("\nUploading to Azure Storage as blob:\n\t" + blobClient.getBlobUrl());
 
         // Upload the blob
-        blobClient.uploadFromFile(filePath + "\\" + fileName);
-
+        try {
+            blobClient.uploadFromFile(filePath + "\\" + fileName);
+            System.out.println("Upload finished");
+            return blobClient.getBlobUrl();
+        } catch (Exception e) {
+            System.out.println("Upload failed");
+            e.printStackTrace();
+        }
         return blobClient.getBlobUrl();
     }
 
@@ -67,7 +74,7 @@ public class BlobService {
      * @param customerId The id of the customer
      * @return
      */
-    public String UploadFile(String path, UUID customerId){
+    public String UploadFile(String path, UUID customerId) throws Exception {
         Path p = Paths.get(path);
         String fileName = p.getFileName().toString();
         String filePath = p.getParent().toString();
@@ -94,7 +101,12 @@ class startup{
         Path currentRelativePath = Paths.get("");
         String s = currentRelativePath.toAbsolutePath().toString();
 
-        var url = blobService.UploadFile(s+"\\src\\test", "test.txt", UUID.randomUUID());
+        String url = null;
+        try {
+            url = blobService.UploadFile(s+"\\src\\test", "test.txt", UUID.randomUUID());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         var out = blobService.DeleteBlob(url);
         System.out.println(out);
     }

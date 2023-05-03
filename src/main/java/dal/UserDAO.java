@@ -12,7 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
+
 
 public class UserDAO extends DAO implements IDAO<User> {
     private final DBConnection dbConnection;
@@ -74,16 +75,16 @@ public class UserDAO extends DAO implements IDAO<User> {
     public String update(User user) {
         String result = "updated";
         String sql = "UPDATE SystemUser SET FullName = ?, Username = ?, UserPassword = ?, " +
-                "UserRole = ?, PhoneNumber = ?, ProfilePicture = ?, Salt = ? " +
+                "UserRole = ?, PhoneNumber = ?, Salt = ?, ProfilePicture = ? " +
                 "WHERE UserID = ?";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             fillPreparedStatement(ps, user);
-            String profilePicturePath = saveToBlobService(user).get();
-            ps.setString(6, profilePicturePath);
-            ps.setBytes(7, user.getPassword()[1]);
+            String profilePicturePath = saveToBlobService(user);
+            ps.setBytes(6, user.getPassword()[1]);
+            ps.setString(7, profilePicturePath);
             ps.setString(8, user.getUserID().toString());
             ps.executeUpdate();
         } catch (Exception e) {
@@ -212,16 +213,30 @@ public class UserDAO extends DAO implements IDAO<User> {
         ps.setBytes(6, user.getPassword()[1]);
     }
 
-    private CompletableFuture<String> saveToBlobService(User user) {
+    private String saveToBlobService(User user) throws ExecutionException, InterruptedException {
+        // Try to upload the file to blob service
+        Callable<String> uploadFile = () -> BlobService.getInstance().UploadFile(user.getProfilePicturePath(), user.getUserID());
+
         // Make sure the thread waits until blob service is done
-        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return BlobService.getInstance().UploadFile(user.getProfilePicturePath(), user.getUserID());
-            } catch (Exception e) {
-                e.printStackTrace();
-                return user.getProfilePicturePath();
-            }
-        });
-        return future;
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<String> future = executor.submit(uploadFile);
+
+        String result = "/img/userIcon.png";
+        try {
+            result = future.get();
+            return result;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Thread was interrupted while waiting for result: " + e.getMessage());
+            throw e;
+        } catch (ExecutionException e) {
+            System.err.println("An error occurred while executing the task: " + e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            System.err.println("An error occurred: " + e.getMessage());
+            throw e;
+        } finally {
+            executor.shutdown();
+        }
     }
 }
