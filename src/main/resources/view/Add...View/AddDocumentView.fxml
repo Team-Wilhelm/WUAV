@@ -14,10 +14,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="900.0" styleClass="background" stylesheets="@../../css/style.css" vgap="10.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.AddControllers.AddDocumentController">
+<GridPane hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="600.0" minWidth="900.0" styleClass="background" stylesheets="@../../css/style.css" vgap="10.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.AddControllers.AddDocumentController">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
-    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" prefWidth="100.0" />
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
   </columnConstraints>
@@ -34,45 +35,46 @@
       <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <MFXTextField fx:id="txtJobTitle" floatingText="Job title" maxWidth="1.7976931348623157E308" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-      <TextArea fx:id="txtJobDescription" prefHeight="200.0" prefWidth="200.0" promptText="Job description" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="3" />
-      <TextArea fx:id="txtNotes" prefHeight="200.0" prefWidth="200.0" promptText="Notes" GridPane.columnSpan="2" GridPane.rowIndex="5" GridPane.rowSpan="2" />
-      <MFXListView fx:id="listViewPictures" depthLevel="LEVEL1" maxWidth="1.7976931348623157E308" prefWidth="517.0" GridPane.columnSpan="2" GridPane.rowIndex="7" GridPane.rowSpan="2" />
-      <MFXButton fx:id="btnDelete" onAction="#deleteAction" maxWidth="1.7976931348623157E308" text="Delete" GridPane.rowIndex="9">
+      <MFXTextField fx:id="txtJobTitle" floatingText="Job title" maxWidth="1.7976931348623157E308" GridPane.columnSpan="3" GridPane.rowIndex="1" />
+      <TextArea fx:id="txtJobDescription" prefHeight="200.0" prefWidth="200.0" promptText="Job description" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.rowSpan="3" />
+      <TextArea fx:id="txtNotes" prefHeight="200.0" prefWidth="200.0" promptText="Notes" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.rowSpan="2" />
+      <MFXListView fx:id="listViewPictures" depthLevel="LEVEL1" maxWidth="1.7976931348623157E308" prefWidth="517.0" GridPane.columnSpan="3" GridPane.rowIndex="7" GridPane.rowSpan="2" />
+      <MFXButton fx:id="btnDelete" maxWidth="1.7976931348623157E308" onAction="#deleteAction" text="Delete" GridPane.rowIndex="9">
          <GridPane.margin>
             <Insets />
          </GridPane.margin>
       </MFXButton>
-      <MFXButton fx:id="btnUploadPictures" onAction="#uploadPicturesAction" text="Upload pictures..." GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
-      <MFXTextField fx:id="txtName" floatingText="Name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-      <MFXTextField fx:id="txtEmail" floatingText="Email" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-      <MFXTextField fx:id="txtPhoneNumber" floatingText="Phone number" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-      <MFXTextField fx:id="txtStreetName" floatingText="Street name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-      <MFXTextField fx:id="txtHouseNumber" floatingText="House number" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-      <MFXTextField fx:id="txtCity" floatingText="City" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-      <MFXTextField fx:id="txtPostcode" floatingText="Postal code" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-      <MFXTextField fx:id="txtCountry" floatingText="Country" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.rowIndex="5" />
-      <MFXFilterComboBox fx:id="comboTechnicians" floatingText="Assign technicians" maxWidth="1.7976931348623157E308" selectable="true" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
-      <MFXButton fx:id="btnCancel" maxWidth="1.7976931348623157E308" onAction="#cancelAction" text="Cancel" GridPane.columnIndex="2" GridPane.rowIndex="9">
+      <MFXButton fx:id="btnUploadPictures" maxWidth="1.7976931348623157E308" onAction="#uploadPicturesAction" text="Upload pictures..." GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
+      <MFXTextField fx:id="txtName" floatingText="Name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+      <MFXTextField fx:id="txtEmail" floatingText="Email" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+      <MFXTextField fx:id="txtPhoneNumber" floatingText="Phone number" maxWidth="1.7976931348623157E308" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+      <MFXTextField fx:id="txtStreetName" floatingText="Street name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+      <MFXTextField fx:id="txtHouseNumber" floatingText="House number" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+      <MFXTextField fx:id="txtCity" floatingText="City" maxWidth="1.7976931348623157E308" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+      <MFXTextField fx:id="txtPostcode" floatingText="Postal code" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+      <MFXTextField fx:id="txtCountry" floatingText="Country" maxWidth="1.7976931348623157E308" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+      <MFXFilterComboBox fx:id="comboTechnicians" floatingText="Assign technicians" maxWidth="1.7976931348623157E308" selectable="true" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+      <MFXButton fx:id="btnCancel" maxWidth="1.7976931348623157E308" onAction="#cancelAction" text="Cancel" GridPane.columnIndex="3" GridPane.rowIndex="9">
          <GridPane.margin>
             <Insets />
          </GridPane.margin>
       </MFXButton>
-      <MFXButton fx:id="btnSave" maxWidth="1.7976931348623157E308" onAction="#saveAction" text="Save" GridPane.columnIndex="3" GridPane.rowIndex="9">
+      <MFXButton fx:id="btnSave" maxWidth="1.7976931348623157E308" onAction="#saveAction" text="Save" GridPane.columnIndex="4" GridPane.rowIndex="9">
          <GridPane.margin>
             <Insets />
          </GridPane.margin>
       </MFXButton>
-      <Label text="Customer information" GridPane.columnIndex="2" />
+      <Label text="Customer information" GridPane.columnIndex="3" />
       <Label text="Job information" />
-      <HBox alignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="7">
+      <HBox alignment="CENTER" GridPane.columnIndex="3" GridPane.rowIndex="7">
          <children>
             <Label text="Business" />
             <MFXToggleButton fx:id="toggleCustomerType" contentDisposition="GRAPHIC_ONLY" />
             <Label text="Private" />
          </children>
       </HBox>
-      <MFXDatePicker fx:id="dateLastContract" floatMode="INLINE" floatingText="Last contract" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+      <MFXDatePicker fx:id="dateLastContract" floatMode="INLINE" floatingText="Last contract" GridPane.columnIndex="4" GridPane.rowIndex="7" />
+      <MFXButton fx:id="btnCreatePdf" maxWidth="1.7976931348623157E308" onAction="#createPdfAction" text="Download PDF" GridPane.columnIndex="1" GridPane.rowIndex="9" />
    </children>
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

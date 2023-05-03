@@ -118,4 +118,8 @@ public class UserModel implements IModel<User> {
             loadedCards.put(user, new UserCard(user));
         }
     }
+
+    public boolean logIn(String username, byte[] password){
+        return userManager.logIn(username, password);
+    }
 }

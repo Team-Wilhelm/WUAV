@@ -6,6 +6,7 @@ import be.Document;
 import be.User;
 import be.enums.CustomerType;
 import be.enums.UserRole;
+import bll.PdfGenerator;
 import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
@@ -40,10 +41,14 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class AddDocumentController extends AddController implements Initializable {
     @FXML
-    private MFXButton btnCancel, btnDelete, btnSave, btnUploadPictures;
+    private MFXButton btnCancel, btnDelete, btnSave, btnUploadPictures, btnCreatePdf;
     @FXML
     private MFXFilterComboBox<User> comboTechnicians;
     @FXML
@@ -57,8 +62,9 @@ public class AddDocumentController extends AddController implements Initializabl
     @FXML
     private MFXDatePicker dateLastContract;
 
-    private final DocumentModel documentModel;
-    private final CustomerModel customerModel;
+    private DocumentModel documentModel;
+    private CustomerModel customerModel;
+    private PdfGenerator pdfGenerator;
     private boolean isEditing;
     private Document documentToEdit;
     private DocumentController documentController;
@@ -77,6 +83,7 @@ public class AddDocumentController extends AddController implements Initializabl
     public AddDocumentController() {
         documentModel = DocumentModel.getInstance();
         customerModel = CustomerModel.getInstance();
+        pdfGenerator = new PdfGenerator();
         pictures = new HashMap<>();
         alertManager = AlertManager.getInstance();
         technicians = new ArrayList<>();
@@ -94,6 +101,7 @@ public class AddDocumentController extends AddController implements Initializabl
         isEditing = false;
         btnSave.setDisable(true);
         btnDelete.setDisable(true);
+        btnCreatePdf.setDisable(true);
 
         assignListenersToTextFields();
         setUpListView();
@@ -132,7 +140,6 @@ public class AddDocumentController extends AddController implements Initializabl
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
-        closeWindow(actionEvent);
         assignInputToVariables();
 
         Address address = new Address(streetName, houseNumber, postcode, city, country);
@@ -152,6 +159,9 @@ public class AddDocumentController extends AddController implements Initializabl
         Task<TaskState> task = new SaveTask<>(document, isEditing, documentModel);
         setUpSaveTask(task, documentController, txtCity.getScene().getWindow());
         executeTask(task);
+
+        documentToEdit = document;
+        btnCreatePdf.setDisable(false);
     }
 
     public void deleteAction(ActionEvent actionEvent) {
@@ -196,6 +206,7 @@ public class AddDocumentController extends AddController implements Initializabl
         documentToEdit = document;
         btnSave.setDisable(false);
         btnDelete.setDisable(false);
+        btnCreatePdf.setDisable(false);
 
         // Customer information
         txtName.setText(document.getCustomer().getCustomerName());
@@ -350,6 +361,28 @@ public class AddDocumentController extends AddController implements Initializabl
 
     public void setDocumentController(DocumentController documentController) {
         this.documentController = documentController;
+    }
+
+    public void createPdfAction(ActionEvent actionEvent) {
+        if(isInputChanged(documentToEdit)){
+            AlertManager.getInstance().showWarning("Unsaved changes", "Please save changes", txtCity.getScene().getWindow());
+        }
+        else pdfGenerator.generatePdf(documentToEdit);
+    }
+
+    private boolean isInputChanged(Document document){
+        Address customerAddress = document.getCustomer().getCustomerAddress();
+        return !txtCity.getText().trim().equals(customerAddress.getTown())
+                || !txtCountry.getText().trim().equals(customerAddress.getCountry())
+                || !txtEmail.getText().trim().equals(document.getCustomer().getCustomerEmail())
+                || !txtHouseNumber.getText().trim().equals(customerAddress.getStreetNumber())
+                || !txtJobTitle.getText().trim().equals(document.getJobTitle())
+                || !txtName.getText().trim().equals(document.getCustomer().getCustomerName())
+                || !txtPhoneNumber.getText().trim().equals(document.getCustomer().getCustomerPhoneNumber())
+                || !txtPostcode.getText().trim().equals(customerAddress.getPostcode())
+                || !txtStreetName.getText().trim().equals(customerAddress.getStreetName())
+                || !txtJobDescription.getText().trim().equals(document.getJobDescription())
+                || !txtNotes.getText().trim().equals(document.getOptionalNotes());
     }
 
     private void populateComboBox() {
