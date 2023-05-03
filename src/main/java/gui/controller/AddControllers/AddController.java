@@ -107,7 +107,8 @@ public abstract class AddController {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            executorService.shutdownNow();
+            if (!executorService.isTerminated())
+                executorService.shutdownNow();
         }
     }
 

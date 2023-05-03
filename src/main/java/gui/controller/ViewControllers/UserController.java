@@ -99,8 +99,7 @@ public class UserController extends ViewController implements Initializable {
         for (User user : (List<User>) items) {
             UserCard userCard = loadedCards.get(user);
             if (userCard == null) {
-                userCard = new UserCard(user);
-                userModel.getLoadedCards().put(user, userCard);
+                userCard = userModel.addUserCard(user);
                 loadedCards.put(user, userCard);
             }
 

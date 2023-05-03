@@ -1,13 +1,14 @@
 package be;
 
 import be.enums.UserRole;
+import be.interfaces.Observable;
 import javafx.scene.image.Image;
 
 import javax.print.Doc;
 import java.io.File;
 import java.util.*;
 
-public class User {
+public class User extends Observable<User> {
     private UUID userID;
     private String fullName, username, phoneNumber, profilePicturePath;
     private byte[][] password;
@@ -29,6 +30,7 @@ public class User {
 
         this.profilePicturePath = Objects.requireNonNullElse(profilePicturePath, "/img/userIcon.png");
         this.profilePicture = new Image(profilePicturePath);
+        notifyObservers(this);
     }
 
     public User(UUID userID, String fullName, String username, byte[][] password, String phoneNumber, UserRole userRole, String profilePicturePath) {
@@ -118,6 +120,7 @@ public class User {
 
     public void setProfilePicturePath(String profilePicturePath) {
         this.profilePicturePath = profilePicturePath;
+        notifyObservers(this);
     }
 
     public String getAssignation(Document document){

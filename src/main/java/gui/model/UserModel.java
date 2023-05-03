@@ -115,11 +115,20 @@ public class UserModel implements IModel<User> {
      */
     public void createUserCards() {
         for (User user : allUsers.values()) {
-            loadedCards.put(user, new UserCard(user));
+            UserCard userCard = new UserCard(user);
+            loadedCards.put(user, userCard);
+            user.addObserver(userCard);
         }
     }
 
     public boolean logIn(String username, byte[] password){
         return userManager.logIn(username, password);
+    }
+
+    public UserCard addUserCard(User user){
+        UserCard userCard = new UserCard(user);
+        loadedCards.put(user, userCard);
+        user.addObserver(userCard);
+        return userCard;
     }
 }
