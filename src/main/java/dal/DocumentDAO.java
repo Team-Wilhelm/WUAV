@@ -67,6 +67,19 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 ps.addBatch();
             }
             ps.executeBatch();
+
+
+            //Save and link image filepaths to document
+            sql = "INSERT INTO Document_Image_Link (DocumentID, filepath) VALUES (?, ?)";
+            ps = connection.prepareStatement(sql);
+            String documentID = document.getDocumentID().toString();
+            for (String filepath: document.getDocumentImages()){
+                ps.setString(1, documentID);
+                ps.setString(2, filepath);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+
         } catch (Exception e) {
             e.printStackTrace();
             result = e.getMessage();
@@ -97,6 +110,24 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             ps.setString(6, document.getDocumentID().toString());
             ps.executeUpdate();
 
+
+            //Update document image link
+            if (!document.getDocumentImages().isEmpty()) {
+                sql = "MERGE INTO Document_Image_Link AS d "
+                        + "USING (VALUES (?, ?)) AS s(DocumentID, filepath) "
+                        + "ON (d.DocumentID = s.DocumentID AND d.filepath = s.filepath) "
+                        + "WHEN NOT MATCHED THEN "
+                        + "INSERT (DocumentID, filepath) VALUES (s.DocumentID, s.filepath);";
+                ps = connection.prepareStatement(sql);
+                String documentID = document.getDocumentID().toString();
+                for (String filepath : document.getDocumentImages()) {
+                    ps.setString(1, documentID);
+                    ps.setString(2, filepath);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+
             return result;
         } catch (Exception e) {
             e.printStackTrace();
@@ -109,9 +140,25 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     @Override
     public String delete(UUID id) {
-        String sql = "UPDATE Document SET Deleted = 1 WHERE DocumentID = ?";
-        return delete(id, sql);
+        String result = "deleted";
+        String sql = "UPDATE Document SET Deleted = 1 WHERE DocumentID = ?;" +
+                "DELETE FROM Document_Image_Link WHERE DocumentID = ?";
+        Connection connection = null;
+        try {
+            connection = dbConnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, id.toString());
+            ps.setString(2, id.toString());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            result = e.getMessage();
+        } finally {
+            dbConnection.releaseConnection(connection);
+        }
+        return result;
     }
+
 
 
     @Override
@@ -165,6 +212,30 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 rs.getDate("DateOfCreation")
             );
     }
+
+    //TODO make this correctly without assholes distracting me with shit music
+    public List<String> getImageFilepathsForDocument(Document document){
+        String sql = "SELECT * Document_Image_Link WHERE DocumentID =?;";
+        Connection connection = null;
+        List<String> filepaths = new ArrayList<>();
+        try {
+            connection = dbConnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, document.getDocumentID().toString());
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String filepath = rs.getString("Filepath");
+                filepaths.add(filepath);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            dbConnection.releaseConnection(connection);
+        }
+        return filepaths;
+    }
+
 
     public void assignUserToDocument(User user, Document document, boolean isAssigning){
         String sql = "INSERT INTO User_Document_Link (UserID, DocumentID) VALUES (?, ?);";

@@ -12,7 +12,7 @@ public class Document {
     private Customer customer;
     private Date dateOfCreation;
     private List<User> technicians;
-    private List<Image> documentImages;
+    private List<String> documentImages;
     private String jobDescription, optionalNotes, jobTitle;
 
     public Document (){
@@ -66,11 +66,11 @@ public class Document {
         this.technicians = technicians;
     }
 
-    public List<Image> getDocumentImages() {
+    public List<String> getDocumentImages() {
         return documentImages;
     }
 
-    public void setDocumentImages(List<Image> documentImages) {
+    public void setDocumentImages(List<String> documentImages) {
         this.documentImages = documentImages;
     }
 
