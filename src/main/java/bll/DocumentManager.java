@@ -1,6 +1,7 @@
 package bll;
 
 import be.Document;
+import be.User;
 import dal.DAOFactory;
 import dal.DocumentDAO;
 
@@ -37,5 +38,9 @@ public class DocumentManager implements IManager<Document> {
     @Override
     public Document getById(UUID id) {
         return null;
+    }
+
+    public void assignUserToDocument(User user, Document document, boolean isAssigning){
+        dao.assignUserToDocument(user, document, isAssigning);
     }
 }

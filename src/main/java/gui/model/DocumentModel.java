@@ -1,7 +1,9 @@
 package gui.model;
 
 import be.Document;
+import be.User;
 import be.cards.DocumentCard;
+import bll.DocumentManager;
 import bll.IManager;
 import bll.ManagerFactory;
 
@@ -11,12 +13,12 @@ import java.util.concurrent.CountDownLatch;
 
 public class DocumentModel implements IModel<Document> {
     private static DocumentModel instance;
-    private IManager<Document> documentManager;
+    private DocumentManager documentManager;
     private HashMap<UUID, Document> allDocuments;
     private HashMap<Document, DocumentCard> createdDocumentCards;
 
     private DocumentModel() {
-        documentManager = ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
+        documentManager = (DocumentManager) ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
         createdDocumentCards = new HashMap<>();
         setAllDocuments();
         createDocumentCards();
@@ -84,6 +86,10 @@ public class DocumentModel implements IModel<Document> {
                 createdDocumentCards.put(document, new DocumentCard(document));
             }
         }
+    }
+
+    public void assignUserToDocument(User user, Document document, boolean isAssigning){
+        documentManager.assignUserToDocument(user, document, isAssigning);
     }
 
 
