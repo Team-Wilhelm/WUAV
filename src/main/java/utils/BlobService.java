@@ -64,6 +64,18 @@ public class BlobService {
     }
 
     /**
+     * Uploads a file to the storage
+     * @param path Absolute path to the file
+     * @param customerId The id of the customer
+     * @return
+     */
+    public String UploadFile(String path, UUID customerId){
+        Path p = Paths.get(path);
+        String fileName = p.getFileName().toString();
+        return UploadFile(path, fileName, customerId);
+    }
+
+    /**
      * Deletes a blob from the storage
      * @param blobUrl The url of the b lob to delete
      * @return True if the blob was deleted, false if not
