@@ -89,7 +89,6 @@ public class BlobService {
 class startup{
     public static void main(String[] args) throws IOException {
         // This is just a test
-        // The file test.txt needs to be in the folder C:\Users\matej\EASV\CSe22\2ndSemester\WUAV\src\test
         // TODO: Make this into unit tests
         BlobService blobService = BlobService.getInstance();
         Path currentRelativePath = Paths.get("");

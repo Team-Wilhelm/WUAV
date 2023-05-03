@@ -4,11 +4,12 @@
 .menu{
     -fx-background-color: white;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 4, 0, 0, 4);
+    -fx-text-fill: #0e283f;
 }
 
 .addButton {
-    -fx-background-color: #2b2b2c;
-    -fx-border-color: #2b2b2c;
+    -fx-background-color: #0e283f;
+    -fx-border-color: #0e283f;
     -fx-text-fill: white;
     -fx-font-size: 14;
 }

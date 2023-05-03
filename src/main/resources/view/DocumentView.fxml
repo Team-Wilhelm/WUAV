@@ -14,6 +14,8 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <GridPane alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="600.0" prefHeight="600.0" prefWidth="900.0" styleClass="background" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.ViewControllers.DocumentController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" percentWidth="100.0" prefWidth="100.0" />
@@ -26,10 +28,15 @@
             <padding>
                 <Insets right="15" bottom="10" top="5"/>
             </padding>
-            <MFXButton fx:id="btnAddDocument" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addDocumentAction" styleClass="addButton, rounded" text="+ Add document">
+            <MFXButton fx:id="btnAddDocument" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addDocumentAction" styleClass="addButton, rounded" text=" Add document">
                 <GridPane.margin>
                     <Insets left="15.0" right="15.0" />
                 </GridPane.margin>
+                <graphic>
+                    <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="/img/ic_round-plus.png" />
+                    </ImageView>
+                </graphic>
             </MFXButton>
 
             <MFXProgressSpinner fx:id="progressSpinner" prefHeight="30.0" prefWidth="30.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
