@@ -52,7 +52,7 @@ public class BlobService {
         BlobContainerClient containerClient = this.blobServiceClient.getBlobContainerClient(containerName);
 
         // Create relative path in the storage for the file.
-        var uploadPath = customerId + "/" + UUID.randomUUID() + "-" +fileName.toLowerCase(Locale.ROOT);
+        var uploadPath = customerId + "/" + UUID.randomUUID() + "--" +fileName.toLowerCase(Locale.ROOT);
 
         // Get a reference to a blob
         BlobClient blobClient = containerClient.getBlobClient(uploadPath);
@@ -78,7 +78,7 @@ public class BlobService {
 
     /**
      * Deletes a blob from the storage
-     * @param blobUrl The url of the b lob to delete
+     * @param blobUrl The url of the blob to delete
      * @return True if the blob was deleted, false if not
      */
     public boolean DeleteBlob(String blobUrl) {

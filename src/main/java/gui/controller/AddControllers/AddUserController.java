@@ -66,6 +66,7 @@ public class AddUserController extends AddController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         isEditing = false;
         isUpdating = true;
+        profilePicturePath = "/img/userIcon.png";
 
         btnSave.setDisable(true);
         btnDelete.setDisable(true);
@@ -199,6 +200,7 @@ public class AddUserController extends AddController implements Initializable {
         comboPosition.getSelectionModel().selectItem(user.getUserRole());
         listViewDocuments.getItems().setAll(user.getAssignedDocuments().values());
         imgProfilePicture.setImage(user.getProfilePicture());
+        profilePicturePath = user.getProfilePicturePath();
     }
 
     private boolean checkInput() {

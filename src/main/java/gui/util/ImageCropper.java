@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ImageCropper {
+    //TODO add resizing to the rectangle
     private final int CROP_WIDTH = 300;
     private final int CROP_HEIGHT = 300;
     private int imageWidth, imageHeight;

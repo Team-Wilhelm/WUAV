@@ -63,6 +63,7 @@ public class UserDAO extends DAO implements IDAO<User> {
 
     @Override
     public String update(User user) {
+        System.out.println(user.getProfilePicturePath());
         String result = "updated";
         String sql = "UPDATE SystemUser SET FullName = ?, Username = ?, UserPassword = ?, " +
                 "UserRole = ?, PhoneNumber = ?, ProfilePicture = ?, Salt = ? " +
@@ -205,13 +206,11 @@ public class UserDAO extends DAO implements IDAO<User> {
     private String saveToBlobService(User user) {
         String profilePicture;
         try {
-            String filePath = user.getProfilePicturePath().substring(0, user.getProfilePicturePath().lastIndexOf("\\"));
-            profilePicture = BlobService.getInstance().UploadFile(filePath, user.getUserID() + "_cropped.png", user.getUserID());
+            profilePicture = BlobService.getInstance().UploadFile(user.getProfilePicturePath(), user.getUserID());
         } catch (Exception e) {
             e.printStackTrace();
             profilePicture = user.getProfilePicturePath();
         }
-        System.out.println(profilePicture);
         return profilePicture;
     }
 }
