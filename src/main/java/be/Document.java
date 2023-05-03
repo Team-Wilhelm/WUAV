@@ -12,13 +12,12 @@ public class Document {
     private Customer customer;
     private Date dateOfCreation;
     private List<User> technicians;
-    private List<Image> electricalDrawings, sitePhotos;
+    private List<Image> documentImages;
     private String jobDescription, optionalNotes, jobTitle;
 
     public Document (){
         this.technicians = new ArrayList<>();
-        this.electricalDrawings = new ArrayList<>();
-        this.sitePhotos = new ArrayList<>();
+        this.documentImages = new ArrayList<>();
     }
 
     public Document(Customer customer, String jobDescription, String optionalNotes, String jobTitle, Date dateOfCreation) {
@@ -67,20 +66,12 @@ public class Document {
         this.technicians = technicians;
     }
 
-    public List<Image> getElectricalDrawings() {
-        return electricalDrawings;
+    public List<Image> getDocumentImages() {
+        return documentImages;
     }
 
-    public void setElectricalDrawings(List<Image> electricalDrawings) {
-        this.electricalDrawings = electricalDrawings;
-    }
-
-    public List<Image> getSitePhotos() {
-        return sitePhotos;
-    }
-
-    public void setSitePhotos(List<Image> sitePhotos) {
-        this.sitePhotos = sitePhotos;
+    public void setDocumentImages(List<Image> documentImages) {
+        this.documentImages = documentImages;
     }
 
     public String getJobTitle() {

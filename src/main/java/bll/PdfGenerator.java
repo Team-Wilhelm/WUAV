@@ -24,6 +24,7 @@ import com.itextpdf.layout.property.VerticalAlignment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class PdfGenerator {
@@ -135,6 +136,10 @@ public class PdfGenerator {
 
     private String getLogo(){
         return "https://easvprojects.blob.core.windows.net/wuav/9e112cc6-1487-426a-9bdc-2a4fd7b91861/7e7d9e00-507b-47ee-989b-8686859b41aa-wuav.png";
+    }
+
+    private ArrayList<String> getDocumentImages(Document document){
+        return null;
     }
 
     private String getWUAVinfo() {
