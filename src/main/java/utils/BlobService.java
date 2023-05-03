@@ -72,7 +72,8 @@ public class BlobService {
     public String UploadFile(String path, UUID customerId){
         Path p = Paths.get(path);
         String fileName = p.getFileName().toString();
-        return UploadFile(path, fileName, customerId);
+        String filePath = p.getParent().toString();
+        return UploadFile(filePath, fileName, customerId);
     }
 
     /**
@@ -80,7 +81,6 @@ public class BlobService {
      * @param blobUrl The url of the b lob to delete
      * @return True if the blob was deleted, false if not
      */
-
     public boolean DeleteBlob(String blobUrl) {
         blobUrl = blobUrl.replace("https://easvprojects.blob.core.windows.net/wuav/", "").replace("%2F", "/");
         BlobClient blobClient = this.blobServiceClient.getBlobContainerClient(containerName).getBlobClient(blobUrl);
