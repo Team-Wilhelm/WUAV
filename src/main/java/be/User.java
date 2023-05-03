@@ -10,7 +10,7 @@ import java.util.*;
 public class User {
     private UUID userID;
     private String fullName, username, phoneNumber, profilePicturePath;
-    private byte[] password;
+    private byte[][] password;
     private HashMap<UUID, Document> assignedDocuments;
     private UserRole userRole;
     private Image profilePicture;
@@ -19,7 +19,7 @@ public class User {
         assignedDocuments = new HashMap<>();
     }
 
-    public User(String fullName, String username, byte[] password, String phoneNumber, UserRole userRole, String profilePicturePath) {
+    public User(String fullName, String username, byte[][] password, String phoneNumber, UserRole userRole, String profilePicturePath) {
         this.fullName = fullName;
         this.username = username;
         this.password = password;
@@ -37,7 +37,7 @@ public class User {
         }
     }
 
-    public User(UUID userID, String fullName, String username, byte[] password, String phoneNumber, UserRole userRole, String profilePicturePath) {
+    public User(UUID userID, String fullName, String username, byte[][] password, String phoneNumber, UserRole userRole, String profilePicturePath) {
         this(fullName, username, password, phoneNumber, userRole, profilePicturePath);
         this.userID = userID;
     }
@@ -66,11 +66,11 @@ public class User {
         this.username = username;
     }
 
-    public byte[] getPassword() {
+    public byte[][] getPassword() {
         return password;
     }
 
-    public void setPassword(byte[] password) {
+    public void setPassword(byte[][] password) {
         this.password = password;
     }
 

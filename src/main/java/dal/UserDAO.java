@@ -21,8 +21,8 @@ public class UserDAO extends DAO implements IDAO<User> {
     @Override
     public String add(User user) {
         String result = "saved";
-        String sql = "INSERT INTO SystemUser (FullName, Username, UserPassword, UserRole, PhoneNumber) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO SystemUser (FullName, Username, UserPassword, UserRole, PhoneNumber, Salt) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         Connection connection = null;
         try {
@@ -33,10 +33,9 @@ public class UserDAO extends DAO implements IDAO<User> {
             ps.executeUpdate();
 
             // Get the generated userID from the database and set it as the user's ID
-            sql = "SELECT UserID FROM SystemUser WHERE Username = ? AND UserPassword = ?";
+            sql = "SELECT UserID FROM SystemUser WHERE Username = ?";
             ps = connection.prepareStatement(sql);
             ps.setString(1, user.getUsername());
-            ps.setBytes(2, user.getPassword());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 user.setUserID(UUID.fromString(rs.getString("UserID")));
@@ -66,7 +65,7 @@ public class UserDAO extends DAO implements IDAO<User> {
     public String update(User user) {
         String result = "updated";
         String sql = "UPDATE SystemUser SET FullName = ?, Username = ?, UserPassword = ?, " +
-                "UserRole = ?, PhoneNumber = ?, ProfilePicture = ? " +
+                "UserRole = ?, PhoneNumber = ?, ProfilePicture = ?, Salt = ? " +
                 "WHERE UserID = ?";
         Connection connection = null;
         try {
@@ -74,7 +73,8 @@ public class UserDAO extends DAO implements IDAO<User> {
             PreparedStatement ps = connection.prepareStatement(sql);
             fillPreparedStatement(ps, user);
             ps.setString(6, saveToBlobService(user));
-            ps.setString(7, user.getUserID().toString());
+            ps.setBytes(7, user.getPassword()[1]);
+            ps.setString(8, user.getUserID().toString());
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,7 +92,6 @@ public class UserDAO extends DAO implements IDAO<User> {
         delete(id, sql);
         return result;
     }
-
 
     @Override
     public Map<UUID, User> getAll() {
@@ -151,7 +150,6 @@ public class UserDAO extends DAO implements IDAO<User> {
             while (resultSet.next()) {
                 documentIDs.add(UUID.fromString(resultSet.getString("DocumentID")));
             }
-
             return getUserFromResultSet(resultSet, documentIDs);
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,14 +160,17 @@ public class UserDAO extends DAO implements IDAO<User> {
     }
 
     public boolean logIn(String username, byte[] password) {
-        String sql = "SELECT * FROM [SystemUser] WHERE Username=? AND UserPassword=?";
+        String sql = "SELECT UserPassword, Salt FROM [SystemUser] WHERE Username = ?";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, username);
-            statement.setBytes(2, password);
-            return statement.executeQuery().next();
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                byte[] dbPassword = resultSet.getBytes("UserPassword");
+                return Arrays.equals(password, dbPassword);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -183,7 +184,7 @@ public class UserDAO extends DAO implements IDAO<User> {
                 UUID.fromString(resultSet.getString("UserID")),
                 resultSet.getString("FullName"),
                 resultSet.getString("Username"),
-                resultSet.getBytes("UserPassword"),
+                new byte[][] {resultSet.getBytes("UserPassword"), resultSet.getBytes("Salt")},
                 resultSet.getString("PhoneNumber"),
                 UserRole.fromString(resultSet.getString("UserRole")),
                 resultSet.getString("ProfilePicture")
@@ -195,9 +196,10 @@ public class UserDAO extends DAO implements IDAO<User> {
     private void fillPreparedStatement(PreparedStatement ps, User user) throws SQLException {
         ps.setString(1, user.getFullName());
         ps.setString(2, user.getUsername());
-        ps.setBytes(3, user.getPassword());
+        ps.setBytes(3, user.getPassword()[0]);
         ps.setString(4, user.getUserRole().toString());
         ps.setString(5, user.getPhoneNumber());
+        ps.setBytes(6, user.getPassword()[1]);
     }
 
     private String saveToBlobService(User user) {

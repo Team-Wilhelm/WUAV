@@ -1,5 +1,6 @@
 package gui.controller;
 
+import be.User;
 import dal.UserDAO;
 import gui.SceneManager;
 import gui.model.UserModel;
@@ -44,7 +45,8 @@ public class LoginViewController implements Initializable {
     }
 
     public Boolean loginUser(Event event){
-        if(userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText()))){
+        User user = userModel.getUserByUsername(usernameInput.getText());
+        if(userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText(), user.getPassword()[1]))){
             userModel.setLoggedInUser(userModel.getUserByUsername(usernameInput.getText()));
             openMenuView();
             return true;

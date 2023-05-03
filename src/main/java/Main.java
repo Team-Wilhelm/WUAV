@@ -15,12 +15,17 @@ import java.util.UUID;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
+        Parent root;
+        if (!true)
+            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
+        else {
+            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.MENU_SCENE)));
+            primaryStage.setMaximized(true);
+        }
         primaryStage.setTitle("WUAV Documentation Management System");
         primaryStage.getIcons().add(new Image("/img/WUAV.png"));
         primaryStage.setScene(new Scene(root));
         primaryStage.centerOnScreen();
-        //primaryStage.setMaximized(true);
         primaryStage.show();
     }
 

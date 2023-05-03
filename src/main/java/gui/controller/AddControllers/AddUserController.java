@@ -111,7 +111,7 @@ public class AddUserController extends AddController implements Initializable {
 
             // Save the user
             assignInputToVariables();
-            byte[] passwordHash = hashPasswordHelper.hashPassword(password);
+            byte[][] passwordHash = hashPasswordHelper.hashPassword(password);
             User user = new User(name, username, passwordHash, phoneNumber, userRole, profilePicturePath);
             Task<TaskState> saveTask = new SaveTask<>(user, isEditing, userModel);
             if (isEditing) {
