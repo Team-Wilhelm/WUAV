@@ -93,7 +93,7 @@ public class PdfGenerator {
             Paragraph jobDescription = new Paragraph(document.getJobDescription());
 
             String optionalNotes;
-                if(document.getOptionalNotes() != null){
+                if(!document.getOptionalNotes().isEmpty()){
                     optionalNotes = "Additional notes: " + document.getOptionalNotes();
                 }
                 else optionalNotes = "";
@@ -104,6 +104,27 @@ public class PdfGenerator {
             doc.add(jobTitle);
             doc.add(jobDescription);
             doc.add(notes);
+            doc.add(lineBreak3);
+
+            //Add images
+            int tableSize = 0;
+            Table imageTable;
+            if (!document.getDocumentImages().isEmpty()) {
+                tableSize = document.getDocumentImages().size();
+                imageTable = new Table(tableSize);
+
+                for (String path: document.getDocumentImages()){
+//TODO add cells for all images please
+                    data = ImageDataFactory.create(path);
+                    Image documentImage = new Image(data);
+                    documentImage.setHeight(50).setHorizontalAlignment(HorizontalAlignment.CENTER);
+                    imageTable.addCell(documentImage);
+                }
+                imageTable.setHorizontalAlignment(HorizontalAlignment.CENTER);
+                removeBorder(imageTable);
+                doc.add(imageTable);
+            }
+
 
             //List of technicians that did the job
             Paragraph technicianList = new Paragraph(getTechnicianNames(document));

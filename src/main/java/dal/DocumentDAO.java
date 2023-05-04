@@ -126,7 +126,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 String documentID = document.getDocumentID().toString();
                 for (String filepath : document.getDocumentImages()) {
                     ps.setString(1, documentID);
-                    ps.setString(2, filepath);
+                    ps.setString(2, documentID);
+                    ps.setString(3, filepath);
                     ps.addBatch();
                 }
                 ps.executeBatch();
