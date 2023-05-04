@@ -226,7 +226,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 rs.getDate("DateOfCreation")
             );
         //TODO notify document when images are assigned to it, so it can update the view
-        executorService.execute(() -> assignImagesToDocument(document));
+        //executorService.execute(() -> assignImagesToDocument(document));
+        assignImagesToDocument(document);
         return document;
     }
 
