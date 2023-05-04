@@ -22,13 +22,12 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import utils.BlobService;
 import utils.HashPasswordHelper;
 
+import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class AddUserController extends AddController implements Initializable {
     @FXML
@@ -229,10 +228,17 @@ public class AddUserController extends AddController implements Initializable {
         comboPosition.getItems().setAll(Arrays.stream(UserRole.values()).toList().subList(0, 4));
     }
 
-    public void setProfilePicture(Image image, String profilePicturePath) {
+    public void setProfilePicture(Image image, String profilePicturePath) throws Exception {
         profilePicture = image;
         imgProfilePicture.setImage(profilePicture);
-        this.profilePicturePath = profilePicturePath;
+
+        // Save the picture to blob service
+        UUID id = isEditing ? userToUpdate.getUserID() : UUID.randomUUID();
+        this.profilePicturePath = BlobService.getInstance().UploadFile(profilePicturePath, id);
+
+        // Delete the physical file
+        File file = new File(profilePicturePath);
+        file.delete();
     }
     //endregion
 }

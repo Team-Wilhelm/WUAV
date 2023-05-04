@@ -20,9 +20,7 @@ public class SaveTask<T> extends Task<TaskState> {
     @Override
     protected TaskState call() {
         Thread.currentThread().setName("SaveTask");
-        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
-        System.out.println(Thread.currentThread().getName() + " started");
         if (isCancelled()) {
             updateMessage("Saving was not successful");
             return TaskState.NOT_SUCCESSFUL;

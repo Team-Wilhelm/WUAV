@@ -90,7 +90,7 @@ public class ImageCropper {
             ImageIO.write(SwingFXUtils.fromFXImage(croppedImage, null), "png", file);
             controller.setProfilePicture(croppedImage, file.getAbsolutePath());
             stage.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             AlertManager.getInstance().showError("Error", "An error occurred while saving the image.", stage);
         }
     }

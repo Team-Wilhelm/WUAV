@@ -15,6 +15,7 @@ public class BlobService {
     private static BlobService instance;
     private final BlobServiceClient blobServiceClient;
     private final String containerName = "wuav";
+
     private BlobService() {
         Properties prop = new Properties();
         InputStream input = startup.class.getClassLoader().getResourceAsStream("config.properties");
@@ -54,15 +55,11 @@ public class BlobService {
 
         // Get a reference to a blob
         BlobClient blobClient = containerClient.getBlobClient(uploadPath);
-        System.out.println("\nUploading to Azure Storage as blob:\n\t" + blobClient.getBlobUrl());
 
         // Upload the blob
         try {
             blobClient.uploadFromFile(filePath + "\\" + fileName);
-            System.out.println("Upload finished");
-            return blobClient.getBlobUrl();
         } catch (Exception e) {
-            System.out.println("Upload failed");
             e.printStackTrace();
         }
         return blobClient.getBlobUrl();

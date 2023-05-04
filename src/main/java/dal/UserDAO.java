@@ -82,9 +82,8 @@ public class UserDAO extends DAO implements IDAO<User> {
             connection = dbConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             fillPreparedStatement(ps, user);
-            String profilePicturePath = saveToBlobService(user);
             ps.setBytes(6, user.getPassword()[1]);
-            ps.setString(7, profilePicturePath);
+            ps.setString(7, user.getProfilePicturePath());
             ps.setString(8, user.getUserID().toString());
             ps.executeUpdate();
         } catch (Exception e) {
@@ -211,32 +210,5 @@ public class UserDAO extends DAO implements IDAO<User> {
         ps.setString(4, user.getUserRole().toString());
         ps.setString(5, user.getPhoneNumber());
         ps.setBytes(6, user.getPassword()[1]);
-    }
-
-    private String saveToBlobService(User user) throws ExecutionException, InterruptedException {
-        // Try to upload the file to blob service
-        Callable<String> uploadFile = () -> BlobService.getInstance().UploadFile(user.getProfilePicturePath(), user.getUserID());
-
-        // Make sure the thread waits until blob service is done
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<String> future = executor.submit(uploadFile);
-
-        String result = "/img/userIcon.png";
-        try {
-            result = future.get();
-            return result;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            System.err.println("Thread was interrupted while waiting for result: " + e.getMessage());
-            throw e;
-        } catch (ExecutionException e) {
-            System.err.println("An error occurred while executing the task: " + e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            System.err.println("An error occurred: " + e.getMessage());
-            throw e;
-        } finally {
-            executor.shutdown();
-        }
     }
 }
