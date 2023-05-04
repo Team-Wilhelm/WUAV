@@ -25,8 +25,8 @@ public class UserDAO extends DAO implements IDAO<User> {
     @Override
     public String add(User user) {
         String result = "saved";
-        String sql = "INSERT INTO SystemUser (FullName, Username, UserPassword, UserRole, PhoneNumber, Salt) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO SystemUser (FullName, Username, UserPassword, UserRole, PhoneNumber, Salt, ProfilePicture) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         Connection connection = null;
         try {
@@ -44,24 +44,6 @@ public class UserDAO extends DAO implements IDAO<User> {
             if (rs.next()) {
                 user.setUserID(UUID.fromString(rs.getString("UserID")));
             }
-
-            //TODO delete the file after it has been uploaded to the blob service
-            /*
-            // Save the profile picture to downloads folder
-            File file = new File(user.getProfilePicturePath());
-            File newFile = new File(System.getProperty("user.home") + "/Downloads/" +
-                    user.getUserID() + "cropped.png");
-            Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            user.setProfilePicturePath(newFile.getAbsolutePath());
-
-
-            sql = "UPDATE SystemUser SET ProfilePicture = ? WHERE UserID = ?";
-            ps = connection.prepareStatement(sql);
-            ps.setString(1, saveToBlobService(user));
-            ps.setString(2, user.getUserID().toString());
-            ps.executeUpdate();
-
-             */
         } catch (Exception e) {
             e.printStackTrace();
             result = e.getMessage();
