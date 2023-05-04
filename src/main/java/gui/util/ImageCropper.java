@@ -128,7 +128,7 @@ public class ImageCropper {
         imageView.setImage(croppedImage);
 
         stage.setWidth(CROP_WIDTH + 100);
-        stage.setHeight(CROP_HEIGHT + cropButton.getHeight() + 100);
+        stage.setHeight(CROP_HEIGHT + cropButton.getHeight() + 75);
         setGridPaneChildren(true);
         stage.centerOnScreen();
     }
@@ -160,7 +160,7 @@ public class ImageCropper {
             // Calculate the image's display size based on the screen size
             calculateImageDisplaySize(selectedFile);
 
-            Scene scene = new Scene(gridPane, imageWidth + 100, imageHeight + cropButton.getHeight() + 100);
+            Scene scene = new Scene(gridPane, imageWidth + 100, imageHeight + cropButton.getHeight() + 75);
             stage.setScene(scene);
             stage.show();
         }
