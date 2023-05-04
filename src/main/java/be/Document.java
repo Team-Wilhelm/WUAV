@@ -4,6 +4,7 @@ import javafx.scene.image.Image;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ public class Document {
     private Customer customer;
     private Date dateOfCreation;
     private List<User> technicians;
-    private List<String> documentImages;
+    private List<ImageWrapper> documentImages;
     private String jobDescription, optionalNotes, jobTitle;
 
     public Document (){
@@ -66,11 +67,11 @@ public class Document {
         this.technicians = technicians;
     }
 
-    public List<String> getDocumentImages() {
+    public List<ImageWrapper> getDocumentImages() {
         return documentImages;
     }
 
-    public void setDocumentImages(List<String> documentImages) {
+    public void setDocumentImages(List<ImageWrapper> documentImages) {
         this.documentImages = documentImages;
     }
 

@@ -109,6 +109,7 @@ public class AddUserController extends AddController implements Initializable {
             }
             setUpSaveTask(saveTask, userController, txtName.getScene().getWindow());
             executeTask(saveTask);
+            userToUpdate = user;
         }
     }
 

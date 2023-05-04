@@ -75,7 +75,6 @@ public class DocumentModel implements IModel<Document> {
         this.allDocuments = (HashMap<UUID, Document>) documentManager.getAll();
     }
 
-
     public HashMap<Document, DocumentCard> getCreatedDocumentCards() {
         return createdDocumentCards;
     }

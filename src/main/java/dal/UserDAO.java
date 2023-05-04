@@ -2,17 +2,14 @@ package dal;
 
 import be.User;
 import be.enums.UserRole;
-import utils.BlobService;
+import dal.interfaces.DAO;
+import dal.interfaces.IDAO;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.*;
 
 
 public class UserDAO extends DAO implements IDAO<User> {
@@ -64,8 +61,6 @@ public class UserDAO extends DAO implements IDAO<User> {
             connection = dbConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             fillPreparedStatement(ps, user);
-            ps.setBytes(6, user.getPassword()[1]);
-            ps.setString(7, user.getProfilePicturePath());
             ps.setString(8, user.getUserID().toString());
             ps.executeUpdate();
         } catch (Exception e) {
@@ -192,5 +187,6 @@ public class UserDAO extends DAO implements IDAO<User> {
         ps.setString(4, user.getUserRole().toString());
         ps.setString(5, user.getPhoneNumber());
         ps.setBytes(6, user.getPassword()[1]);
+        ps.setString(7, user.getProfilePicturePath());
     }
 }

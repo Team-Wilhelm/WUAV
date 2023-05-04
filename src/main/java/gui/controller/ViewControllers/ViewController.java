@@ -2,6 +2,8 @@ package gui.controller.ViewControllers;
 
 import com.sun.tools.javac.Main;
 import gui.tasks.TaskState;
+import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
+import io.github.palexdev.materialfx.css.themes.Themes;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
@@ -27,6 +29,7 @@ public abstract class ViewController {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(fxmlPath));
         Stage stage = new Stage();
         Scene scene = new Scene(fxmlLoader.load());
+        MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
         stage.setScene(scene);
         stage.setTitle("WUAV Documentation Management System");
         stage.getIcons().add(new Image("/img/WUAV.png"));
