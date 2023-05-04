@@ -31,6 +31,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
+import utils.BlobService;
 
 import java.awt.*;
 import java.io.File;
@@ -111,7 +112,7 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     @FXML
-    private void uploadPicturesAction(ActionEvent actionEvent) {
+    private void uploadPicturesAction(ActionEvent actionEvent) throws Exception {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.jpeg"),
@@ -129,7 +130,8 @@ public class AddDocumentController extends AddController implements Initializabl
         if (selectedFile != null) {
             //TODO blobs
             Image image = new Image(selectedFile.toURI().toString());
-            pictures.put(image, selectedFile.getAbsolutePath());
+            String path = BlobService.getInstance().UploadFile(selectedFile.getAbsolutePath(), documentToEdit.getCustomer().getCustomerID());
+            pictures.put(image, path);
             listViewPictures.getItems().add(image);
         }
     }
@@ -150,6 +152,7 @@ public class AddDocumentController extends AddController implements Initializabl
                 .orElse(new Customer(name, email, phoneNumber, address, customerType, lastContract));
         Document document = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         document.setTechnicians(technicians);
+        document.setDocumentImages(pictures.values().stream().toList());
 
         if (isEditing) {
             document.setDocumentID(documentToEdit.getDocumentID());

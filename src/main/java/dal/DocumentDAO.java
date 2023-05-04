@@ -119,7 +119,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 //                        + "WHEN NOT MATCHED THEN "
 //                        + "INSERT (DocumentID, filepath) VALUES (s.DocumentID, s.filepath);";
 
-                sql = "DELETE FROM Document_Image_Link WHERE DocumentID = ?;"
+                sql = "DELETE FROM Document_Image_Link WHERE DocumentID = ? AND Filepath = ?;"
                         + "INSERT INTO Document_Image_Link (DocumentID, filepath) VALUES (?, ?);";
 
                 ps = connection.prepareStatement(sql);
@@ -127,6 +127,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 for (String filepath : document.getDocumentImages()) {
                     ps.setString(1, documentID);
                     ps.setString(2, filepath);
+                    ps.setString(3, documentID);
+                    ps.setString(4, filepath);
                     ps.addBatch();
                 }
                 ps.executeBatch();
