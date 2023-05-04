@@ -2,6 +2,7 @@ import be.Document;
 import bll.PdfGenerator;
 import gui.SceneManager;
 import gui.model.DocumentModel;
+import gui.util.ImageCropper;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,6 +23,7 @@ public class Main extends Application {
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.MENU_SCENE)));
             primaryStage.setMaximized(true);
         }
+
         primaryStage.setTitle("WUAV Documentation Management System");
         primaryStage.getIcons().add(new Image("/img/WUAV.png"));
         primaryStage.setScene(new Scene(root));

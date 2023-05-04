@@ -44,6 +44,7 @@ public class User extends Observable<User> {
 
     public void setUserID(UUID userID) {
         this.userID = userID;
+        notifyObservers(this);
     }
 
     public String getFullName() {

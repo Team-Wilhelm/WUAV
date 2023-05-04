@@ -99,12 +99,18 @@ public class DocumentController extends ViewController implements Initializable 
     @Override
     public void refreshItems(List<?> documentsToDisplay) {
         //TODO refresh all cards with given customer
+        // TODO fix this mess
         documentCards.clear();
 
         HashMap<Document, DocumentCard> loadedCards = documentModel.getCreatedDocumentCards();
         for (Document document : (List<Document>) documentsToDisplay) {
             DocumentCard documentCard = loadedCards.get(document);
             if (documentCard == null) {
+                documentCard = new DocumentCard(document);
+                documentModel.getCreatedDocumentCards().put(document, documentCard);
+            }
+
+            if (lastFocusedCard != null && documentCard.getDocument() == lastFocusedCard.getDocument()) {
                 documentCard = new DocumentCard(document);
                 documentModel.getCreatedDocumentCards().put(document, documentCard);
                 loadedCards.put(document, documentCard);
