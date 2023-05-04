@@ -1,4 +1,6 @@
-package dal;
+package dal.interfaces;
+
+import dal.DBConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

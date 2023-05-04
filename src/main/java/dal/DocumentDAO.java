@@ -3,20 +3,20 @@ package dal;
 import be.Document;
 import be.ImageWrapper;
 import be.User;
-import gui.model.UserModel;
+import dal.interfaces.DAO;
+import dal.interfaces.IDAO;
 import javafx.scene.image.Image;
 
-import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DocumentDAO extends DAO implements IDAO<Document> {
     private final DBConnection dbConnection;
+    private final DocumentImageFactory imageFactory = DocumentImageFactory.getInstance();
 
     public DocumentDAO() {
         dbConnection = DBConnection.getInstance();
@@ -124,17 +124,17 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 //                        + "WHEN NOT MATCHED THEN "
 //                        + "INSERT (DocumentID, filepath) VALUES (s.DocumentID, s.filepath);";
 
-                sql = "DELETE FROM Document_Image_Link WHERE DocumentID = ? AND Filepath = ?;"
-                        + "INSERT INTO Document_Image_Link (DocumentID, Filepath, FileName) VALUES (?, ?, ?);";
-
+                sql = "DELETE FROM Document_Image_Link WHERE DocumentID = ?;";
                 ps = connection.prepareStatement(sql);
-                String documentID = document.getDocumentID().toString();
+                ps.setString(1, document.getDocumentID().toString());
+                ps.executeUpdate();
+
+                sql = "INSERT INTO Document_Image_Link (DocumentID, Filepath, FileName) VALUES (?, ?, ?);";
+                ps = connection.prepareStatement(sql);
                 for (ImageWrapper image : document.getDocumentImages()) {
-                    ps.setString(1, documentID);
+                    ps.setString(1, document.getDocumentID().toString());
                     ps.setString(2, image.getUrl());
-                    ps.setString(3, documentID);
-                    ps.setString(4, image.getUrl());
-                    ps.setString(5, image.getName());
+                    ps.setString(3, image.getName());
                     ps.addBatch();
                 }
                 ps.executeBatch();
@@ -171,10 +171,9 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         return result;
     }
 
-
-
     @Override
     public Map<UUID, Document> getAll() {
+        long startTime = System.currentTimeMillis();
         String sql = "SELECT * FROM Document WHERE Deleted = 0";
         HashMap<UUID, Document> documents = new HashMap<>();
         Connection connection = null;
@@ -191,6 +190,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         } finally {
             dbConnection.releaseConnection(connection);
         }
+        long endTime = System.currentTimeMillis();
+        System.out.println("DocumentDAO.getAll() took " + (endTime - startTime) + " milliseconds");
         return documents;
     }
 
@@ -223,11 +224,11 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 rs.getString("JobTitle"),
                 rs.getDate("DateOfCreation")
             );
-        document.setDocumentImages(getImageFilepathsForDocument(document));
+        document.setDocumentImages(assignImagesToDocument(document));
         return document;
     }
 
-    public List<ImageWrapper> getImageFilepathsForDocument(Document document){
+    public List<ImageWrapper> assignImagesToDocument(Document document){
         //TODO - make this faster
         long startTime = System.currentTimeMillis();
         String sql = "SELECT * FROM Document_Image_Link WHERE DocumentID =?;";
@@ -242,16 +243,15 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             while (rs.next()) {
                 String filepath = rs.getString("Filepath");
                 String filename = rs.getString("FileName");
-                Image image = new Image(filepath);
-                images.add(new ImageWrapper(filepath, filename, image));
+                images.add(new ImageWrapper(filepath, filename, imageFactory.create(filepath)));
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             dbConnection.releaseConnection(connection);
         }
         long endTime = System.currentTimeMillis();
-        System.out.println("Time taken to get images for document: " + (endTime - startTime));
+        System.out.println("Time taken to get images for document " + document.getJobTitle() + ": " + (endTime - startTime));
         return images;
     }
 

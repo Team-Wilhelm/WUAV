@@ -1,4 +1,4 @@
-package be.cards;
+package gui.util;
 
 import javafx.scene.image.Image;
 

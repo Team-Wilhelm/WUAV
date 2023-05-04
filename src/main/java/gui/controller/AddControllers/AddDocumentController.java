@@ -13,6 +13,8 @@ import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.*;
+import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -21,14 +23,18 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import utils.BlobService;
 
@@ -61,6 +67,7 @@ public class AddDocumentController extends AddController implements Initializabl
     private MFXToggleButton toggleCustomerType;
     @FXML
     private MFXDatePicker dateLastContract;
+    private MFXContextMenu contextMenu;
 
     private DocumentModel documentModel;
     private CustomerModel customerModel;
@@ -107,7 +114,24 @@ public class AddDocumentController extends AddController implements Initializabl
         setUpListView();
         setUpComboBox();
         dateLastContract.setValue(LocalDate.now());
+
         Bindings.bindContentBidirectional(pictures, listViewPictures.getItems());
+
+        // Set up the context menu for the list view
+        contextMenu = new MFXContextMenu(listViewPictures);
+
+        MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
+                .setText("Delete")
+                .setAccelerator("Ctrl + D")
+                .setOnAction(event -> {
+                    ImageWrapper image = listViewPictures.getSelectionModel().getSelectedValue();
+                    pictures.remove(image);
+                })
+                .setIcon(new MFXFontIcon("fas-delete-left", 16))
+                .get();
+
+        contextMenu.getItems().add(deleteItem);
+        Platform.runLater(() -> listViewPictures.getScene().setOnContextMenuRequested(event -> contextMenu.show(listViewPictures, event.getScreenX(), event.getScreenY())));
     }
 
     @FXML
@@ -140,6 +164,7 @@ public class AddDocumentController extends AddController implements Initializabl
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
+        //TODO change the way we're dealing with customers
         assignInputToVariables();
 
         Address address = new Address(streetName, houseNumber, postcode, city, country);
@@ -150,6 +175,7 @@ public class AddDocumentController extends AddController implements Initializabl
         Document document = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         document.setTechnicians(technicians);
         document.setDocumentImages(pictures);
+        System.out.println(pictures.size());
 
         if (isEditing) {
             document.setDocumentID(documentToEdit.getDocumentID());
@@ -280,7 +306,7 @@ public class AddDocumentController extends AddController implements Initializabl
         listViewPictures.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getClickCount() == 2) {
                 if (!listViewPictures.getSelectionModel().getSelection().isEmpty()) {
-                    ImageWrapper image = listViewPictures.getSelectionModel().getSelectedValues().get(0);
+                    ImageWrapper image = listViewPictures.getSelectionModel().getSelectedValue();
                     try {
                         // Get the blob url, download picture and open the image in the default image viewer
                         String downloadPath = System.getProperty("user.home") + "/Downloads/" + image.getName();
@@ -390,7 +416,8 @@ public class AddDocumentController extends AddController implements Initializabl
                 || !txtPostcode.getText().trim().equals(customerAddress.getPostcode())
                 || !txtStreetName.getText().trim().equals(customerAddress.getStreetName())
                 || !txtJobDescription.getText().trim().equals(document.getJobDescription())
-                || !txtNotes.getText().trim().equals(document.getOptionalNotes());
+                || !txtNotes.getText().trim().equals(document.getOptionalNotes())
+                || !listViewPictures.getItems().equals(document.getDocumentImages());
     }
 
     private void populateComboBox() {

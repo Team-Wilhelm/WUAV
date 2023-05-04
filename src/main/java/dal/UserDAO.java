@@ -2,17 +2,14 @@ package dal;
 
 import be.User;
 import be.enums.UserRole;
-import utils.BlobService;
+import dal.interfaces.DAO;
+import dal.interfaces.IDAO;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.*;
 
 
 public class UserDAO extends DAO implements IDAO<User> {

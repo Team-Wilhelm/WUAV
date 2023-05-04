@@ -1,4 +1,4 @@
-package dal;
+package dal.interfaces;
 
 import java.util.Map;
 import java.util.UUID;

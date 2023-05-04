@@ -1,5 +1,7 @@
 package dal;
 
+import dal.interfaces.IDAO;
+
 public class DAOFactory {
     public enum DAOType {
         CUSTOMER, USER, DOCUMENT

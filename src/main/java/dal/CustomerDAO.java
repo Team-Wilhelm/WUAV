@@ -3,6 +3,8 @@ package dal;
 import be.Address;
 import be.Customer;
 import be.enums.CustomerType;
+import dal.interfaces.DAO;
+import dal.interfaces.IDAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
