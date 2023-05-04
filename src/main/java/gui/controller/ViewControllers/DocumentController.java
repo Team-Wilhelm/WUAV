@@ -108,7 +108,6 @@ public class DocumentController extends ViewController implements Initializable 
             if (documentCard == null) {
                 documentCard = new DocumentCard(document);
                 documentModel.getCreatedDocumentCards().put(document, documentCard);
-                loadedCards.put(document, documentCard);
             }
 
             if (lastFocusedCard != null && documentCard.getDocument() == lastFocusedCard.getDocument()) {

@@ -24,14 +24,11 @@ public class Main extends Application {
             primaryStage.setMaximized(true);
         }
 
-        ImageCropper imageCropper = new ImageCropper(null);
-        imageCropper.chooseImage();
-
         primaryStage.setTitle("WUAV Documentation Management System");
         primaryStage.getIcons().add(new Image("/img/WUAV.png"));
         primaryStage.setScene(new Scene(root));
         primaryStage.centerOnScreen();
-        //primaryStage.show();
+        primaryStage.show();
     }
 
     public static void main(String[] args) {

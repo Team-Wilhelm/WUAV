@@ -100,7 +100,6 @@ public class UserController extends ViewController implements Initializable {
             UserCard userCard = loadedCards.get(user);
             if (userCard == null) {
                 userCard = userModel.addUserCard(user);
-                userCards.add(userCard);
             }
 
             //TODO change into observer pattern
