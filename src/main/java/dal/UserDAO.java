@@ -64,8 +64,6 @@ public class UserDAO extends DAO implements IDAO<User> {
             connection = dbConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             fillPreparedStatement(ps, user);
-            ps.setBytes(6, user.getPassword()[1]);
-            ps.setString(7, user.getProfilePicturePath());
             ps.setString(8, user.getUserID().toString());
             ps.executeUpdate();
         } catch (Exception e) {
@@ -192,5 +190,6 @@ public class UserDAO extends DAO implements IDAO<User> {
         ps.setString(4, user.getUserRole().toString());
         ps.setString(5, user.getPhoneNumber());
         ps.setBytes(6, user.getPassword()[1]);
+        ps.setString(7, user.getProfilePicturePath());
     }
 }

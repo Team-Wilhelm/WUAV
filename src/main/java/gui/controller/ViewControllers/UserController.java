@@ -87,18 +87,24 @@ public class UserController extends ViewController implements Initializable {
 
     @Override
     public void refreshLastFocusedCard() {
-        //TODO observer pattern ?
+        if (lastFocusedCard != null)
+            lastFocusedCard.update(userModel.getAll().get(lastFocusedCard.getUser().getUserID()), userModel.getAll().get(lastFocusedCard.getUser().getUserID()));
     }
 
     @Override
     public void refreshItems(List<?> items) {
-        //TODO after saving a new user
         userCards.clear();
 
         HashMap<User, UserCard> loadedCards = (HashMap<User, UserCard>) userModel.getLoadedCards();
         for (User user : (List<User>) items) {
             UserCard userCard = loadedCards.get(user);
             if (userCard == null) {
+                userCard = userModel.addUserCard(user);
+                userCards.add(userCard);
+            }
+
+            //TODO change into observer pattern
+            if (lastFocusedCard != null && userCard.getUser() == lastFocusedCard.getUser()) {
                 userCard = userModel.addUserCard(user);
                 loadedCards.put(user, userCard);
             }

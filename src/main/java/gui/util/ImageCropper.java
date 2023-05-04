@@ -27,7 +27,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ImageCropper {
-    // TODO add size based on the screen size
+    //TODO add size based on the screen size
     //TODO add resizing to the rectangle
     private final int CROP_WIDTH = 400;
     private final int CROP_HEIGHT = 400;
