@@ -92,7 +92,6 @@ public class DocumentModel implements IModel<Document> {
         documentManager.assignUserToDocument(user, document, isAssigning);
     }
 
-
     public List<Document> searchDocuments(String query) {
         List<Document> filteredDocuments = new ArrayList<>();
         allDocuments.values().stream().filter(document ->

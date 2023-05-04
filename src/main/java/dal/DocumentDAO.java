@@ -113,11 +113,15 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
             //Update document image link
             if (!document.getDocumentImages().isEmpty()) {
-                sql = "MERGE INTO Document_Image_Link AS d "
-                        + "USING (VALUES (?, ?)) AS s(DocumentID, filepath) "
-                        + "ON (d.DocumentID = s.DocumentID AND d.filepath = s.filepath) "
-                        + "WHEN NOT MATCHED THEN "
-                        + "INSERT (DocumentID, filepath) VALUES (s.DocumentID, s.filepath);";
+//                sql = "MERGE INTO Document_Image_Link AS d "
+//                        + "USING (VALUES (?, ?)) AS s(DocumentID, filepath) "
+//                        + "ON (d.DocumentID = s.DocumentID AND d.filepath = s.filepath) "
+//                        + "WHEN NOT MATCHED THEN "
+//                        + "INSERT (DocumentID, filepath) VALUES (s.DocumentID, s.filepath);";
+
+                sql = "DELETE FROM Document_Image_Link WHERE DocumentID = ?;"
+                        + "INSERT INTO Document_Image_Link (DocumentID, filepath) VALUES (?, ?);";
+
                 ps = connection.prepareStatement(sql);
                 String documentID = document.getDocumentID().toString();
                 for (String filepath : document.getDocumentImages()) {
@@ -203,7 +207,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     }
 
     private Document createDocumentFromResultSet(ResultSet rs) throws SQLException {
-        return new Document(
+        Document document = new Document (
                 UUID.fromString(rs.getString("DocumentID")),
                 new CustomerDAO().getById(UUID.fromString(rs.getString("CustomerID"))),
                 rs.getString("JobDescription"),
@@ -211,11 +215,12 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 rs.getString("JobTitle"),
                 rs.getDate("DateOfCreation")
             );
+        document.setDocumentImages(getImageFilepathsForDocument(document));
+        return document;
     }
 
-    //TODO make this correctly without assholes distracting me with shit music
     public List<String> getImageFilepathsForDocument(Document document){
-        String sql = "SELECT * Document_Image_Link WHERE DocumentID =?;";
+        String sql = "SELECT * FROM Document_Image_Link WHERE DocumentID =?;";
         Connection connection = null;
         List<String> filepaths = new ArrayList<>();
         try {
