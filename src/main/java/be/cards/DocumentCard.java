@@ -11,6 +11,7 @@ import javafx.scene.layout.*;
 public class DocumentCard extends VBox {
     private Document document;
     private Label customerName, dateOfCreation, jobTitle;
+    private IconFactory iconFactory = IconFactory.getInstance();
 
     public DocumentCard(Document document){
         super();
@@ -37,7 +38,7 @@ public class DocumentCard extends VBox {
         dateBox.setSpacing(10);
 
         dateOfCreation = new Label(document.getDateOfCreation().toString());
-        var imageDate = new ImageView(new Image("/img/material-symbols_calendar-month-outline-rounded.png"));
+        var imageDate = new ImageView(iconFactory.create(IconFactory.Icon.CALENDAR));
         imageDate.setFitWidth(20);
         imageDate.setFitHeight(20);
 
@@ -48,7 +49,7 @@ public class DocumentCard extends VBox {
         nameBox.setSpacing(10);
 
         customerName = new Label(document.getCustomer().getCustomerName());
-        var imageCustomer = new ImageView(new Image("/img/mdi_clipboard-account-outline.png"));
+        var imageCustomer = new ImageView(iconFactory.create(IconFactory.Icon.NAMETAG));
         imageCustomer.setFitWidth(20);
         imageCustomer.setFitHeight(20);
 

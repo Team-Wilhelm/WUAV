@@ -4,7 +4,6 @@ import be.Document;
 import be.User;
 import be.enums.UserRole;
 import gui.controller.ViewControllers.UserController;
-import gui.model.IModel;
 import gui.model.UserModel;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
@@ -19,26 +18,16 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import utils.BlobService;
 import utils.HashPasswordHelper;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Stack;
+import java.util.*;
 
 public class AddUserController extends AddController implements Initializable {
     @FXML
@@ -52,11 +41,9 @@ public class AddUserController extends AddController implements Initializable {
     @FXML
     private MFXComboBox<UserRole> comboPosition;
     @FXML
-    private MFXComboBox<Action> comboActions;
-    @FXML
     private MFXListView<Document> listViewDocuments;
     @FXML
-    private MFXButton btnSave;
+    private MFXButton btnSave, btnDelete, btnEdit;
 
     private final UserModel userModel;
     private final AlertManager alertManager;
@@ -79,12 +66,16 @@ public class AddUserController extends AddController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         isEditing = false;
         isUpdating = true;
+        profilePicturePath = "/img/userIcon.png";
+
         btnSave.setDisable(true);
-        comboActions.setDisable(true);
+        btnDelete.setDisable(true);
+        btnEdit.setDisable(true);
+
         profilePictureDoubleClick();
-        populateComboboxes();
+        populateCombobox();
+
         assignListenersToTextFields();
-        comboActions.getSelectionModel().selectedItemProperty().addListener(actionListener);
         comboPosition.getSelectionModel().selectedItemProperty().addListener(positionListener);
 
         // Bind the text of the label displaying an employee's role to the selected item of the combo box
@@ -107,7 +98,6 @@ public class AddUserController extends AddController implements Initializable {
             isUpdating = false;
             btnSave.setDisable(true);
             disableFields(true);
-            comboActions.getSelectionModel().clearSelection();
 
             // Save the user
             assignInputToVariables();
@@ -122,21 +112,22 @@ public class AddUserController extends AddController implements Initializable {
         }
     }
 
-
-    private void editUser() {
+    @FXML
+    private void editUserAction(ActionEvent actionEvent) {
         isUpdating = true;
         disableFields(false);
         btnSave.setDisable(false);
     }
 
-    private void deleteUser(ActionEvent actionEvent) {
+    @FXML
+    private void deleteUserAction(ActionEvent actionEvent) {
         Optional<ButtonType> result = alertManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", txtName.getScene().getWindow());
         if (result.isPresent() && result.get().equals(ButtonType.OK)) {
             Task<TaskState> deleteTask = new DeleteTask<>(userToUpdate.getUserID(), userModel);
             setUpDeleteTask(deleteTask, userController, txtName.getScene().getWindow());
             executeTask(deleteTask);
+            closeWindow(actionEvent);
         }
-        closeWindow(actionEvent);
     }
 
     private void profilePictureDoubleClick() {
@@ -148,21 +139,7 @@ public class AddUserController extends AddController implements Initializable {
         });
     }
 
-    private enum Action {
-        EDIT, DELETE;
-
-        @Override
-        public String toString() {
-            return super.toString().charAt(0) + super.toString().substring(1).toLowerCase();
-        }
-
-        public static Action fromString(String string) {
-            return Action.valueOf(string.toUpperCase());
-        }
-    }
-
     // region Listeners
-
     /**
      * Disables the save button if any of the required text fields are empty.
      */
@@ -189,22 +166,6 @@ public class AddUserController extends AddController implements Initializable {
             }
         }
     };
-
-    /**
-     * Listens for changes in the combo box and performs the selected action.
-     */
-    private ChangeListener<Action> actionListener = new ChangeListener() {
-        @Override
-        public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-            if (newValue != null) {
-                switch ((Action) newValue) {
-                    case EDIT -> editUser();
-                    case DELETE -> deleteUser(new ActionEvent(txtName, txtName));
-                }
-                comboActions.getSelectionModel().clearSelection();
-            }
-        }
-    };
     // endregion
 
     // region Utilities, helpers and setters
@@ -227,9 +188,10 @@ public class AddUserController extends AddController implements Initializable {
 
     public void setIsEditing(User user) {
         disableFields(true);
-        comboActions.setDisable(false);
         isEditing = true;
         isUpdating = false;
+        btnEdit.setDisable(false);
+        btnDelete.setDisable(false);
 
         userToUpdate = user;
         txtName.setText(user.getFullName());
@@ -237,11 +199,13 @@ public class AddUserController extends AddController implements Initializable {
         txtPassword.setPromptText("Leave empty to keep current password");
         comboPosition.getSelectionModel().selectItem(user.getUserRole());
         listViewDocuments.getItems().setAll(user.getAssignedDocuments().values());
-        imgProfilePicture.setImage(new Image(user.getProfilePicturePath()));
+        imgProfilePicture.setImage(user.getProfilePicture());
+        profilePicturePath = user.getProfilePicturePath();
     }
 
     private boolean checkInput() {
-        if (userModel.getAll().values().stream().anyMatch(user -> user.getUsername().equals(username))) {
+        if (userModel.getAll().values().stream().anyMatch(user -> user.getUsername().equals(username))
+                && !Objects.equals(userToUpdate.getUsername(), username)) {
             alertManager.showError("Username already exists", "Please choose another username", txtName.getScene().getWindow());
             return false;
         }
@@ -260,15 +224,21 @@ public class AddUserController extends AddController implements Initializable {
         this.userController = userController;
     }
 
-    private void populateComboboxes() {
+    private void populateCombobox() {
         comboPosition.getItems().setAll(Arrays.stream(UserRole.values()).toList().subList(0, 4));
-        comboActions.getItems().setAll(Action.EDIT, Action.DELETE);
     }
 
-    public void setProfilePicture(Image image, String profilePicturePath) {
+    public void setProfilePicture(Image image, String profilePicturePath) throws Exception {
         profilePicture = image;
         imgProfilePicture.setImage(profilePicture);
-        this.profilePicturePath = profilePicturePath;
+
+        // Save the picture to blob service
+        UUID id = isEditing ? userToUpdate.getUserID() : UUID.randomUUID();
+        this.profilePicturePath = BlobService.getInstance().UploadFile(profilePicturePath, id);
+
+        // Delete the physical file
+        File file = new File(profilePicturePath);
+        file.delete();
     }
     //endregion
 }

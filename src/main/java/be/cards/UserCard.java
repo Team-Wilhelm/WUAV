@@ -1,6 +1,8 @@
 package be.cards;
 
 import be.User;
+import be.interfaces.Observable;
+import be.interfaces.Observer;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -9,8 +11,10 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
-public class UserCard extends VBox {
+public class UserCard extends VBox implements Observer<User> {
     private final User user;
+    private Label nameLabel, positionLabel;
+    private ImageView profileImage;
 
     public UserCard(User user) {
         super();
@@ -19,14 +23,13 @@ public class UserCard extends VBox {
         // variables
         int width = 200;
         int height = 300;
-        Label nameLabel, positionLabel;
 
         this.setPrefWidth(width);
         this.setPrefHeight(height);
         this.getStyleClass().addAll("user-card");
 
         // Profile image
-        ImageView profileImage = new ImageView(new Image("https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8cHJvZmlsZXxlbnwwfHwwfHw%3D&w=1000&q=80"));
+        profileImage = new ImageView(new Image(user.getProfilePicturePath()));
         profileImage.setFitWidth(width);
         profileImage.setFitHeight(width);
 
@@ -43,7 +46,6 @@ public class UserCard extends VBox {
         line.setEndX(width / 3 * 2);
 
         content.getChildren().add(text);
-
 
         // User information
         nameLabel = new Label(user.getFullName());
@@ -65,5 +67,12 @@ public class UserCard extends VBox {
 
     public User getUser() {
         return user;
+    }
+
+    @Override
+    public void update(Observable<User> o, User arg) {
+        nameLabel.setText(user.getFullName());
+        positionLabel.setText(user.getUserRole().toString());
+        profileImage.setImage(user.getProfilePicture());
     }
 }

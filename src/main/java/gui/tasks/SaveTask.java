@@ -17,9 +17,10 @@ public class SaveTask<T> extends Task<TaskState> {
         this.model = model;
     }
 
-
     @Override
     protected TaskState call() {
+        Thread.currentThread().setName("SaveTask");
+
         if (isCancelled()) {
             updateMessage("Saving was not successful");
             return TaskState.NOT_SUCCESSFUL;

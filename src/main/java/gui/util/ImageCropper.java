@@ -27,8 +27,10 @@ import java.io.File;
 import java.io.IOException;
 
 public class ImageCropper {
-    private final int CROP_WIDTH = 300;
-    private final int CROP_HEIGHT = 300;
+    // TODO add size based on the screen size
+    //TODO add resizing to the rectangle
+    private final int CROP_WIDTH = 400;
+    private final int CROP_HEIGHT = 400;
     private int imageWidth, imageHeight;
     private final AddUserController controller;
     private User user;
@@ -88,7 +90,7 @@ public class ImageCropper {
             ImageIO.write(SwingFXUtils.fromFXImage(croppedImage, null), "png", file);
             controller.setProfilePicture(croppedImage, file.getAbsolutePath());
             stage.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             AlertManager.getInstance().showError("Error", "An error occurred while saving the image.", stage);
         }
     }
@@ -155,7 +157,7 @@ public class ImageCropper {
             // Get the image's dimensions and scale it down if it's too big
             Image tempImage = new Image(selectedFile.toURI().toString());
             double imageRatio = tempImage.getWidth() / tempImage.getHeight();
-            imageWidth = (int) Math.min(CROP_WIDTH * 2, tempImage.getWidth());
+            imageWidth = (int) Math.min(CROP_WIDTH * 1.5, tempImage.getWidth());
             imageHeight = (int) (imageWidth / imageRatio);
             image = new Image(selectedFile.toURI().toString(), tempImage.getWidth(), tempImage.getHeight(), true, true);
             imageView.setImage(image);

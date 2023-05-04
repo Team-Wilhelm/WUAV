@@ -5,11 +5,15 @@ import be.enums.UserRole;
 import utils.BlobService;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.*;
+
 
 public class UserDAO extends DAO implements IDAO<User> {
     private final DBConnection dbConnection;
@@ -21,8 +25,8 @@ public class UserDAO extends DAO implements IDAO<User> {
     @Override
     public String add(User user) {
         String result = "saved";
-        String sql = "INSERT INTO SystemUser (FullName, Username, UserPassword, UserRole, PhoneNumber, Salt) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO SystemUser (FullName, Username, UserPassword, UserRole, PhoneNumber, Salt, ProfilePicture) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         Connection connection = null;
         try {
@@ -40,18 +44,6 @@ public class UserDAO extends DAO implements IDAO<User> {
             if (rs.next()) {
                 user.setUserID(UUID.fromString(rs.getString("UserID")));
             }
-
-            File file = new File(user.getProfilePicturePath());
-            File newFile = new File(System.getProperty("user.home") + "/Downloads/" +
-                    user.getUserID() + "cropped.png");
-            file.renameTo(newFile);
-            user.setProfilePicturePath(newFile.getAbsolutePath());
-
-            sql = "INSERT INTO SystemUser (ProfilePicture) VALUES (?) WHERE UserID = ?";
-            ps = connection.prepareStatement(sql);
-            ps.setString(1, saveToBlobService(user));
-            ps.setString(2, user.getUserID().toString());
-            ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
             result = e.getMessage();
@@ -65,15 +57,15 @@ public class UserDAO extends DAO implements IDAO<User> {
     public String update(User user) {
         String result = "updated";
         String sql = "UPDATE SystemUser SET FullName = ?, Username = ?, UserPassword = ?, " +
-                "UserRole = ?, PhoneNumber = ?, ProfilePicture = ?, Salt = ? " +
+                "UserRole = ?, PhoneNumber = ?, Salt = ?, ProfilePicture = ? " +
                 "WHERE UserID = ?";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             fillPreparedStatement(ps, user);
-            ps.setString(6, saveToBlobService(user));
-            ps.setBytes(7, user.getPassword()[1]);
+            ps.setBytes(6, user.getPassword()[1]);
+            ps.setString(7, user.getProfilePicturePath());
             ps.setString(8, user.getUserID().toString());
             ps.executeUpdate();
         } catch (Exception e) {
@@ -200,18 +192,5 @@ public class UserDAO extends DAO implements IDAO<User> {
         ps.setString(4, user.getUserRole().toString());
         ps.setString(5, user.getPhoneNumber());
         ps.setBytes(6, user.getPassword()[1]);
-    }
-
-    private String saveToBlobService(User user) {
-        String profilePicture;
-        try {
-            String filePath = user.getProfilePicturePath().substring(0, user.getProfilePicturePath().lastIndexOf("\\"));
-            profilePicture = BlobService.getInstance().UploadFile(filePath, user.getUserID() + "_cropped.png", user.getUserID());
-        } catch (Exception e) {
-            e.printStackTrace();
-            profilePicture = user.getProfilePicturePath();
-        }
-        System.out.println(profilePicture);
-        return profilePicture;
     }
 }
