@@ -107,17 +107,15 @@ public class PdfGenerator {
             doc.add(lineBreak3);
 
             //Add images
-            int tableSize = 0;
             Table imageTable;
             if (!document.getDocumentImages().isEmpty()) {
-                tableSize = document.getDocumentImages().size();
-                imageTable = new Table(tableSize);
+                imageTable = new Table(1);
 
                 for (String path: document.getDocumentImages()){
-//TODO add cells for all images please
                     data = ImageDataFactory.create(path);
                     Image documentImage = new Image(data);
-                    documentImage.setHeight(50).setHorizontalAlignment(HorizontalAlignment.CENTER);
+                    //documentImage.setWidthPercent(75).setHorizontalAlignment(HorizontalAlignment.CENTER);
+                    documentImage.setHeight(150).setHorizontalAlignment(HorizontalAlignment.CENTER);
                     imageTable.addCell(documentImage);
                 }
                 imageTable.setHorizontalAlignment(HorizontalAlignment.CENTER);
