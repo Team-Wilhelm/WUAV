@@ -20,7 +20,10 @@ import com.itextpdf.layout.property.AreaBreakType;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
+import com.itextpdf.layout.renderer.IRenderer;
+import com.itextpdf.layout.renderer.TableRenderer;
 
+import javax.swing.text.html.parser.Element;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -109,43 +112,48 @@ public class PdfGenerator {
             //Add images
             Table imageTable;
             if (!document.getDocumentImages().isEmpty()) {
-                imageTable = new Table(1);
+                for (int i = 0; i < document.getDocumentImages().size()-1; i++) {
+                    if (i % 2 != 0){
+                        doc.add(pageBreak);
+                    }
+                    imageTable = new Table(1);
+                    ImageData imageData = ImageDataFactory.create(document.getDocumentImages().get(i));
+                    Image documentImage = new Image(imageData);
+                    documentImage.setHorizontalAlignment(HorizontalAlignment.CENTER);
+                    documentImage.setAutoScale(true);
 
-                for (String path: document.getDocumentImages()){
-                    data = ImageDataFactory.create(path);
-                    Image documentImage = new Image(data);
-                    //documentImage.setWidthPercent(75).setHorizontalAlignment(HorizontalAlignment.CENTER);
-                    documentImage.setHeight(150).setHorizontalAlignment(HorizontalAlignment.CENTER);
                     imageTable.addCell(documentImage);
+
+                    imageTable.setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.MIDDLE);
+                    removeBorder(imageTable);
+                    imageTable.setMarginTop(20);
+                    doc.add(imageTable);
+                    //doc.add(lineBreak);
                 }
-                imageTable.setHorizontalAlignment(HorizontalAlignment.CENTER);
-                removeBorder(imageTable);
-                doc.add(imageTable);
             }
 
-
             //List of technicians that did the job
-            Paragraph technicianList = new Paragraph(getTechnicianNames(document));
-            technicianList.setVerticalAlignment(VerticalAlignment.BOTTOM);
+            String technicians = getTechnicianNames(document);
+            Paragraph technicianList = new Paragraph(technicians);
             doc.add(technicianList);
 
-            //Create pagenumber header and website footer and add contents
-            Paragraph footerText = new Paragraph("www.wuav.dk");
-            footerText.setTextAlignment(TextAlignment.CENTER);
-            Rectangle footer = new Rectangle(0, 0, pdfDoc.getDefaultPageSize().getWidth(), 50);
+            //Create page number header and website footer and add contents
+//            Paragraph footerText = new Paragraph("www.wuav.dk");
+//            footerText.setTextAlignment(TextAlignment.CENTER);
+//            Rectangle footer = new Rectangle(0, 0, pdfDoc.getDefaultPageSize().getWidth(), 50);
+//            int numberOfPages = doc.getPdfDocument().getNumberOfPages();
+//            for (int i = 1; i <= numberOfPages; i++) {
+//                PdfPage page = pdfDoc.getPage(i);
+//                PdfCanvas pdfCanvas = new PdfCanvas(page);
+//                pdfCanvas.rectangle(footer);
+//                Canvas canvas = new Canvas(pdfCanvas, pdfDoc, footer);
+//                canvas.add(footerText);
+//                if(numberOfPages>1) {
+//                    canvas.add(new Paragraph(i + " of " + numberOfPages).setTextAlignment(TextAlignment.CENTER).setFixedPosition(0,pdfDoc.getDefaultPageSize().getTop()-50, pdfDoc.getDefaultPageSize().getWidth()));
+//                }
+//                canvas.close();
+//            }
 
-            int numberOfPages = doc.getPdfDocument().getNumberOfPages();
-                for (int i = 1; i <= numberOfPages; i++) {
-                    PdfPage page = pdfDoc.getPage(i);
-                    PdfCanvas pdfCanvas = new PdfCanvas(page);
-                    pdfCanvas.rectangle(footer);
-                    Canvas canvas = new Canvas(pdfCanvas, pdfDoc, footer);
-                    canvas.add(footerText);
-                    if(numberOfPages>1) {
-                        canvas.add(new Paragraph(i + " of " + numberOfPages).setTextAlignment(TextAlignment.CENTER).setFixedPosition(0,pdfDoc.getDefaultPageSize().getTop()-50, pdfDoc.getDefaultPageSize().getWidth()));
-                    }
-                    canvas.close();
-                }
             doc.close();
 
         } catch (IOException e) {
@@ -153,12 +161,14 @@ public class PdfGenerator {
         }
     }
 
+    private boolean isOverHalfPageAvailable(com.itextpdf.layout.Document doc){
+        float halfPage = (doc.getPdfDocument().getDefaultPageSize().getHeight()/2)-75;
+        float currentPos = doc.getPdfDocument().getWriter().getCurrentPos();
+        System.out.println("halfpage: "+halfPage + "current pos: " + currentPos);
+        return halfPage > currentPos;
+    }
     private String getLogo(){
         return "https://easvprojects.blob.core.windows.net/wuav/9e112cc6-1487-426a-9bdc-2a4fd7b91861/7e7d9e00-507b-47ee-989b-8686859b41aa-wuav.png";
-    }
-
-    private ArrayList<String> getDocumentImages(Document document){
-        return null;
     }
 
     private String getWUAVinfo() {
@@ -179,14 +189,14 @@ public class PdfGenerator {
     }
 
     private String getTechnicianNames(Document document){
-        String technicians = "";
+        StringBuilder technicians = new StringBuilder();
         if(!document.getTechnicians().isEmpty()) {
-            technicians = "Technician(s): ";
+            technicians = new StringBuilder("Technician(s): ");
             for (User user : document.getTechnicians()) {
-                technicians += user.getFullName();
+                technicians.append(user.getFullName());
             }
         }
-        return technicians;
+        return technicians.toString();
     }
 
     private void removeBorder(Table table)
