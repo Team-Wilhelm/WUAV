@@ -18,10 +18,12 @@ public class DocumentModel implements IModel<Document> {
     private HashMap<Document, DocumentCard> createdDocumentCards;
 
     private DocumentModel() {
+        long start = System.currentTimeMillis();
         documentManager = (DocumentManager) ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
         createdDocumentCards = new HashMap<>();
         setAllDocuments();
         createDocumentCards();
+        System.out.println("DocumentModel constructor took: " + (System.currentTimeMillis() - start) + "ms");
     }
 
     public static DocumentModel getInstance() {

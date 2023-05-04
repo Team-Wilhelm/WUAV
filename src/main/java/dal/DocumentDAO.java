@@ -6,6 +6,7 @@ import be.User;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
 import javafx.scene.image.Image;
+import utils.ThreadPool;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,10 +14,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class DocumentDAO extends DAO implements IDAO<Document> {
     private final DBConnection dbConnection;
     private final DocumentImageFactory imageFactory = DocumentImageFactory.getInstance();
+    private ThreadPool executorService = ThreadPool.getInstance();
 
     public DocumentDAO() {
         dbConnection = DBConnection.getInstance();
@@ -115,7 +121,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             ps.setString(6, document.getDocumentID().toString());
             ps.executeUpdate();
 
-
             //Update document image link
             if (!document.getDocumentImages().isEmpty()) {
 //                sql = "MERGE INTO Document_Image_Link AS d "
@@ -190,8 +195,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        long endTime = System.currentTimeMillis();
-        System.out.println("DocumentDAO.getAll() took " + (endTime - startTime) + " milliseconds");
+        System.out.println("DocumentDAO.getAll() took " + (System.currentTimeMillis() - startTime) + "ms");
         return documents;
     }
 
@@ -224,12 +228,19 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 rs.getString("JobTitle"),
                 rs.getDate("DateOfCreation")
             );
-        document.setDocumentImages(assignImagesToDocument(document));
+        List<ImageWrapper> images;
+        Future<List<ImageWrapper>> future = executorService.submit(() -> assignImagesToDocument(document));
+        try {
+            images = future.get();
+            document.setDocumentImages(images);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
         return document;
     }
 
     public List<ImageWrapper> assignImagesToDocument(Document document){
-        //TODO - make this faster
+        System.out.println(Thread.currentThread().getName());
         long startTime = System.currentTimeMillis();
         String sql = "SELECT * FROM Document_Image_Link WHERE DocumentID =?;";
         Connection connection = null;
@@ -250,8 +261,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        long endTime = System.currentTimeMillis();
-        System.out.println("Time taken to get images for document " + document.getJobTitle() + ": " + (endTime - startTime));
+        System.out.println("DocumentDAO.assignImagesToDocument() took " + (System.currentTimeMillis() - startTime) + "ms");
         return images;
     }
 

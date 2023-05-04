@@ -20,10 +20,13 @@ public class UserModel implements IModel<User> {
     private static User loggedInUser;
 
     private UserModel() {
+        long start = System.currentTimeMillis();
         userManager = (UserManager) ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
         loadedCards = new HashMap<>();
         setAllUsersFromManager();
         createUserCards();
+        long end = System.currentTimeMillis();
+        System.out.println("UserModel constructor took: " + (end - start) + "ms");
     }
 
     public static UserModel getInstance() {

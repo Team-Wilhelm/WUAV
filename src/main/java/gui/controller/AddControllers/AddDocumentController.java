@@ -175,7 +175,6 @@ public class AddDocumentController extends AddController implements Initializabl
         Document document = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         document.setTechnicians(technicians);
         document.setDocumentImages(pictures);
-        System.out.println(pictures.size());
 
         if (isEditing) {
             document.setDocumentID(documentToEdit.getDocumentID());

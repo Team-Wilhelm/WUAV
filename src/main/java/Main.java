@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import utils.ThreadPool;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
+        long start = System.currentTimeMillis();
         Parent root;
         if (!true)
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
@@ -33,9 +35,14 @@ public class Main extends Application {
         MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
         primaryStage.centerOnScreen();
         primaryStage.show();
+        System.out.println("Time to load: " + (System.currentTimeMillis() - start) + "ms");
     }
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public void stop() {
+        ThreadPool.getInstance().shutdown();
     }
 }
