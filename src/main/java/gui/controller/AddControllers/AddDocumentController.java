@@ -37,6 +37,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import utils.BlobService;
+import utils.ThreadPool;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -77,7 +78,8 @@ public class AddDocumentController extends AddController implements Initializabl
     private DocumentController documentController;
     private final ObservableList<ImageWrapper> pictures;
     private AlertManager alertManager;
-    private ObservableList<User> allTechnicians = FXCollections.observableArrayList();
+    private ObservableList<User> allTechnicians;
+    private final ThreadPool executorService;
 
     // Document and customer information
     private UUID temporaryId;
@@ -95,6 +97,8 @@ public class AddDocumentController extends AddController implements Initializabl
         alertManager = AlertManager.getInstance();
         technicians = new ArrayList<>();
         temporaryId = UUID.randomUUID();
+        executorService = ThreadPool.getInstance();
+        allTechnicians = FXCollections.observableArrayList();
 
         if (UserModel.getInstance().getLoggedInUser() != null
                 && UserModel.getInstance().getLoggedInUser().getUserRole() == UserRole.TECHNICIAN)
@@ -184,7 +188,7 @@ public class AddDocumentController extends AddController implements Initializabl
 
         Task<TaskState> task = new SaveTask<>(document, isEditing, documentModel);
         setUpSaveTask(task, documentController, txtCity.getScene().getWindow());
-        executeTask(task);
+        executorService.execute(task);
 
         documentToEdit = document;
         btnCreatePdf.setDisable(false);
@@ -195,7 +199,7 @@ public class AddDocumentController extends AddController implements Initializabl
         if (result.isPresent() && result.get().equals(ButtonType.OK)) {
             Task<TaskState> deleteTask = new DeleteTask<>(documentToEdit.getDocumentID(), documentModel);
             setUpDeleteTask(deleteTask, documentController, txtName.getScene().getWindow());
-            executeTask(deleteTask);
+            executorService.execute(deleteTask);
         }
         closeWindow(actionEvent);
     }

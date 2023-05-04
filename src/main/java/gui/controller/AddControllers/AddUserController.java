@@ -24,6 +24,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import utils.BlobService;
 import utils.HashPasswordHelper;
+import utils.ThreadPool;
 
 import java.io.File;
 import java.net.URL;
@@ -55,11 +56,13 @@ public class AddUserController extends AddController implements Initializable {
     private String name, username, password, phoneNumber, profilePicturePath;
     private Image profilePicture;
     private UserRole userRole;
+    private final ThreadPool executorService;
 
     public AddUserController() {
         userModel = UserModel.getInstance();
         alertManager = AlertManager.getInstance();
         hashPasswordHelper = new HashPasswordHelper();
+        executorService = ThreadPool.getInstance();
     }
 
     @Override
@@ -108,7 +111,7 @@ public class AddUserController extends AddController implements Initializable {
                 user.setUserID(userToUpdate.getUserID());
             }
             setUpSaveTask(saveTask, userController, txtName.getScene().getWindow());
-            executeTask(saveTask);
+            executorService.execute(saveTask);
             userToUpdate = user;
         }
     }
@@ -126,7 +129,7 @@ public class AddUserController extends AddController implements Initializable {
         if (result.isPresent() && result.get().equals(ButtonType.OK)) {
             Task<TaskState> deleteTask = new DeleteTask<>(userToUpdate.getUserID(), userModel);
             setUpDeleteTask(deleteTask, userController, txtName.getScene().getWindow());
-            executeTask(deleteTask);
+            executorService.execute(deleteTask);
             closeWindow(actionEvent);
         }
     }

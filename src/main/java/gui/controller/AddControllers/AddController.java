@@ -12,10 +12,6 @@ import javafx.scene.control.TextArea;
 import javafx.stage.Window;
 import gui.util.AlertManager;
 
-import java.awt.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public abstract class AddController {
     protected abstract void assignInputToVariables();
     protected abstract void assignListenersToTextFields();
@@ -99,20 +95,6 @@ public abstract class AddController {
                 alertManager.showError("Oops...", "Something went wrong!", owner);
             }
         });
-    }
-
-    protected void executeTask(Task<TaskState> task) {
-        ExecutorService executorService = Executors.newFixedThreadPool(1);
-        executorService.submit(task);
-
-        try {
-            executorService.shutdown();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (!executorService.isTerminated())
-                executorService.shutdownNow();
-        }
     }
 
     protected void closeWindow(ActionEvent actionEvent) {

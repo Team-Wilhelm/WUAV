@@ -14,10 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class DocumentDAO extends DAO implements IDAO<Document> {
     private final DBConnection dbConnection;
@@ -180,7 +177,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     public Map<UUID, Document> getAll() {
         long startTime = System.currentTimeMillis();
         String sql = "SELECT * FROM Document WHERE Deleted = 0";
-        HashMap<UUID, Document> documents = new HashMap<>();
+        ConcurrentHashMap<UUID, Document> documents = new ConcurrentHashMap<>();
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
@@ -228,20 +225,12 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 rs.getString("JobTitle"),
                 rs.getDate("DateOfCreation")
             );
-        List<ImageWrapper> images;
-        Future<List<ImageWrapper>> future = executorService.submit(() -> assignImagesToDocument(document));
-        try {
-            images = future.get();
-            document.setDocumentImages(images);
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        //TODO notify document when images are assigned to it, so it can update the view
+        executorService.execute(() -> assignImagesToDocument(document));
         return document;
     }
 
-    public List<ImageWrapper> assignImagesToDocument(Document document){
-        System.out.println(Thread.currentThread().getName());
-        long startTime = System.currentTimeMillis();
+    public void assignImagesToDocument(Document document){
         String sql = "SELECT * FROM Document_Image_Link WHERE DocumentID =?;";
         Connection connection = null;
         List<ImageWrapper> images = new ArrayList<>();
@@ -256,13 +245,12 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 String filename = rs.getString("FileName");
                 images.add(new ImageWrapper(filepath, filename, imageFactory.create(filepath)));
             }
+            document.setDocumentImages(images);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        System.out.println("DocumentDAO.assignImagesToDocument() took " + (System.currentTimeMillis() - startTime) + "ms");
-        return images;
     }
 
 
