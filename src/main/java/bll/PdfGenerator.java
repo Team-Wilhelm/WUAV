@@ -2,6 +2,7 @@ package bll;
 
 import be.Address;
 import be.Document;
+import be.ImageWrapper;
 import be.User;
 import com.itextpdf.io.font.FontConstants;
 import com.itextpdf.io.image.ImageData;
@@ -30,7 +31,6 @@ import java.util.ArrayList;
 public class PdfGenerator {
     private static PdfFont FONT;
     private static final int FONT_SIZE = 12;
-
 
     public void generatePdf(Document document){
         try {
@@ -111,7 +111,8 @@ public class PdfGenerator {
             if (!document.getDocumentImages().isEmpty()) {
                 imageTable = new Table(1);
 
-                for (String path: document.getDocumentImages()){
+                for (ImageWrapper image: document.getDocumentImages()){
+                    String path = image.getUrl();
                     data = ImageDataFactory.create(path);
                     Image documentImage = new Image(data);
                     //documentImage.setWidthPercent(75).setHorizontalAlignment(HorizontalAlignment.CENTER);

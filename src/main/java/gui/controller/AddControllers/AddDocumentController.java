@@ -1,9 +1,6 @@
 package gui.controller.AddControllers;
 
-import be.Address;
-import be.Customer;
-import be.Document;
-import be.User;
+import be.*;
 import be.enums.CustomerType;
 import be.enums.UserRole;
 import bll.PdfGenerator;
@@ -16,11 +13,13 @@ import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.*;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -33,6 +32,7 @@ import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import utils.BlobService;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -42,8 +42,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.HashMap;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -54,7 +52,7 @@ public class AddDocumentController extends AddController implements Initializabl
     @FXML
     private MFXFilterComboBox<User> comboTechnicians;
     @FXML
-    private MFXListView<Image> listViewPictures;
+    private MFXListView<ImageWrapper> listViewPictures;
     @FXML
     private MFXTextField txtCity, txtCountry, txtEmail, txtHouseNumber, txtJobTitle, txtName, txtPhoneNumber, txtPostcode, txtStreetName;
     @FXML
@@ -70,7 +68,7 @@ public class AddDocumentController extends AddController implements Initializabl
     private boolean isEditing;
     private Document documentToEdit;
     private DocumentController documentController;
-    private HashMap<Image, String> pictures;
+    private final ObservableList<ImageWrapper> pictures;
     private AlertManager alertManager;
     private ObservableList<User> allTechnicians = FXCollections.observableArrayList();
 
@@ -86,7 +84,7 @@ public class AddDocumentController extends AddController implements Initializabl
         documentModel = DocumentModel.getInstance();
         customerModel = CustomerModel.getInstance();
         pdfGenerator = new PdfGenerator();
-        pictures = new HashMap<>();
+        pictures = FXCollections.observableArrayList();
         alertManager = AlertManager.getInstance();
         technicians = new ArrayList<>();
         temporaryId = UUID.randomUUID();
@@ -109,6 +107,7 @@ public class AddDocumentController extends AddController implements Initializabl
         setUpListView();
         setUpComboBox();
         dateLastContract.setValue(LocalDate.now());
+        Bindings.bindContentBidirectional(pictures, listViewPictures.getItems());
     }
 
     @FXML
@@ -128,11 +127,9 @@ public class AddDocumentController extends AddController implements Initializabl
 
         File selectedFile = fileChooser.showOpenDialog(((Node) actionEvent.getSource()).getScene().getWindow());
         if (selectedFile != null) {
-            //TODO blobs
-            Image image = new Image(selectedFile.toURI().toString());
             String path = BlobService.getInstance().UploadFile(selectedFile.getAbsolutePath(), documentToEdit.getCustomer().getCustomerID());
-            pictures.put(image, path);
-            listViewPictures.getItems().add(image);
+            ImageWrapper image = new ImageWrapper(path, selectedFile.getName());
+            pictures.add(image);
         }
     }
 
@@ -152,7 +149,7 @@ public class AddDocumentController extends AddController implements Initializabl
                 .orElse(new Customer(name, email, phoneNumber, address, customerType, lastContract));
         Document document = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         document.setTechnicians(technicians);
-        document.setDocumentImages(pictures.values().stream().toList());
+        document.setDocumentImages(pictures);
 
         if (isEditing) {
             document.setDocumentID(documentToEdit.getDocumentID());
@@ -231,6 +228,9 @@ public class AddDocumentController extends AddController implements Initializabl
         txtJobDescription.setText(document.getJobDescription());
         txtNotes.setText(document.getOptionalNotes());
 
+        // Pictures
+        pictures.setAll(document.getDocumentImages());
+
         // Switch the listeners to editing mode
         comboTechnicians.getSelectionModel().selectedItemProperty().removeListener(technicianListenerNotEditing);
         comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerIsEditing);
@@ -280,9 +280,14 @@ public class AddDocumentController extends AddController implements Initializabl
         listViewPictures.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getClickCount() == 2) {
                 if (!listViewPictures.getSelectionModel().getSelection().isEmpty()) {
-                    Image image = listViewPictures.getSelectionModel().getSelectedValues().get(0);
+                    ImageWrapper image = listViewPictures.getSelectionModel().getSelectedValues().get(0);
                     try {
-                        Desktop.getDesktop().open(new File(pictures.get(image)));
+                        // Get the blob url, download picture and open the image in the default image viewer
+                        String downloadPath = System.getProperty("user.home") + "/Downloads/" + image.getName();
+                        Image imageToOpen = new Image(image.getUrl());
+                        File file = new File(downloadPath);
+                        ImageIO.write(SwingFXUtils.fromFXImage(imageToOpen, null), "png", file);
+                        Desktop.getDesktop().open(file);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -293,15 +298,14 @@ public class AddDocumentController extends AddController implements Initializabl
             }
         });
 
-        listViewPictures.setConverter(new StringConverter<Image>() {
+        listViewPictures.setConverter(new StringConverter<>() {
             @Override
-            public String toString(Image image) {
-                String path = pictures.get(image);
-                return path.substring(path.lastIndexOf("\\") + 1);
+            public String toString(ImageWrapper image) {
+                return image.getName();
             }
 
             @Override
-            public Image fromString(String string) {
+            public ImageWrapper fromString(String string) {
                 return null;
             }
         });
