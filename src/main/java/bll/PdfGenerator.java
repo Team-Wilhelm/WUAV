@@ -35,7 +35,7 @@ public class PdfGenerator {
     private static PdfFont FONT;
     private static final int FONT_SIZE = 12;
 
-    public void generatePdf(Document document){
+    public void generatePdf(Document document) {
         try {
             FONT = PdfFontFactory.createFont(FontConstants.HELVETICA);
 
@@ -49,7 +49,7 @@ public class PdfGenerator {
 
             //Create formatting elements
             Paragraph lineBreak = new Paragraph();
-            Paragraph lineBreak3 = new Paragraph("\n"+"\n"+"\n");
+            Paragraph lineBreak3 = new Paragraph("\n" + "\n" + "\n");
             AreaBreak pageBreak = new AreaBreak(AreaBreakType.NEXT_AREA);
 
             //Left side header, customer info
@@ -91,15 +91,14 @@ public class PdfGenerator {
             //Create job contents for document
             Paragraph date = new Paragraph(String.valueOf(document.getDateOfCreation()));
             Paragraph jobTitle = new Paragraph(document.getJobTitle());
-                jobTitle.setBold();
-                jobTitle.setFontSize(14);
+            jobTitle.setBold();
+            jobTitle.setFontSize(14);
             Paragraph jobDescription = new Paragraph(document.getJobDescription());
 
             String optionalNotes;
-                if(!document.getOptionalNotes().isEmpty()){
-                    optionalNotes = "Additional notes: " + document.getOptionalNotes();
-                }
-                else optionalNotes = "";
+            if (!document.getOptionalNotes().isEmpty()) {
+                optionalNotes = "Additional notes: " + document.getOptionalNotes();
+            } else optionalNotes = "";
             Paragraph notes = new Paragraph(optionalNotes);
 
             doc.add(date);
@@ -112,21 +111,18 @@ public class PdfGenerator {
             //Add images
             Table imageTable;
             if (!document.getDocumentImages().isEmpty()) {
-                for (int i = 0; i < document.getDocumentImages().size()-1; i++) {
-                    if (i % 2 != 0){
+                for (int i = 0; i < document.getDocumentImages().size() - 1; i++) {
+                    if (i % 2 != 0) {
                         doc.add(pageBreak);
                     }
                     imageTable = new Table(1);
-                    ImageData imageData = ImageDataFactory.create(document.getDocumentImages().get(i));
+
+
+                    ImageData imageData = ImageDataFactory.create(document.getDocumentImages().get(i).getUrl());
                     Image documentImage = new Image(imageData);
                     documentImage.setHorizontalAlignment(HorizontalAlignment.CENTER);
                     documentImage.setAutoScale(true);
 
-                for (ImageWrapper image: document.getDocumentImages()){
-                    String path = image.getUrl();
-                    data = ImageDataFactory.create(path);
-                    Image documentImage = new Image(data);
-                    //documentImage.setWidthPercent(75).setHorizontalAlignment(HorizontalAlignment.CENTER);
                     documentImage.setHeight(150).setHorizontalAlignment(HorizontalAlignment.CENTER);
                     imageTable.addCell(documentImage);
 
@@ -134,16 +130,14 @@ public class PdfGenerator {
                     removeBorder(imageTable);
                     imageTable.setMarginTop(20);
                     doc.add(imageTable);
-                    //doc.add(lineBreak);
                 }
-            }
 
-            //List of technicians that did the job
-            String technicians = getTechnicianNames(document);
-            Paragraph technicianList = new Paragraph(technicians);
-            doc.add(technicianList);
+                //List of technicians that did the job
+                String technicians = getTechnicianNames(document);
+                Paragraph technicianList = new Paragraph(technicians);
+                doc.add(technicianList);
 
-            //Create page number header and website footer and add contents
+                //Create page number header and website footer and add contents
 //            Paragraph footerText = new Paragraph("www.wuav.dk");
 //            footerText.setTextAlignment(TextAlignment.CENTER);
 //            Rectangle footer = new Rectangle(0, 0, pdfDoc.getDefaultPageSize().getWidth(), 50);
@@ -158,14 +152,15 @@ public class PdfGenerator {
 //                    canvas.add(new Paragraph(i + " of " + numberOfPages).setTextAlignment(TextAlignment.CENTER).setFixedPosition(0,pdfDoc.getDefaultPageSize().getTop()-50, pdfDoc.getDefaultPageSize().getWidth()));
 //                }
 //                canvas.close();
-//            }
+           }
 
-            doc.close();
+                doc.close();
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            } catch(IOException e){
+                throw new RuntimeException(e);
+            }
         }
-    }
+
 
     private boolean isOverHalfPageAvailable(com.itextpdf.layout.Document doc){
         float halfPage = (doc.getPdfDocument().getDefaultPageSize().getHeight()/2)-75;
