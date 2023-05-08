@@ -111,7 +111,7 @@ public class PdfGenerator {
             //Add images
             Table imageTable;
             if (!document.getDocumentImages().isEmpty()) {
-                for (int i = 0; i < document.getDocumentImages().size() - 1; i++) {
+                for (int i = 0; i < document.getDocumentImages().size(); i++) {
                     if (i % 2 != 0) {
                         doc.add(pageBreak);
                     }
@@ -192,7 +192,7 @@ public class PdfGenerator {
     private String getTechnicianNames(Document document){
         StringBuilder technicians = new StringBuilder();
         if(!document.getTechnicians().isEmpty()) {
-            technicians = new StringBuilder("Technician(s): ");
+            technicians.append("Technician(s): ");
             for (User user : document.getTechnicians()) {
                 technicians.append(user.getFullName());
             }
