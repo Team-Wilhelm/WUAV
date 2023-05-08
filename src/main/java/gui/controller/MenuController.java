@@ -1,6 +1,7 @@
 package gui.controller;
 
 import gui.SceneManager;
+import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,6 +12,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class MenuController implements Initializable {
+    @FXML
+    private MFXButton btnMyProfile;
     @FXML
     private GridPane gridPane;
     private Node documentView, employeeView, currentScene;
@@ -24,6 +27,7 @@ public class MenuController implements Initializable {
             employeeView = employeeLoader.load();
             currentScene = documentView;
             gridPane.add(currentScene, 2, 0, 1,gridPane.getRowCount());
+            btnMyProfile.setVisible(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
