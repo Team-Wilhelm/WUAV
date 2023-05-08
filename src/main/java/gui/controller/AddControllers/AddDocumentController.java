@@ -24,21 +24,16 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import utils.BlobService;
 import utils.ThreadPool;
@@ -120,9 +115,10 @@ public class AddDocumentController extends AddController implements Initializabl
         // Disable the save button until the user has filled in the required fields
         // Disable the delete button until the user has selected a document to delete
         isEditing = false;
-        btnSave.setDisable(true);
-        btnDelete.setDisable(true);
-        btnCreatePdf.setDisable(true);
+        btnNextJobTab.setDisable(true);
+        customerInformationTab.setDisable(true);
+        picturesTab.setDisable(true);
+        pdfTab.setDisable(true);
 
         assignListenersToTextFields();
         setUpComboBox();
@@ -196,7 +192,8 @@ public class AddDocumentController extends AddController implements Initializabl
         executorService.execute(task);
 
         documentToEdit = document;
-        btnCreatePdf.setDisable(false);
+        pdfTab.setDisable(false);
+        btnSave.setDisable(true);
     }
 
     @FXML
@@ -213,6 +210,22 @@ public class AddDocumentController extends AddController implements Initializabl
     @FXML
     private void nextAction(ActionEvent actionEvent) {
         tabPane.getSelectionModel().selectNext();
+        if (actionEvent.getSource() == btnNextCustomerTab) {
+            btnNextCustomerTab.setDisable(true);
+            if (isEditing && isInputChanged(documentToEdit)) {
+                btnSave.setDisable(false);
+                pdfTab.setDisable(true);
+                /*Optional<ButtonType> result = alertManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
+                if (result.isPresent() && result.get().equals(ButtonType.OK)) {
+                    saveAction(actionEvent);
+                }
+
+                 */
+            } else if (isEditing && !isInputChanged(documentToEdit)) {
+                btnSave.setDisable(true);
+                pdfTab.setDisable(false);
+            }
+        }
     }
 
     public void assignUserToDocument(User technician) {
@@ -226,20 +239,32 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     /**
-     * Disables the save button if any of the required text fields are empty.
+     * Disables switching to the next tab if any of the required job text fields are empty.
      */
-    private final ChangeListener<String> inputListener = new ChangeListener<>() {
+    private final ChangeListener<String> jobInputListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (isInputEmpty(txtCity) || isInputEmpty(txtCountry) || isInputEmpty(txtEmail) || isInputEmpty(txtHouseNumber)
-                    || isInputEmpty(txtJobTitle) || isInputEmpty(txtName) || isInputEmpty(txtPhoneNumber)
-                    || isInputEmpty(txtPostcode) || isInputEmpty(txtStreetName) || isInputEmpty(txtJobDescription)) {
-                btnSave.setDisable(true);
-            } else {
-                btnSave.setDisable(false);
-            }
+            boolean isNotFilled = isInputEmpty(txtJobTitle) || isInputEmpty(txtJobDescription);
+            btnNextJobTab.setDisable(isNotFilled);
+            customerInformationTab.setDisable(isNotFilled);
         }
     };
+
+    /**
+     * Disables switching to the next tab if any of the required customer text fields are empty.
+     */
+    private final ChangeListener<String> customerInputListener = new ChangeListener<>() {
+        @Override
+        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+            boolean isNotFilled = isInputEmpty(txtName) || isInputEmpty(txtEmail)
+                    || isInputEmpty(txtPhoneNumber) || isInputEmpty(txtStreetName)
+                    || isInputEmpty(txtHouseNumber) || isInputEmpty(txtPostcode)
+                    || isInputEmpty(txtCity) || isInputEmpty(txtCountry);
+            btnNextCustomerTab.setDisable(isNotFilled);
+            picturesTab.setDisable(isNotFilled);
+        }
+    };
+
 
     // region Utilities, helpers and setters
     public void setDocumentToEdit(Document document) {
@@ -280,21 +305,21 @@ public class AddDocumentController extends AddController implements Initializabl
 
     protected void assignListenersToTextFields() {
         // Customer information
-        txtName.textProperty().addListener(inputListener);
-        txtEmail.textProperty().addListener(inputListener);
-        txtPhoneNumber.textProperty().addListener(inputListener);
+        txtName.textProperty().addListener(customerInputListener);
+        txtEmail.textProperty().addListener(customerInputListener);
+        txtPhoneNumber.textProperty().addListener(customerInputListener);
 
         // Customer address
-        txtStreetName.textProperty().addListener(inputListener);
-        txtHouseNumber.textProperty().addListener(inputListener);
-        txtCity.textProperty().addListener(inputListener);
-        txtPostcode.textProperty().addListener(inputListener);
-        txtCountry.textProperty().addListener(inputListener);
+        txtStreetName.textProperty().addListener(customerInputListener);
+        txtHouseNumber.textProperty().addListener(customerInputListener);
+        txtCity.textProperty().addListener(customerInputListener);
+        txtPostcode.textProperty().addListener(customerInputListener);
+        txtCountry.textProperty().addListener(customerInputListener);
 
         // Document information
-        txtJobTitle.textProperty().addListener(inputListener);
-        txtJobDescription.textProperty().addListener(inputListener);
-        txtNotes.textProperty().addListener(inputListener);
+        txtJobTitle.textProperty().addListener(jobInputListener);
+        txtJobDescription.textProperty().addListener(jobInputListener);
+        txtNotes.textProperty().addListener(jobInputListener);
     }
 
     protected void assignInputToVariables() {
