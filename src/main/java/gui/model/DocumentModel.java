@@ -48,7 +48,8 @@ public class DocumentModel implements IModel<Document> {
         String message = documentManager.update(document);
         CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
         return future.thenApplyAsync(documents -> {
-            allDocuments = (HashMap<UUID, Document>) documents;
+            allDocuments.clear();
+            allDocuments.putAll(documents);
             return message;
         });
     }
