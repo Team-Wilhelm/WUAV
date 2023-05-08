@@ -1,14 +1,15 @@
 package gui.controller.ViewControllers;
 
+import be.Customer;
 import be.Document;
 import be.cards.DocumentCard;
 import gui.SceneManager;
 import gui.controller.AddControllers.AddDocumentController;
 import gui.model.DocumentModel;
 import gui.tasks.TaskState;
-import io.github.palexdev.materialfx.controls.MFXButton;
-import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
-import io.github.palexdev.materialfx.controls.MFXTextField;
+import io.github.palexdev.materialfx.controls.*;
+import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
+import io.github.palexdev.materialfx.enums.SortState;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,6 +19,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Window;
@@ -25,15 +27,14 @@ import gui.util.AlertManager;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class DocumentController extends ViewController implements Initializable {
     @FXML
-    private FlowPane documentFlowPane;
-    @FXML
-    private ScrollPane scrollPane;
+    private MFXTableView documentTableView;
     @FXML
     private MFXProgressSpinner progressSpinner;
     @FXML
@@ -44,6 +45,7 @@ public class DocumentController extends ViewController implements Initializable 
     private MFXTextField searchBar;
 
     private ObservableList<DocumentCard> documentCards = FXCollections.observableArrayList();
+    private ObservableList<Document> documentList = FXCollections.observableArrayList();
     private final DocumentModel documentModel = DocumentModel.getInstance();
     private DocumentCard lastFocusedCard;
 
@@ -51,19 +53,18 @@ public class DocumentController extends ViewController implements Initializable 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Bindings.bindContent(documentFlowPane.getChildren(), documentCards);
-        documentCards.setAll(documentModel.getCreatedDocumentCards().values());
-
-        documentFlowPane.prefHeightProperty().bind(scrollPane.heightProperty());
-        documentFlowPane.prefWidthProperty().bind(scrollPane.widthProperty());
-
         setProgressVisibility(false);
 
+//        searchBar.textProperty().addListener((observable, oldValue, newValue) ->
+//                refreshItems(documentModel.searchDocuments(searchBar.getText().toLowerCase().trim())));
         searchBar.textProperty().addListener((observable, oldValue, newValue) ->
-                refreshItems(documentModel.searchDocuments(searchBar.getText().toLowerCase().trim())));
+                documentTableView.getItems().setAll(documentModel.searchDocuments(searchBar.getText().toLowerCase().trim())));
 
-        refreshItems();
+        documentList.addAll(documentModel.getAll().values());
+        populateTableView();
+
         btnAddDocument.getStyleClass().addAll("addButton", "rounded");
+        btnAddDocument.setText("");
     }
 
     //region progress methods
@@ -127,7 +128,7 @@ public class DocumentController extends ViewController implements Initializable 
 
                 if (e.getClickCount() == 2) {
                     lastFocusedCard = finalDocumentCard;
-                    editDocument(scrollPane.getScene().getWindow());
+                    editDocument(btnAddDocument.getScene().getWindow());
                 }
             });
             documentCards.add(documentCard);
@@ -155,5 +156,44 @@ public class DocumentController extends ViewController implements Initializable 
 
     public void addDocumentAction() throws IOException {
         ((AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController()).setDocumentController(this);
+    }
+
+    private void populateTableView(){
+        Bindings.bindContentBidirectional(documentTableView.getItems(), documentList);
+
+        MFXTableColumn<Document> jobTitle = new MFXTableColumn<>("Title", false);
+        MFXTableColumn<Document> dateOfCreation = new MFXTableColumn<>("Date of Creation", false);
+        MFXTableColumn<Document> customerName = new MFXTableColumn<>("Customer Name", false);
+        MFXTableColumn<Document> customerEmail = new MFXTableColumn<>("Customer Email", false);
+
+        jobTitle.setRowCellFactory(document -> {
+            MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(Document::getJobTitle);
+            row.setOnMouseClicked(this::tableViewDoubleClickAction);
+            return row;
+        });
+
+        dateOfCreation.setRowCellFactory(document -> {
+            MFXTableRowCell<Document, Date> row = new MFXTableRowCell<>(Document::getDateOfCreation);
+            row.setOnMouseClicked(this::tableViewDoubleClickAction);
+            return row;
+        });
+
+        customerName.setRowCellFactory(document -> {
+            MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(d -> d.getCustomer().getCustomerName());
+            row.setOnMouseClicked(this::tableViewDoubleClickAction);
+            return row;
+        });
+
+        customerEmail.setRowCellFactory(document -> {
+            MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(d -> d.getCustomer().getCustomerEmail());
+            row.setOnMouseClicked(this::tableViewDoubleClickAction);
+            return row;
+        });
+
+        documentTableView.getTableColumns().addAll(jobTitle, dateOfCreation, customerName, customerEmail);
+        documentTableView.autosizeColumnsOnInitialization();
+    }
+
+    private void tableViewDoubleClickAction(MouseEvent mouseEvent) {
     }
 }

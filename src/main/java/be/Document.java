@@ -1,10 +1,7 @@
 package be;
 
-import javafx.scene.image.Image;
-
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
