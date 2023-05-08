@@ -27,9 +27,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
@@ -60,7 +58,7 @@ public class AddDocumentController extends AddController implements Initializabl
     @FXML
     private FlowPane flowPanePictures;
     @FXML
-    private MFXButton btnCancel, btnDelete, btnSave, btnUploadPictures, btnCreatePdf, btnNextJobTab, btnNextCustomerTab;
+    private MFXButton btnDelete, btnSave, btnUploadPictures, btnCreatePdf, btnNextJobTab, btnNextCustomerTab;
     @FXML
     private MFXFilterComboBox<User> comboTechnicians;
     @FXML
@@ -115,32 +113,21 @@ public class AddDocumentController extends AddController implements Initializabl
         // Disable the save button until the user has filled in the required fields
         // Disable the delete button until the user has selected a document to delete
         isEditing = false;
+        btnDelete.setDisable(true);
+
         btnNextJobTab.setDisable(true);
+        btnNextCustomerTab.setDisable(true);
         customerInformationTab.setDisable(true);
         picturesTab.setDisable(true);
         pdfTab.setDisable(true);
+        tabPane.getSelectionModel().selectedItemProperty().addListener(tabChangeListener);
 
         assignListenersToTextFields();
         setUpComboBox();
-        refreshItems();
+        setUpContextMenu();
         dateLastContract.setValue(LocalDate.now());
 
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
-
-        // Set up the context menu for the list view
-        contextMenu = new MFXContextMenu(flowPanePictures);
-        MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
-                .setText("Delete")
-                .setAccelerator("Ctrl + D")
-                .setOnAction(event -> {
-                    ImageWrapper image = lastFocused.getImageWrapper();
-                    pictures.remove(image);
-                })
-                .setIcon(new MFXFontIcon("fas-delete-left", 16))
-                .get();
-
-        contextMenu.getItems().add(deleteItem);
-        Platform.runLater(() -> flowPanePictures.getScene().setOnContextMenuRequested(event -> contextMenu.show(flowPanePictures, event.getScreenX(), event.getScreenY())));
     }
 
     @FXML
@@ -160,7 +147,8 @@ public class AddDocumentController extends AddController implements Initializabl
 
         File selectedFile = fileChooser.showOpenDialog(((Node) actionEvent.getSource()).getScene().getWindow());
         if (selectedFile != null) {
-            String path = BlobService.getInstance().UploadFile(selectedFile.getAbsolutePath(), documentToEdit.getCustomer().getCustomerID());
+            UUID customerId = documentToEdit != null ? documentToEdit.getCustomer().getCustomerID() : UUID.randomUUID();
+            String path = BlobService.getInstance().UploadFile(selectedFile.getAbsolutePath(), customerId);
             ImageWrapper image = new ImageWrapper(path, selectedFile.getName());
             pictures.add(image);
         }
@@ -210,22 +198,6 @@ public class AddDocumentController extends AddController implements Initializabl
     @FXML
     private void nextAction(ActionEvent actionEvent) {
         tabPane.getSelectionModel().selectNext();
-        if (actionEvent.getSource() == btnNextCustomerTab) {
-            btnNextCustomerTab.setDisable(true);
-            if (isEditing && isInputChanged(documentToEdit)) {
-                btnSave.setDisable(false);
-                pdfTab.setDisable(true);
-                /*Optional<ButtonType> result = alertManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
-                if (result.isPresent() && result.get().equals(ButtonType.OK)) {
-                    saveAction(actionEvent);
-                }
-
-                 */
-            } else if (isEditing && !isInputChanged(documentToEdit)) {
-                btnSave.setDisable(true);
-                pdfTab.setDisable(false);
-            }
-        }
     }
 
     public void assignUserToDocument(User technician) {
@@ -265,6 +237,51 @@ public class AddDocumentController extends AddController implements Initializabl
         }
     };
 
+    /**
+     * Assigns the user to the document in the database.
+     */
+    private final ChangeListener<User> technicianListenerIsEditing = (observable, oldValue, newValue) -> {
+        if (newValue != null) {
+            assignUserToDocument(newValue);
+            comboTechnicians.getSelectionModel().clearSelection();
+            populateComboBox();
+        }
+    };
+
+    /**
+     * Assigns the user to the document and adds them to the list of technicians,
+     * saving them in a batch when saving the document.
+     */
+    private final ChangeListener<User> technicianListenerNotEditing = (observable, oldValue, newValue) -> {
+        if (newValue != null) {
+            if (!technicians.contains(newValue)) {
+                newValue.getAssignedDocuments().put(temporaryId, documentToEdit);
+                technicians.add(newValue);
+            } else {
+                technicians.remove(newValue);
+                newValue.getAssignedDocuments().remove(temporaryId);
+            }
+            comboTechnicians.getSelectionModel().clearSelection();
+            populateComboBox();
+        }
+    };
+
+
+    /**
+     * Listens for changes in the tab selection and prompts the user to save the document if they are editing it.
+     */
+    private final ChangeListener<Tab> tabChangeListener = new ChangeListener<>() {
+        @Override
+        public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
+            if (newValue.equals(pdfTab) && isEditing && isInputChanged(documentToEdit)) {
+                Optional<ButtonType> result = alertManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
+                if (result.isPresent() && result.get().equals(ButtonType.OK)) {
+                    saveAction(null);
+                }
+            }
+        }
+    };
+
 
     // region Utilities, helpers and setters
     public void setDocumentToEdit(Document document) {
@@ -272,7 +289,7 @@ public class AddDocumentController extends AddController implements Initializabl
         documentToEdit = document;
         btnSave.setDisable(false);
         btnDelete.setDisable(false);
-        btnCreatePdf.setDisable(false);
+        pdfTab.setDisable(false);
 
         // Customer information
         txtName.setText(document.getCustomer().getCustomerName());
@@ -371,35 +388,6 @@ public class AddDocumentController extends AddController implements Initializabl
 
     }
 
-    /**
-     * Assigns the user to the document in the database.
-     */
-    private final ChangeListener<User> technicianListenerIsEditing = (observable, oldValue, newValue) -> {
-        if (newValue != null) {
-            assignUserToDocument(newValue);
-            comboTechnicians.getSelectionModel().clearSelection();
-            populateComboBox();
-        }
-    };
-
-    /**
-     * Assigns the user to the document and adds them to the list of technicians,
-     * saving them in a batch when saving the document.
-     */
-    private final ChangeListener<User> technicianListenerNotEditing = (observable, oldValue, newValue) -> {
-        if (newValue != null) {
-            if (!technicians.contains(newValue)) {
-                newValue.getAssignedDocuments().put(temporaryId, documentToEdit);
-                technicians.add(newValue);
-            } else {
-                technicians.remove(newValue);
-                newValue.getAssignedDocuments().remove(temporaryId);
-            }
-            comboTechnicians.getSelectionModel().clearSelection();
-            populateComboBox();
-        }
-    };
-
     private void setUpComboBox() {
         comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerNotEditing);
 
@@ -439,38 +427,43 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     private boolean isInputChanged(Document document){
-        Address customerAddress = document.getCustomer().getCustomerAddress();
-        if (!txtCity.getText().trim().equals(customerAddress.getTown()))
-            return false;
-        if (!txtCountry.getText().trim().equals(customerAddress.getCountry()))
-            return false;
-        if (!txtEmail.getText().trim().equals(document.getCustomer().getCustomerEmail()))
-            return false;
-        if (!txtHouseNumber.getText().trim().equals(customerAddress.getStreetNumber()))
-            return false;
+        // Check if job information has changed
         if (!txtJobTitle.getText().trim().equals(document.getJobTitle()))
-            return false;
-        if (!txtName.getText().trim().equals(document.getCustomer().getCustomerName()))
-            return false;
-        if (!txtPhoneNumber.getText().trim().equals(document.getCustomer().getCustomerPhoneNumber()))
-            return false;
-        if (!txtPostcode.getText().trim().equals(customerAddress.getPostcode()))
-            return false;
-        if (!txtStreetName.getText().trim().equals(customerAddress.getStreetName()))
-            return false;
+            return true;
         if (!txtJobDescription.getText().trim().equals(document.getJobDescription()))
-            return false;
+            return true;
         if (!txtNotes.getText().trim().equals(document.getOptionalNotes()))
-            return false;
-        if (!dateLastContract.getValue().equals(document.getCustomer().getLastContract()))
-            return false;
+            return true;
+
+        // Check if customer information has changed
+        if (!txtName.getText().trim().equals(document.getCustomer().getCustomerName()))
+            return true;
+        if (!txtPhoneNumber.getText().trim().equals(document.getCustomer().getCustomerPhoneNumber()))
+            return true;
+        if (!txtEmail.getText().trim().equals(document.getCustomer().getCustomerEmail()))
+            return true;
         if (!toggleCustomerType.isSelected() == document.getCustomer().getCustomerType().equals(CustomerType.PRIVATE))
-            return false;
-        if (!comboTechnicians.getSelectionModel().getSelectedItem().equals(document.getTechnicians()))
-            return false;
+            return true;
+
+        // Address
+        Address customerAddress = document.getCustomer().getCustomerAddress();
+        if (!txtStreetName.getText().trim().equals(customerAddress.getStreetName()))
+            return true;
+        if (!txtHouseNumber.getText().trim().equals(customerAddress.getStreetNumber()))
+            return true;
+        if (!txtCity.getText().trim().equals(customerAddress.getTown()))
+            return true;
+        if (!txtPostcode.getText().trim().equals(customerAddress.getPostcode()))
+            return true;
+        if (!txtCountry.getText().trim().equals(customerAddress.getCountry()))
+            return true;
+
+        // Other information
+        if (!Date.valueOf(dateLastContract.getValue()).equals(document.getCustomer().getLastContract()))
+            return true;
         if (!pictures.equals(document.getDocumentImages()))
-            return false;
-        return true;
+            return true;
+        return false;
     }
 
     private void populateComboBox() {
@@ -478,6 +471,23 @@ public class AddDocumentController extends AddController implements Initializabl
         allTechnicians.setAll(UserModel.getInstance().getAll().values().stream().filter(user ->
                 user.getUserRole() == UserRole.TECHNICIAN).collect(Collectors.toList()));
         comboTechnicians.setItems(allTechnicians);
+    }
+
+    private void setUpContextMenu() {
+        contextMenu = new MFXContextMenu(flowPanePictures);
+        MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
+                .setText("Delete")
+                .setAccelerator("Ctrl + D")
+                .setOnAction(event -> {
+                    ImageWrapper image = lastFocused.getImageWrapper();
+                    pictures.remove(image);
+                })
+                .setIcon(new MFXFontIcon("fas-delete-left", 16))
+                .get();
+
+        contextMenu.getItems().add(deleteItem);
+        Platform.runLater(() -> flowPanePictures.getScene().setOnContextMenuRequested(
+                event -> contextMenu.show(flowPanePictures, event.getScreenX(), event.getScreenY())));
     }
     // endregion
 }

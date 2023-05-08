@@ -20,6 +20,7 @@ public class DocumentModel implements IModel<Document> {
     private DocumentModel() {
         long start = System.currentTimeMillis();
         documentManager = (DocumentManager) ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
+        allDocuments = new HashMap<>();
         createdDocumentCards = new HashMap<>();
         setAllDocuments();
         createDocumentCards();
@@ -37,7 +38,8 @@ public class DocumentModel implements IModel<Document> {
         String message = documentManager.add(document);
         CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
         return future.thenApplyAsync(documents -> {
-            allDocuments = (HashMap<UUID, Document>) documents;
+            allDocuments.clear();
+            allDocuments.putAll(documents);
             return message;
         });
     }
@@ -58,7 +60,8 @@ public class DocumentModel implements IModel<Document> {
         String message = documentManager.delete(id);
         CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
         return future.thenApplyAsync(documents -> {
-            allDocuments = (HashMap<UUID, Document>) documents;
+            allDocuments.clear();
+            allDocuments.putAll(documents);
             return message;
         });
     }
