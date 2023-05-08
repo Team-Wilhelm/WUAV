@@ -24,12 +24,14 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
+import javafx.scene.input.*;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
@@ -358,6 +360,10 @@ public class AddDocumentController extends AddController implements Initializabl
         jobTitle = txtJobTitle.getText();
         jobDescription = txtJobDescription.getText();
         notes = txtNotes.getText();
+
+        // Pictures
+        pictures.clear();
+        pictures.addAll(imagePreviews.stream().map(ImagePreview::getImageWrapper).toList());
     }
 
     public void refreshItems() {
@@ -383,10 +389,88 @@ public class AddDocumentController extends AddController implements Initializabl
                     }
                 }
             });
+
+            // Add drag and drop functionality to the image preview
+            imagePreview.setOnDragDetected(dragDetected);
+            imagePreview.setOnDragOver(dragOver);
+            imagePreview.setOnDragDropped(dragDropped);
+
             imagePreviews.add(imagePreview);
         });
 
     }
+
+    // Event handler for when the user drops an image preview on the flow pane
+    private EventHandler<MouseEvent> dragDetected = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+            ImagePreview imagePreview = (ImagePreview) event.getSource();
+            Dragboard db = imagePreview.startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent clipboard = new ClipboardContent();
+            final int index = flowPanePictures.getChildrenUnmodifiable().indexOf(imagePreview);
+            clipboard.putString(String.valueOf(index));
+            db.setContent(clipboard);
+            event.consume();
+        }
+    };
+
+    private EventHandler<DragEvent> dragOver = new EventHandler<>() {
+        @Override
+        public void handle(DragEvent event) {
+            ImagePreview imagePreview = (ImagePreview) event.getSource();
+            boolean isAccepted = true;
+            final Dragboard dragboard = event.getDragboard();
+
+            if (dragboard.hasString()) {
+                try {
+                    final int newIndex = Integer.parseInt(dragboard.getString());
+                    if (newIndex == flowPanePictures.getChildrenUnmodifiable().indexOf(imagePreview)) {
+                        isAccepted = false;
+                    }
+                } catch (NumberFormatException e) {
+                    isAccepted = false;
+                }
+            } else {
+                isAccepted = false;
+            }
+            if (isAccepted) {
+                event.acceptTransferModes(TransferMode.MOVE);
+            }
+        }
+    };
+
+    private EventHandler<DragEvent> dragDropped = new EventHandler<>() {
+        @Override
+        public void handle(DragEvent event) {
+            boolean success = false;
+            ImagePreview imagePreview = (ImagePreview) event.getSource();
+            final Dragboard dragboard = event.getDragboard();
+
+            if (dragboard.hasString()) {
+                try {
+                    final int newIndex = Integer.parseInt(dragboard.getString());
+                    final int currentIndex = imagePreviews.indexOf(imagePreview);
+
+                    final int laterIndex = Math.max(newIndex, currentIndex);
+                    ImagePreview removedLater = imagePreviews.remove(laterIndex);
+                    final int earlierIndex = Math.min(newIndex, currentIndex);
+                    ImagePreview removedEarlier = imagePreviews.remove(earlierIndex);
+                    imagePreviews.add(earlierIndex, removedLater);
+                    imagePreviews.add(laterIndex, removedEarlier);
+
+                    imagePreviews.forEach(ip -> {
+                        System.out.println(ip.getImageWrapper().getName() + " " + imagePreviews.indexOf(ip));
+                    });
+
+                    success = true;
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
+            event.setDropCompleted(success);
+        }
+    };
+
 
     private void setUpComboBox() {
         comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerNotEditing);
@@ -400,7 +484,7 @@ public class AddDocumentController extends AddController implements Initializabl
                                 + " " + object.getFullName() + " (" + object.getUsername() + ")";
                     } else {
                         if (technicians.contains(object))
-                            return "ASSIGNED:" + object.getFullName() + " (" + object.getUsername() + ")";
+                            return "ASSIGNED: " + object.getFullName() + " (" + object.getUsername() + ")";
                     }  return object.getFullName() + " (" + object.getUsername() + ")";
                 }
                 return null;
@@ -411,7 +495,6 @@ public class AddDocumentController extends AddController implements Initializabl
                 return null;
             }
         });
-
         populateComboBox();
     }
 
