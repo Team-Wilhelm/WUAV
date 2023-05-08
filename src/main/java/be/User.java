@@ -2,6 +2,7 @@ package be;
 
 import be.enums.UserRole;
 import be.interfaces.Observable;
+import dal.DocumentImageFactory;
 import javafx.scene.image.Image;
 
 import javax.print.Doc;
@@ -29,7 +30,7 @@ public class User extends Observable<User> {
         this.assignedDocuments = new HashMap<>();
 
         this.profilePicturePath = Objects.requireNonNullElse(profilePicturePath, "/img/userIcon.png");
-        this.profilePicture = new Image(profilePicturePath);
+        this.profilePicture = DocumentImageFactory.getInstance().create(profilePicturePath);
         notifyObservers(this);
     }
 

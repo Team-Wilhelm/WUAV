@@ -19,6 +19,7 @@ public class SaveTask<T> extends Task<TaskState> {
 
     @Override
     protected TaskState call() {
+        long start = System.currentTimeMillis();
         Thread.currentThread().setName("SaveTask");
 
         if (isCancelled()) {
@@ -36,7 +37,7 @@ public class SaveTask<T> extends Task<TaskState> {
                 future = model.add(objectToSave);
             }
             String message = future.join();
-            System.out.println(message);
+            System.out.println("Time to save: " + (System.currentTimeMillis() - start) + "ms");
 
             if (message.equals("saved") || message.equals("updated")) {
                 updateMessage("Saved successfully");

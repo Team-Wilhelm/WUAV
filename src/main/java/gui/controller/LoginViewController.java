@@ -8,6 +8,8 @@ import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
+import io.github.palexdev.materialfx.css.themes.Themes;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -37,10 +39,14 @@ public class LoginViewController implements Initializable {
     private final UserModel userModel = UserModel.getInstance();
     private HashPasswordHelper hashPasswordHelper = new HashPasswordHelper();
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Platform.runLater(this::setEnterKeyAction);
+        try {
+            root = FXMLLoader.load(getClass().getResource(SceneManager.MENU_SCENE));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Boolean loginUser(Event event){
@@ -58,18 +64,13 @@ public class LoginViewController implements Initializable {
     }
 
     private void openMenuView(){
-        FXMLLoader menuLoader = new FXMLLoader(getClass().getResource(SceneManager.MENU_SCENE));
-        try {
-            root = menuLoader.load();
-            stage = (Stage) btnLogin.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.centerOnScreen();
-            stage.setMaximized(true);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        stage = (Stage) btnLogin.getScene().getWindow();
+        Scene scene = new Scene(root);
+        MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.setMaximized(true);
     }
-
 
 
     private void setEnterKeyAction() {
