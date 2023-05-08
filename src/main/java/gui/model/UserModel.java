@@ -26,7 +26,6 @@ public class UserModel implements IModel<User> {
         setAllUsersFromManager();
         createUserCards();
         long end = System.currentTimeMillis();
-        System.out.println("UserModel constructor took: " + (end - start) + "ms");
     }
 
     public static UserModel getInstance() {

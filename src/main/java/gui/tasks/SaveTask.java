@@ -36,7 +36,6 @@ public class SaveTask<T> extends Task<TaskState> {
                 future = model.add(objectToSave);
             }
             String message = future.join();
-            System.out.println(message);
 
             if (message.equals("saved") || message.equals("updated")) {
                 updateMessage("Saved successfully");

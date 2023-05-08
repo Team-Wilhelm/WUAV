@@ -23,7 +23,6 @@ public class DocumentModel implements IModel<Document> {
         createdDocumentCards = new HashMap<>();
         setAllDocuments();
         createDocumentCards();
-        System.out.println("DocumentModel constructor took: " + (System.currentTimeMillis() - start) + "ms");
     }
 
     public static DocumentModel getInstance() {
