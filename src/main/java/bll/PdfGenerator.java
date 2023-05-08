@@ -117,7 +117,6 @@ public class PdfGenerator {
                     }
                     imageTable = new Table(1);
 
-
                     ImageData imageData = ImageDataFactory.create(document.getDocumentImages().get(i).getUrl());
                     Image documentImage = new Image(imageData);
                     documentImage.setHorizontalAlignment(HorizontalAlignment.CENTER);
@@ -131,30 +130,32 @@ public class PdfGenerator {
                     imageTable.setMarginTop(20);
                     doc.add(imageTable);
                 }
-
+            }
                 //List of technicians that did the job
                 String technicians = getTechnicianNames(document);
                 Paragraph technicianList = new Paragraph(technicians);
                 doc.add(technicianList);
 
-                //Create page number header and website footer and add contents
-//            Paragraph footerText = new Paragraph("www.wuav.dk");
-//            footerText.setTextAlignment(TextAlignment.CENTER);
-//            Rectangle footer = new Rectangle(0, 0, pdfDoc.getDefaultPageSize().getWidth(), 50);
-//            int numberOfPages = doc.getPdfDocument().getNumberOfPages();
-//            for (int i = 1; i <= numberOfPages; i++) {
-//                PdfPage page = pdfDoc.getPage(i);
-//                PdfCanvas pdfCanvas = new PdfCanvas(page);
-//                pdfCanvas.rectangle(footer);
-//                Canvas canvas = new Canvas(pdfCanvas, pdfDoc, footer);
-//                canvas.add(footerText);
-//                if(numberOfPages>1) {
-//                    canvas.add(new Paragraph(i + " of " + numberOfPages).setTextAlignment(TextAlignment.CENTER).setFixedPosition(0,pdfDoc.getDefaultPageSize().getTop()-50, pdfDoc.getDefaultPageSize().getWidth()));
-//                }
-//                canvas.close();
-           }
 
-                doc.close();
+            //Create page number header and website footer and add contents
+            Paragraph footerText = new Paragraph("www.wuav.dk");
+            footerText.setTextAlignment(TextAlignment.CENTER);
+            Rectangle footer = new Rectangle(0, 0, pdfDoc.getDefaultPageSize().getWidth(), 50);
+            int numberOfPages = doc.getPdfDocument().getNumberOfPages();
+            for (int i = 1; i <= numberOfPages; i++) {
+                PdfPage page = pdfDoc.getPage(i);
+                PdfCanvas pdfCanvas = new PdfCanvas(page);
+                pdfCanvas.rectangle(footer);
+                Canvas canvas = new Canvas(pdfCanvas, pdfDoc, footer);
+                canvas.add(footerText);
+                if (numberOfPages > 1) {
+                    canvas.add(new Paragraph(i + " of " + numberOfPages).setTextAlignment(TextAlignment.CENTER).setFixedPosition(0, pdfDoc.getDefaultPageSize().getTop() - 50, pdfDoc.getDefaultPageSize().getWidth()));
+                }
+                canvas.close();
+            }
+
+            doc.close();
+
 
             } catch(IOException e){
                 throw new RuntimeException(e);
