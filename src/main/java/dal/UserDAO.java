@@ -176,6 +176,7 @@ public class UserDAO extends DAO implements IDAO<User> {
                 UserRole.fromString(resultSet.getString("UserRole")),
                 resultSet.getString("ProfilePicture")
         );
+        long startTime = System.currentTimeMillis();
         user.setAssignedDocuments(new DocumentDAO().getDocumentsByIDs(documentIDs));
         return user;
     }

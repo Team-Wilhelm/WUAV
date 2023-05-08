@@ -20,7 +20,8 @@ public class CustomerModel implements IModel<Customer> {
 
     private CustomerModel() {
         customerManager = ManagerFactory.createManager(ManagerFactory.ManagerType.CUSTOMER);
-        setAllCustomers();
+        allCustomers = new HashMap<>();
+        allCustomers.putAll(customerManager.getAll());
     }
 
     public static CustomerModel getInstance() {
@@ -36,7 +37,8 @@ public class CustomerModel implements IModel<Customer> {
 
         CompletableFuture<Map<UUID, Customer>> future = CompletableFuture.supplyAsync(() -> customerManager.getAll());
         return future.thenApplyAsync(customers -> {
-            allCustomers = (HashMap<UUID, Customer>) customers;
+            allCustomers.clear();
+            allCustomers.putAll(customers);
             return message;
         });
     }
@@ -46,7 +48,8 @@ public class CustomerModel implements IModel<Customer> {
         String message = customerManager.update(customer);
         CompletableFuture<Map<UUID, Customer>> future = CompletableFuture.supplyAsync(() -> customerManager.getAll());
         return future.thenApplyAsync(customers -> {
-            allCustomers = (HashMap<UUID, Customer>) customers;
+            allCustomers.clear();
+            allCustomers.putAll(customers);
             return message;
         });
     }
@@ -56,7 +59,8 @@ public class CustomerModel implements IModel<Customer> {
         String message = customerManager.delete(id);
         CompletableFuture<Map<UUID, Customer>> future = CompletableFuture.supplyAsync(() -> customerManager.getAll());
         return future.thenApplyAsync(customers -> {
-            allCustomers = (HashMap<UUID, Customer>) customers;
+            allCustomers.clear();
+            allCustomers.putAll(customers);
             return message;
         });
     }
@@ -69,9 +73,5 @@ public class CustomerModel implements IModel<Customer> {
     @Override
     public Customer getById(UUID id) {
         return customerManager.getById(id);
-    }
-
-    public void setAllCustomers() {
-        allCustomers = (HashMap<UUID, Customer>) customerManager.getAll();
     }
 }

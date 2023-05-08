@@ -1,6 +1,7 @@
 package gui.controller.AddControllers;
 
 import be.*;
+import be.cards.ImagePreview;
 import be.enums.CustomerType;
 import be.enums.UserRole;
 import bll.PdfGenerator;
@@ -23,18 +24,14 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import utils.BlobService;
 import utils.ThreadPool;
@@ -55,11 +52,15 @@ import java.util.ResourceBundle;
 public class AddDocumentController extends AddController implements Initializable {
     //TODO imageListView
     @FXML
-    private MFXButton btnCancel, btnDelete, btnSave, btnUploadPictures, btnCreatePdf;
+    private TabPane tabPane;
+    @FXML
+    private Tab jobInformationTab, customerInformationTab, picturesTab, pdfTab;
+    @FXML
+    private FlowPane flowPanePictures;
+    @FXML
+    private MFXButton btnDelete, btnSave, btnUploadPictures, btnCreatePdf, btnNextJobTab, btnNextCustomerTab;
     @FXML
     private MFXFilterComboBox<User> comboTechnicians;
-    @FXML
-    private MFXListView<ImageWrapper> listViewPictures;
     @FXML
     private MFXTextField txtCity, txtCountry, txtEmail, txtHouseNumber, txtJobTitle, txtName, txtPhoneNumber, txtPostcode, txtStreetName;
     @FXML
@@ -77,9 +78,11 @@ public class AddDocumentController extends AddController implements Initializabl
     private Document documentToEdit;
     private DocumentController documentController;
     private final ObservableList<ImageWrapper> pictures;
+    private final ObservableList<ImagePreview> imagePreviews = FXCollections.observableArrayList();
     private AlertManager alertManager;
     private ObservableList<User> allTechnicians;
     private final ThreadPool executorService;
+    private ImagePreview lastFocused;
 
     // Document and customer information
     private UUID temporaryId;
@@ -110,32 +113,21 @@ public class AddDocumentController extends AddController implements Initializabl
         // Disable the save button until the user has filled in the required fields
         // Disable the delete button until the user has selected a document to delete
         isEditing = false;
-        btnSave.setDisable(true);
         btnDelete.setDisable(true);
-        btnCreatePdf.setDisable(true);
+
+        btnNextJobTab.setDisable(true);
+        btnNextCustomerTab.setDisable(true);
+        customerInformationTab.setDisable(true);
+        picturesTab.setDisable(true);
+        pdfTab.setDisable(true);
+        tabPane.getSelectionModel().selectedItemProperty().addListener(tabChangeListener);
 
         assignListenersToTextFields();
-        setUpListView();
         setUpComboBox();
+        setUpContextMenu();
         dateLastContract.setValue(LocalDate.now());
 
-        Bindings.bindContentBidirectional(pictures, listViewPictures.getItems());
-
-        // Set up the context menu for the list view
-        contextMenu = new MFXContextMenu(listViewPictures);
-
-        MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
-                .setText("Delete")
-                .setAccelerator("Ctrl + D")
-                .setOnAction(event -> {
-                    ImageWrapper image = listViewPictures.getSelectionModel().getSelectedValue();
-                    pictures.remove(image);
-                })
-                .setIcon(new MFXFontIcon("fas-delete-left", 16))
-                .get();
-
-        contextMenu.getItems().add(deleteItem);
-        Platform.runLater(() -> listViewPictures.getScene().setOnContextMenuRequested(event -> contextMenu.show(listViewPictures, event.getScreenX(), event.getScreenY())));
+        Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
     }
 
     @FXML
@@ -155,15 +147,12 @@ public class AddDocumentController extends AddController implements Initializabl
 
         File selectedFile = fileChooser.showOpenDialog(((Node) actionEvent.getSource()).getScene().getWindow());
         if (selectedFile != null) {
-            String path = BlobService.getInstance().UploadFile(selectedFile.getAbsolutePath(), documentToEdit.getCustomer().getCustomerID());
+            UUID customerId = documentToEdit != null ? documentToEdit.getCustomer().getCustomerID() : UUID.randomUUID();
+            String path = BlobService.getInstance().UploadFile(selectedFile.getAbsolutePath(), customerId);
             ImageWrapper image = new ImageWrapper(path, selectedFile.getName());
             pictures.add(image);
         }
-    }
-
-    @FXML
-    private void cancelAction(ActionEvent actionEvent) {
-        closeWindow(actionEvent);
+        refreshItems();
     }
 
     @FXML
@@ -191,10 +180,12 @@ public class AddDocumentController extends AddController implements Initializabl
         executorService.execute(task);
 
         documentToEdit = document;
-        btnCreatePdf.setDisable(false);
+        pdfTab.setDisable(false);
+        btnSave.setDisable(true);
     }
 
-    public void deleteAction(ActionEvent actionEvent) {
+    @FXML
+    private void deleteAction(ActionEvent actionEvent) {
         Optional<ButtonType> result = alertManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", txtName.getScene().getWindow());
         if (result.isPresent() && result.get().equals(ButtonType.OK)) {
             Task<TaskState> deleteTask = new DeleteTask<>(documentToEdit.getDocumentID(), documentModel);
@@ -202,6 +193,11 @@ public class AddDocumentController extends AddController implements Initializabl
             executorService.execute(deleteTask);
         }
         closeWindow(actionEvent);
+    }
+
+    @FXML
+    private void nextAction(ActionEvent actionEvent) {
+        tabPane.getSelectionModel().selectNext();
     }
 
     public void assignUserToDocument(User technician) {
@@ -215,130 +211,31 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     /**
-     * Disables the save button if any of the required text fields are empty.
+     * Disables switching to the next tab if any of the required job text fields are empty.
      */
-    private final ChangeListener<String> inputListener = new ChangeListener<>() {
+    private final ChangeListener<String> jobInputListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (isInputEmpty(txtCity) || isInputEmpty(txtCountry) || isInputEmpty(txtEmail) || isInputEmpty(txtHouseNumber)
-                    || isInputEmpty(txtJobTitle) || isInputEmpty(txtName) || isInputEmpty(txtPhoneNumber)
-                    || isInputEmpty(txtPostcode) || isInputEmpty(txtStreetName) || isInputEmpty(txtJobDescription)) {
-                btnSave.setDisable(true);
-            } else {
-                btnSave.setDisable(false);
-            }
+            boolean isNotFilled = isInputEmpty(txtJobTitle) || isInputEmpty(txtJobDescription);
+            btnNextJobTab.setDisable(isNotFilled);
+            customerInformationTab.setDisable(isNotFilled);
         }
     };
 
-    // region Utilities, helpers and setters
-    public void setDocumentToEdit(Document document) {
-        isEditing = true;
-        documentToEdit = document;
-        btnSave.setDisable(false);
-        btnDelete.setDisable(false);
-        btnCreatePdf.setDisable(false);
-
-        // Customer information
-        txtName.setText(document.getCustomer().getCustomerName());
-        txtEmail.setText(document.getCustomer().getCustomerEmail());
-        txtPhoneNumber.setText(document.getCustomer().getCustomerPhoneNumber());
-        dateLastContract.setValue(document.getCustomer().getLastContract().toLocalDate());
-        toggleCustomerType.setSelected(document.getCustomer().getCustomerType() == CustomerType.PRIVATE);
-
-        // Customer address
-        txtStreetName.setText(document.getCustomer().getCustomerAddress().getStreetName());
-        txtHouseNumber.setText(document.getCustomer().getCustomerAddress().getStreetNumber());
-        txtCity.setText(document.getCustomer().getCustomerAddress().getTown());
-        txtPostcode.setText(document.getCustomer().getCustomerAddress().getPostcode());
-        txtCountry.setText(document.getCustomer().getCustomerAddress().getCountry());
-
-        // Document information
-        txtJobTitle.setText(document.getJobTitle());
-        txtJobDescription.setText(document.getJobDescription());
-        txtNotes.setText(document.getOptionalNotes());
-
-        // Pictures
-        pictures.setAll(document.getDocumentImages());
-
-        // Switch the listeners to editing mode
-        comboTechnicians.getSelectionModel().selectedItemProperty().removeListener(technicianListenerNotEditing);
-        comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerIsEditing);
-    }
-
-    protected void assignListenersToTextFields() {
-        // Customer information
-        txtName.textProperty().addListener(inputListener);
-        txtEmail.textProperty().addListener(inputListener);
-        txtPhoneNumber.textProperty().addListener(inputListener);
-
-        // Customer address
-        txtStreetName.textProperty().addListener(inputListener);
-        txtHouseNumber.textProperty().addListener(inputListener);
-        txtCity.textProperty().addListener(inputListener);
-        txtPostcode.textProperty().addListener(inputListener);
-        txtCountry.textProperty().addListener(inputListener);
-
-        // Document information
-        txtJobTitle.textProperty().addListener(inputListener);
-        txtJobDescription.textProperty().addListener(inputListener);
-        txtNotes.textProperty().addListener(inputListener);
-    }
-
-    protected void assignInputToVariables() {
-        // Customer information
-        name = txtName.getText();
-        email = txtEmail.getText();
-        phoneNumber = txtPhoneNumber.getText();
-        customerType = toggleCustomerType.isSelected() ? CustomerType.PRIVATE : CustomerType.BUSINESS;
-        lastContract = dateLastContract.getValue() != null ? Date.valueOf(dateLastContract.getValue()) : Date.valueOf(LocalDate.now());
-
-        // Customer address
-        streetName = txtStreetName.getText();
-        houseNumber = txtHouseNumber.getText();
-        city = txtCity.getText();
-        postcode = txtPostcode.getText();
-        country = txtCountry.getText();
-
-        // Document information
-        jobTitle = txtJobTitle.getText();
-        jobDescription = txtJobDescription.getText();
-        notes = txtNotes.getText();
-    }
-
-    private void setUpListView() {
-        listViewPictures.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if (event.getClickCount() == 2) {
-                if (!listViewPictures.getSelectionModel().getSelection().isEmpty()) {
-                    ImageWrapper image = listViewPictures.getSelectionModel().getSelectedValue();
-                    try {
-                        // Get the blob url, download picture and open the image in the default image viewer
-                        String downloadPath = System.getProperty("user.home") + "/Downloads/" + image.getName();
-                        Image imageToOpen = new Image(image.getUrl());
-                        File file = new File(downloadPath);
-                        ImageIO.write(SwingFXUtils.fromFXImage(imageToOpen, null), "png", file);
-                        Desktop.getDesktop().open(file);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                else {
-                    alertManager.showWarning("No image selected", "Please select an image to open", txtName.getScene().getWindow());
-                }
-            }
-        });
-
-        listViewPictures.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(ImageWrapper image) {
-                return image.getName();
-            }
-
-            @Override
-            public ImageWrapper fromString(String string) {
-                return null;
-            }
-        });
-    }
+    /**
+     * Disables switching to the next tab if any of the required customer text fields are empty.
+     */
+    private final ChangeListener<String> customerInputListener = new ChangeListener<>() {
+        @Override
+        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+            boolean isNotFilled = isInputEmpty(txtName) || isInputEmpty(txtEmail)
+                    || isInputEmpty(txtPhoneNumber) || isInputEmpty(txtStreetName)
+                    || isInputEmpty(txtHouseNumber) || isInputEmpty(txtPostcode)
+                    || isInputEmpty(txtCity) || isInputEmpty(txtCountry);
+            btnNextCustomerTab.setDisable(isNotFilled);
+            picturesTab.setDisable(isNotFilled);
+        }
+    };
 
     /**
      * Assigns the user to the document in the database.
@@ -368,6 +265,128 @@ public class AddDocumentController extends AddController implements Initializabl
             populateComboBox();
         }
     };
+
+
+    /**
+     * Listens for changes in the tab selection and prompts the user to save the document if they are editing it.
+     */
+    private final ChangeListener<Tab> tabChangeListener = new ChangeListener<>() {
+        @Override
+        public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
+            if (newValue.equals(pdfTab) && isEditing && isInputChanged(documentToEdit)) {
+                Optional<ButtonType> result = alertManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
+                if (result.isPresent() && result.get().equals(ButtonType.OK)) {
+                    saveAction(null);
+                }
+            }
+        }
+    };
+
+
+    // region Utilities, helpers and setters
+    public void setDocumentToEdit(Document document) {
+        isEditing = true;
+        documentToEdit = document;
+        btnSave.setDisable(false);
+        btnDelete.setDisable(false);
+        pdfTab.setDisable(false);
+
+        // Customer information
+        txtName.setText(document.getCustomer().getCustomerName());
+        txtEmail.setText(document.getCustomer().getCustomerEmail());
+        txtPhoneNumber.setText(document.getCustomer().getCustomerPhoneNumber());
+        dateLastContract.setValue(document.getCustomer().getLastContract().toLocalDate());
+        toggleCustomerType.setSelected(document.getCustomer().getCustomerType() == CustomerType.PRIVATE);
+
+        // Customer address
+        txtStreetName.setText(document.getCustomer().getCustomerAddress().getStreetName());
+        txtHouseNumber.setText(document.getCustomer().getCustomerAddress().getStreetNumber());
+        txtCity.setText(document.getCustomer().getCustomerAddress().getTown());
+        txtPostcode.setText(document.getCustomer().getCustomerAddress().getPostcode());
+        txtCountry.setText(document.getCustomer().getCustomerAddress().getCountry());
+
+        // Document information
+        txtJobTitle.setText(document.getJobTitle());
+        txtJobDescription.setText(document.getJobDescription());
+        txtNotes.setText(document.getOptionalNotes());
+
+        // Pictures
+        pictures.setAll(document.getDocumentImages());
+
+        // Switch the listeners to editing mode
+        comboTechnicians.getSelectionModel().selectedItemProperty().removeListener(technicianListenerNotEditing);
+        comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerIsEditing);
+
+        refreshItems();
+    }
+
+    protected void assignListenersToTextFields() {
+        // Customer information
+        txtName.textProperty().addListener(customerInputListener);
+        txtEmail.textProperty().addListener(customerInputListener);
+        txtPhoneNumber.textProperty().addListener(customerInputListener);
+
+        // Customer address
+        txtStreetName.textProperty().addListener(customerInputListener);
+        txtHouseNumber.textProperty().addListener(customerInputListener);
+        txtCity.textProperty().addListener(customerInputListener);
+        txtPostcode.textProperty().addListener(customerInputListener);
+        txtCountry.textProperty().addListener(customerInputListener);
+
+        // Document information
+        txtJobTitle.textProperty().addListener(jobInputListener);
+        txtJobDescription.textProperty().addListener(jobInputListener);
+        txtNotes.textProperty().addListener(jobInputListener);
+    }
+
+    protected void assignInputToVariables() {
+        // Customer information
+        name = txtName.getText();
+        email = txtEmail.getText();
+        phoneNumber = txtPhoneNumber.getText();
+        customerType = toggleCustomerType.isSelected() ? CustomerType.PRIVATE : CustomerType.BUSINESS;
+        lastContract = dateLastContract.getValue() != null ? Date.valueOf(dateLastContract.getValue()) : Date.valueOf(LocalDate.now());
+
+        // Customer address
+        streetName = txtStreetName.getText();
+        houseNumber = txtHouseNumber.getText();
+        city = txtCity.getText();
+        postcode = txtPostcode.getText();
+        country = txtCountry.getText();
+
+        // Document information
+        jobTitle = txtJobTitle.getText();
+        jobDescription = txtJobDescription.getText();
+        notes = txtNotes.getText();
+    }
+
+    public void refreshItems() {
+        imagePreviews.clear();
+        pictures.forEach(image -> {
+            ImagePreview imagePreview = image.getImagePreview();
+            imagePreview.setOnMouseClicked(e -> {
+                if (!imagePreview.isFocused()) {
+                    imagePreview.requestFocus();
+                    lastFocused = imagePreview;
+                }
+
+                if (e.getClickCount() == 2) {
+                    try {
+                        // Get the blob url, download picture and open the image in the default image viewer
+                        String downloadPath = System.getProperty("user.home") + "/Downloads/" + image.getName();
+                        Image imageToOpen = image.getImage();
+                        File file = new File(downloadPath);
+                        ImageIO.write(SwingFXUtils.fromFXImage(imageToOpen, null), "png", file);
+                        Desktop.getDesktop().open(file);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+            imagePreviews.add(imagePreview);
+        });
+
+    }
 
     private void setUpComboBox() {
         comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerNotEditing);
@@ -408,19 +427,43 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     private boolean isInputChanged(Document document){
+        // Check if job information has changed
+        if (!txtJobTitle.getText().trim().equals(document.getJobTitle()))
+            return true;
+        if (!txtJobDescription.getText().trim().equals(document.getJobDescription()))
+            return true;
+        if (!txtNotes.getText().trim().equals(document.getOptionalNotes()))
+            return true;
+
+        // Check if customer information has changed
+        if (!txtName.getText().trim().equals(document.getCustomer().getCustomerName()))
+            return true;
+        if (!txtPhoneNumber.getText().trim().equals(document.getCustomer().getCustomerPhoneNumber()))
+            return true;
+        if (!txtEmail.getText().trim().equals(document.getCustomer().getCustomerEmail()))
+            return true;
+        if (!toggleCustomerType.isSelected() == document.getCustomer().getCustomerType().equals(CustomerType.PRIVATE))
+            return true;
+
+        // Address
         Address customerAddress = document.getCustomer().getCustomerAddress();
-        return !txtCity.getText().trim().equals(customerAddress.getTown())
-                || !txtCountry.getText().trim().equals(customerAddress.getCountry())
-                || !txtEmail.getText().trim().equals(document.getCustomer().getCustomerEmail())
-                || !txtHouseNumber.getText().trim().equals(customerAddress.getStreetNumber())
-                || !txtJobTitle.getText().trim().equals(document.getJobTitle())
-                || !txtName.getText().trim().equals(document.getCustomer().getCustomerName())
-                || !txtPhoneNumber.getText().trim().equals(document.getCustomer().getCustomerPhoneNumber())
-                || !txtPostcode.getText().trim().equals(customerAddress.getPostcode())
-                || !txtStreetName.getText().trim().equals(customerAddress.getStreetName())
-                || !txtJobDescription.getText().trim().equals(document.getJobDescription())
-                || !txtNotes.getText().trim().equals(document.getOptionalNotes())
-                || !listViewPictures.getItems().equals(document.getDocumentImages());
+        if (!txtStreetName.getText().trim().equals(customerAddress.getStreetName()))
+            return true;
+        if (!txtHouseNumber.getText().trim().equals(customerAddress.getStreetNumber()))
+            return true;
+        if (!txtCity.getText().trim().equals(customerAddress.getTown()))
+            return true;
+        if (!txtPostcode.getText().trim().equals(customerAddress.getPostcode()))
+            return true;
+        if (!txtCountry.getText().trim().equals(customerAddress.getCountry()))
+            return true;
+
+        // Other information
+        if (!Date.valueOf(dateLastContract.getValue()).equals(document.getCustomer().getLastContract()))
+            return true;
+        if (!pictures.equals(document.getDocumentImages()))
+            return true;
+        return false;
     }
 
     private void populateComboBox() {
@@ -428,6 +471,23 @@ public class AddDocumentController extends AddController implements Initializabl
         allTechnicians.setAll(UserModel.getInstance().getAll().values().stream().filter(user ->
                 user.getUserRole() == UserRole.TECHNICIAN).collect(Collectors.toList()));
         comboTechnicians.setItems(allTechnicians);
+    }
+
+    private void setUpContextMenu() {
+        contextMenu = new MFXContextMenu(flowPanePictures);
+        MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
+                .setText("Delete")
+                .setAccelerator("Ctrl + D")
+                .setOnAction(event -> {
+                    ImageWrapper image = lastFocused.getImageWrapper();
+                    pictures.remove(image);
+                })
+                .setIcon(new MFXFontIcon("fas-delete-left", 16))
+                .get();
+
+        contextMenu.getItems().add(deleteItem);
+        Platform.runLater(() -> flowPanePictures.getScene().setOnContextMenuRequested(
+                event -> contextMenu.show(flowPanePictures, event.getScreenX(), event.getScreenY())));
     }
     // endregion
 }
