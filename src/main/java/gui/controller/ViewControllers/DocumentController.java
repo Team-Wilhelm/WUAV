@@ -1,6 +1,5 @@
 package gui.controller.ViewControllers;
 
-import be.Customer;
 import be.Document;
 import be.cards.DocumentCard;
 import gui.SceneManager;
@@ -10,31 +9,26 @@ import gui.tasks.TaskState;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
 import io.github.palexdev.materialfx.enums.SortState;
+import io.github.palexdev.materialfx.filter.StringFilter;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
-import javafx.stage.Window;
 import gui.util.AlertManager;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.sql.Date;
+import java.util.*;
 
 public class DocumentController extends ViewController implements Initializable {
     @FXML
-    private MFXTableView documentTableView;
+    private MFXTableView<Document> tblDocument;
     @FXML
     private MFXProgressSpinner progressSpinner;
     @FXML
@@ -55,10 +49,8 @@ public class DocumentController extends ViewController implements Initializable 
     public void initialize(URL location, ResourceBundle resources) {
         setProgressVisibility(false);
 
-//        searchBar.textProperty().addListener((observable, oldValue, newValue) ->
-//                refreshItems(documentModel.searchDocuments(searchBar.getText().toLowerCase().trim())));
         searchBar.textProperty().addListener((observable, oldValue, newValue) ->
-                documentTableView.getItems().setAll(documentModel.searchDocuments(searchBar.getText().toLowerCase().trim())));
+                tblDocument.getItems().setAll(documentModel.searchDocuments(searchBar.getText().toLowerCase().trim())));
 
         documentList.addAll(documentModel.getAll().values());
         populateTableView();
@@ -128,7 +120,7 @@ public class DocumentController extends ViewController implements Initializable 
 
                 if (e.getClickCount() == 2) {
                     lastFocusedCard = finalDocumentCard;
-                    editDocument(btnAddDocument.getScene().getWindow());
+                    //editDocument(btnAddDocument.getScene().getWindow());
                 }
             });
             documentCards.add(documentCard);
@@ -139,38 +131,40 @@ public class DocumentController extends ViewController implements Initializable 
     public void refreshItems() {
         refreshItems(List.copyOf(documentModel.getAll().values()));
     }
-
-    private void editDocument(Window owner) {
-        if (lastFocusedCard != null) {
-            try {
-                AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
-                controller.setDocumentController(this);
-                controller.setDocumentToEdit(lastFocusedCard.getDocument());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            AlertManager.getInstance().showWarning("No document selected", "Please select a document to edit", owner);
-        }
-    }
+//
+//    private void editDocument(Window owner) {
+//        if (lastFocusedCard != null) {
+//            try {
+//                AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
+//                controller.setDocumentController(this);
+//                controller.setDocumentToEdit(lastFocusedCard.getDocument());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            AlertManager.getInstance().showWarning("No document selected", "Please select a document to edit", owner);
+//        }
+//    }
 
     public void addDocumentAction() throws IOException {
         ((AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController()).setDocumentController(this);
     }
 
     private void populateTableView(){
-        Bindings.bindContentBidirectional(documentTableView.getItems(), documentList);
+        documentList.sort(Comparator.comparing(Document::getDateOfCreation).reversed());
+        Bindings.bindContentBidirectional(tblDocument.getItems(), documentList);
 
-        MFXTableColumn<Document> jobTitle = new MFXTableColumn<>("Title", false);
-        MFXTableColumn<Document> dateOfCreation = new MFXTableColumn<>("Date of Creation", false);
-        MFXTableColumn<Document> customerName = new MFXTableColumn<>("Customer Name", false);
-        MFXTableColumn<Document> customerEmail = new MFXTableColumn<>("Customer Email", false);
+        MFXTableColumn<Document> jobTitle = new MFXTableColumn<>("Title", false, Comparator.comparing(Document::getJobTitle));
+        MFXTableColumn<Document> dateOfCreation = new MFXTableColumn<>("Date of Creation", false, Comparator.comparing(Document::getDateOfCreation));
+        MFXTableColumn<Document> customerName = new MFXTableColumn<>("Customer Name", false, Comparator.comparing(d -> d.getCustomer().getCustomerName()));
+        MFXTableColumn<Document> customerEmail = new MFXTableColumn<>("Customer Email", false, Comparator.comparing(d -> d.getCustomer().getCustomerEmail()));
 
         jobTitle.setRowCellFactory(document -> {
             MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(Document::getJobTitle);
             row.setOnMouseClicked(this::tableViewDoubleClickAction);
             return row;
         });
+
 
         dateOfCreation.setRowCellFactory(document -> {
             MFXTableRowCell<Document, Date> row = new MFXTableRowCell<>(Document::getDateOfCreation);
@@ -190,10 +184,26 @@ public class DocumentController extends ViewController implements Initializable 
             return row;
         });
 
-        documentTableView.getTableColumns().addAll(jobTitle, dateOfCreation, customerName, customerEmail);
-        documentTableView.autosizeColumnsOnInitialization();
+        tblDocument.getTableColumns().addAll(jobTitle, dateOfCreation, customerName, customerEmail);
+        tblDocument.autosizeColumnsOnInitialization();
+        tblDocument.setFooterVisible(false);
     }
 
-    private void tableViewDoubleClickAction(MouseEvent mouseEvent) {
+    @FXML
+    private void tableViewDoubleClickAction(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            if (!tblDocument.getSelectionModel().getSelection().isEmpty()) {
+                try {
+                    AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
+                    controller.setDocumentController(this);
+                    controller.setDocumentToEdit(tblDocument.getSelectionModel().getSelectedValue());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                AlertManager.getInstance().showError("No document selected", "Please select a document", btnAddDocument.getScene().getWindow());
+            }
+        }
     }
 }
