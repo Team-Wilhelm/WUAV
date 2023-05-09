@@ -23,7 +23,7 @@ public class DocumentModel implements IModel<Document> {
         allDocuments = new HashMap<>();
         createdDocumentCards = new HashMap<>();
         setAllDocuments();
-        createDocumentCards();
+        //createDocumentCards();
     }
 
     public static DocumentModel getInstance() {
@@ -100,10 +100,10 @@ public class DocumentModel implements IModel<Document> {
     public List<Document> searchDocuments(String query) {
         List<Document> filteredDocuments = new ArrayList<>();
         allDocuments.values().stream().filter(document ->
-                        document.getCustomer().getCustomerName().toLowerCase().contains(query.toLowerCase())
-                                || document.getCustomer().getCustomerEmail().toLowerCase().contains(query.toLowerCase())
-                                || document.getCustomer().getCustomerPhoneNumber().toLowerCase().contains(query.toLowerCase())
-                                || document.getDateOfCreation().toString().toLowerCase().contains(query.toLowerCase())
+                        document.getCustomer().getCustomerName().toLowerCase().contains(query)
+                                || document.getCustomer().getCustomerEmail().toLowerCase().contains(query)
+                                || document.getDateOfCreation().toString().toLowerCase().contains(query)
+                                || document.getJobTitle().toLowerCase().contains(query)
                                 //|| document.getTechnicians().stream().allMatch(user -> user.getFullName().toLowerCase().contains(query.toLowerCase()))
                                 //|| document.getTechnicians().stream().allMatch(user -> user.getUsername().toLowerCase().contains(query.toLowerCase()))
                         ).forEach(filteredDocuments::add);

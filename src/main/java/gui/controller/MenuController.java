@@ -16,8 +16,6 @@ import java.util.ResourceBundle;
 
 public class MenuController implements Initializable {
     @FXML
-    private MFXButton btnMyProfile;
-    @FXML
     private GridPane gridPane;
     private Node documentView, employeeView, currentScene;
     private User user;
@@ -31,7 +29,6 @@ public class MenuController implements Initializable {
             employeeView = employeeLoader.load();
             currentScene = documentView;
             gridPane.add(currentScene, 2, 0, 1,gridPane.getRowCount());
-            btnMyProfile.setVisible(false);
         } catch (Exception e) {
             e.printStackTrace();
         }

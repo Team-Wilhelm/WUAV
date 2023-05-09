@@ -125,9 +125,13 @@ public class PdfGenerator {
                     documentImage.setHeight(150).setHorizontalAlignment(HorizontalAlignment.CENTER);
                     imageTable.addCell(documentImage);
 
+                    //TODO add image description and remove border from cell
+                    imageTable.addFooterCell(document.getDocumentImages().get(i).getName()).setTextAlignment(TextAlignment.CENTER);
+
                     imageTable.setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.MIDDLE);
                     removeBorder(imageTable);
                     imageTable.setMarginTop(20);
+
                     doc.add(imageTable);
                 }
             }
@@ -163,12 +167,6 @@ public class PdfGenerator {
         }
 
 
-    private boolean isOverHalfPageAvailable(com.itextpdf.layout.Document doc){
-        float halfPage = (doc.getPdfDocument().getDefaultPageSize().getHeight()/2)-75;
-        float currentPos = doc.getPdfDocument().getWriter().getCurrentPos();
-        System.out.println("halfpage: "+halfPage + "current pos: " + currentPos);
-        return halfPage > currentPos;
-    }
     private String getLogo(){
         return "https://easvprojects.blob.core.windows.net/wuav/9e112cc6-1487-426a-9bdc-2a4fd7b91861/7e7d9e00-507b-47ee-989b-8686859b41aa-wuav.png";
     }
