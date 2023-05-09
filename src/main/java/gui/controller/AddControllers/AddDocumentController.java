@@ -32,6 +32,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.FlowPane;
@@ -188,9 +189,10 @@ public class AddDocumentController extends AddController implements Initializabl
         setUpSaveTask(task, documentController, txtCity.getScene().getWindow());
         executorService.execute(task);
 
-        documentToEdit = currentDocument;
+        setDocumentToEdit(currentDocument);
         pdfTab.setDisable(false);
         btnSave.setDisable(true);
+        isInputChanged.set(false);
     }
 
     @FXML
@@ -285,7 +287,13 @@ public class AddDocumentController extends AddController implements Initializabl
         @Override
         public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
             if (newValue.equals(pdfTab)) {
-                if (isEditing && isInputChanged(documentToEdit) || !isEditing && isInputChanged(currentDocument)) {
+                if (isEditing) {
+                    isInputChanged(documentToEdit);
+                } else {
+                    isInputChanged(currentDocument);
+                }
+
+                if (isInputChanged.get()) {
                     Optional<ButtonType> result = alertManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
                     if (result.isPresent() && result.get().equals(ButtonType.OK)) {
                         saveAction(null);
@@ -484,7 +492,6 @@ public class AddDocumentController extends AddController implements Initializabl
 
     private void setUpComboBox() {
         comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerNotEditing);
-
         comboTechnicians.setConverter(new StringConverter<>() {
             @Override
             public String toString(User object) {
@@ -513,50 +520,53 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     public void createPdfAction(ActionEvent actionEvent) {
-        if(isInputChanged(documentToEdit)){
-            AlertManager.getInstance().showWarning("Unsaved changes", "Please save changes", txtCity.getScene().getWindow());
-        }
-        else pdfGenerator.generatePdf(documentToEdit);
+        pdfGenerator.generatePdf(documentToEdit);
     }
 
-    private boolean isInputChanged(Document document){
+    private void isInputChanged(Document document){
         // Check if job information has changed
-        if (!txtJobTitle.getText().trim().equals(document.getJobTitle()))
-            return true;
-        if (!txtJobDescription.getText().trim().equals(document.getJobDescription()))
-            return true;
-        if (!txtNotes.getText().trim().equals(document.getOptionalNotes()))
-            return true;
+        if (!txtJobTitle.getText().trim().equals(document.getJobTitle())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!txtJobDescription.getText().trim().equals(document.getJobDescription())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!txtNotes.getText().trim().equals(document.getOptionalNotes())) {
+            isInputChanged.setValue(true);
+            return;
+        }
 
         // Check if customer information has changed
-        if (!txtName.getText().trim().equals(document.getCustomer().getCustomerName()))
-            return true;
-        if (!txtPhoneNumber.getText().trim().equals(document.getCustomer().getCustomerPhoneNumber()))
-            return true;
-        if (!txtEmail.getText().trim().equals(document.getCustomer().getCustomerEmail()))
-            return true;
-        if (!toggleCustomerType.isSelected() == document.getCustomer().getCustomerType().equals(CustomerType.PRIVATE))
-            return true;
+        if (!txtName.getText().trim().equals(document.getCustomer().getCustomerName())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!txtPhoneNumber.getText().trim().equals(document.getCustomer().getCustomerPhoneNumber())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!txtEmail.getText().trim().equals(document.getCustomer().getCustomerEmail())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!toggleCustomerType.isSelected() == document.getCustomer().getCustomerType().equals(CustomerType.PRIVATE)) {
+            isInputChanged.setValue(true);
+            return;
+        }
 
         // Address
         Address customerAddress = document.getCustomer().getCustomerAddress();
-        if (!txtStreetName.getText().trim().equals(customerAddress.getStreetName()))
-            return true;
-        if (!txtHouseNumber.getText().trim().equals(customerAddress.getStreetNumber()))
-            return true;
-        if (!txtCity.getText().trim().equals(customerAddress.getTown()))
-            return true;
-        if (!txtPostcode.getText().trim().equals(customerAddress.getPostcode()))
-            return true;
-        if (!txtCountry.getText().trim().equals(customerAddress.getCountry()))
-            return true;
+        Address address = new Address(txtStreetName.getText().trim(), txtHouseNumber.getText().trim(),
+                txtPostcode.getText().trim(), txtCity.getText().trim(), txtCountry.getText().trim());
+        if (!customerAddress.equals(address)) {
+            isInputChanged.setValue(true);
+            return;
+        }
 
         // Other information
-        if (!Date.valueOf(dateLastContract.getValue()).equals(document.getCustomer().getLastContract()))
-            return true;
-        if (!pictures.equals(document.getDocumentImages()))
-            return true;
-        return false;
+        if (!Date.valueOf(dateLastContract.getValue()).equals(document.getCustomer().getLastContract())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!pictures.equals(document.getDocumentImages())) {
+            isInputChanged.setValue(true);
+        }
     }
 
     private void populateComboBox() {

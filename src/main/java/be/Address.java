@@ -1,5 +1,7 @@
 package be;
 
+import java.util.Objects;
+
 public class Address {
     private int addressID;
     private String streetName, streetNumber, postcode, town, country;
@@ -63,5 +65,18 @@ public class Address {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return Objects.equals(streetName, address.streetName) && Objects.equals(streetNumber, address.streetNumber) && Objects.equals(postcode, address.postcode) && Objects.equals(town, address.town) && Objects.equals(country, address.country);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(streetName, streetNumber, postcode, town, country);
     }
 }
