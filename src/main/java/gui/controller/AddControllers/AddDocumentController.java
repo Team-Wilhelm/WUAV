@@ -45,7 +45,6 @@ import utils.BlobService;
 import utils.ThreadPool;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +53,6 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -216,9 +214,11 @@ public class AddDocumentController extends AddController implements Initializabl
     public void assignUserToDocument(User technician) {
         if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
             technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
+            technicians.add(technician);
             documentModel.assignUserToDocument(technician, documentToEdit, true);
         } else {
             technician.getAssignedDocuments().remove(documentToEdit.getDocumentID());
+            technicians.remove(technician);
             documentModel.assignUserToDocument(technician, documentToEdit, false);
         }
     }
@@ -568,6 +568,12 @@ public class AddDocumentController extends AddController implements Initializabl
             isInputChanged.setValue(true);
             return;
         } if (!pictures.equals(document.getDocumentImages())) {
+            isInputChanged.setValue(true);
+            return;
+        }
+
+        // Check if technician assignation has changed
+        if (!technicians.equals(document.getTechnicians())){
             isInputChanged.setValue(true);
         }
     }
