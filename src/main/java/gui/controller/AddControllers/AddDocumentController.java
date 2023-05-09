@@ -114,7 +114,7 @@ public class AddDocumentController extends AddController implements Initializabl
             technicians.add(UserModel.getInstance().getLoggedInUser());
         //TODO bind the save button to the isInputChanged property
         //TODO changing the order of pictures in the flowpane is not detected as a change
-        isInputChanged = new SimpleBooleanProperty(false);
+        isInputChanged = new SimpleBooleanProperty(true);
     }
 
     @Override
@@ -215,7 +215,6 @@ public class AddDocumentController extends AddController implements Initializabl
         if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
             technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
             technicians.add(technician);
-            documentToEdit.getTechnicians().add(technician);
             documentModel.assignUserToDocument(technician, documentToEdit, true);
         } else {
             technician.getAssignedDocuments().remove(documentToEdit.getDocumentID());
@@ -292,7 +291,7 @@ public class AddDocumentController extends AddController implements Initializabl
             if (newValue.equals(pdfTab) || newValue.equals(picturesTab)) {
                 if (isEditing) {
                     isInputChanged(documentToEdit);
-                } else {
+                } else  if (currentDocument != null && !isEditing) {
                     isInputChanged(currentDocument);
                 }
 
@@ -314,6 +313,7 @@ public class AddDocumentController extends AddController implements Initializabl
         //btnSave.setDisable(false);
         btnDelete.setDisable(false);
         pdfTab.setDisable(false);
+        isInputChanged.setValue(false);
 
         // Customer information
         txtName.setText(document.getCustomer().getCustomerName());
@@ -568,6 +568,12 @@ public class AddDocumentController extends AddController implements Initializabl
             isInputChanged.setValue(true);
             return;
         } if (!pictures.equals(document.getDocumentImages())) {
+            isInputChanged.setValue(true);
+            return;
+        }
+
+        // Check if technician assignation has changed
+        if (!technicians.equals(document.getTechnicians())){
             isInputChanged.setValue(true);
         }
     }

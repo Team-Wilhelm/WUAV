@@ -104,7 +104,6 @@ public class PdfGenerator {
             //List of technicians that did the job
             Paragraph technicianList = new Paragraph(getTechnicianNames(document));
             doc.add(technicianList);
-            System.out.println(document.getTechnicians().size());
 
             //Add images
             Table imageTable;
