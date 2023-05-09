@@ -17,6 +17,8 @@ import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -52,7 +54,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class AddDocumentController extends AddController implements Initializable {
-    //TODO imageListView
     @FXML
     private TabPane tabPane;
     @FXML
@@ -77,7 +78,7 @@ public class AddDocumentController extends AddController implements Initializabl
     private CustomerModel customerModel;
     private PdfGenerator pdfGenerator;
     private boolean isEditing;
-    private Document documentToEdit;
+    private Document documentToEdit, currentDocument;
     private DocumentController documentController;
     private final ObservableList<ImageWrapper> pictures;
     private final ObservableList<ImagePreview> imagePreviews = FXCollections.observableArrayList();
@@ -93,21 +94,26 @@ public class AddDocumentController extends AddController implements Initializabl
     private CustomerType customerType;
     private Date lastContract;
     private List<User> technicians;
+    private BooleanProperty isInputChanged;
 
     public AddDocumentController() {
         documentModel = DocumentModel.getInstance();
         customerModel = CustomerModel.getInstance();
-        pdfGenerator = new PdfGenerator();
-        pictures = FXCollections.observableArrayList();
+        executorService = ThreadPool.getInstance();
         alertManager = AlertManager.getInstance();
+        pdfGenerator = new PdfGenerator();
+
         technicians = new ArrayList<>();
         temporaryId = UUID.randomUUID();
-        executorService = ThreadPool.getInstance();
+        pictures = FXCollections.observableArrayList();
         allTechnicians = FXCollections.observableArrayList();
 
         if (UserModel.getInstance().getLoggedInUser() != null
                 && UserModel.getInstance().getLoggedInUser().getUserRole() == UserRole.TECHNICIAN)
             technicians.add(UserModel.getInstance().getLoggedInUser());
+        //TODO bind the save button to the isInputChanged property
+        //TODO changing the order of pictures in the flowpane is not detected as a change
+        isInputChanged = new SimpleBooleanProperty(false);
     }
 
     @Override
@@ -130,6 +136,7 @@ public class AddDocumentController extends AddController implements Initializabl
         dateLastContract.setValue(LocalDate.now());
 
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
+        //btnSave.visibleProperty().bind(isInputChanged);
     }
 
     @FXML
@@ -167,21 +174,21 @@ public class AddDocumentController extends AddController implements Initializabl
                 .filter(c -> c.getCustomerEmail().equals(email))
                 .findFirst()
                 .orElse(new Customer(name, email, phoneNumber, address, customerType, lastContract));
-        Document document = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
-        document.setTechnicians(technicians);
-        document.setDocumentImages(pictures);
+        currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
+        currentDocument.setTechnicians(technicians);
+        currentDocument.setDocumentImages(pictures);
 
         if (isEditing) {
-            document.setDocumentID(documentToEdit.getDocumentID());
+            currentDocument.setDocumentID(documentToEdit.getDocumentID());
             customer.setCustomerID(documentToEdit.getCustomer().getCustomerID());
             address.setAddressID(documentToEdit.getCustomer().getCustomerAddress().getAddressID());
         }
 
-        Task<TaskState> task = new SaveTask<>(document, isEditing, documentModel);
+        Task<TaskState> task = new SaveTask<>(currentDocument, isEditing, documentModel);
         setUpSaveTask(task, documentController, txtCity.getScene().getWindow());
         executorService.execute(task);
 
-        documentToEdit = document;
+        documentToEdit = currentDocument;
         pdfTab.setDisable(false);
         btnSave.setDisable(true);
     }
@@ -212,6 +219,8 @@ public class AddDocumentController extends AddController implements Initializabl
         }
     }
 
+
+    // region Listeners
     /**
      * Disables switching to the next tab if any of the required job text fields are empty.
      */
@@ -275,15 +284,17 @@ public class AddDocumentController extends AddController implements Initializabl
     private final ChangeListener<Tab> tabChangeListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
-            if (newValue.equals(pdfTab) && isEditing && isInputChanged(documentToEdit)) {
-                Optional<ButtonType> result = alertManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
-                if (result.isPresent() && result.get().equals(ButtonType.OK)) {
-                    saveAction(null);
+            if (newValue.equals(pdfTab)) {
+                if (isEditing && isInputChanged(documentToEdit) || !isEditing && isInputChanged(currentDocument)) {
+                    Optional<ButtonType> result = alertManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
+                    if (result.isPresent() && result.get().equals(ButtonType.OK)) {
+                        saveAction(null);
+                    }
                 }
             }
         }
     };
-
+    // endregion
 
     // region Utilities, helpers and setters
     public void setDocumentToEdit(Document document) {
@@ -458,9 +469,8 @@ public class AddDocumentController extends AddController implements Initializabl
                     imagePreviews.add(earlierIndex, removedLater);
                     imagePreviews.add(laterIndex, removedEarlier);
 
-                    imagePreviews.forEach(ip -> {
-                        System.out.println(ip.getImageWrapper().getName() + " " + imagePreviews.indexOf(ip));
-                    });
+                    pictures.clear();
+                    pictures.addAll(imagePreviews.stream().map(ImagePreview::getImageWrapper).toList());
 
                     success = true;
                 } catch (NumberFormatException e) {
@@ -557,6 +567,7 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     private void setUpContextMenu() {
+        //TODO deleting pictures
         contextMenu = new MFXContextMenu(flowPanePictures);
         MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
                 .setText("Delete")
