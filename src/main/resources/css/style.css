@@ -132,3 +132,7 @@
 .mfx-text-field .text-field {
     -fx-highlight-fill: #d8eaf8; /* Selected text highlight */
 }
+
+.mfx-checkbox {
+    -mfx-main: dark-blue-grey;
+}
