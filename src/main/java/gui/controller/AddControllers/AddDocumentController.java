@@ -17,6 +17,8 @@ import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -30,6 +32,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.FlowPane;
@@ -52,7 +55,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class AddDocumentController extends AddController implements Initializable {
-    //TODO imageListView
     @FXML
     private TabPane tabPane;
     @FXML
@@ -77,7 +79,7 @@ public class AddDocumentController extends AddController implements Initializabl
     private CustomerModel customerModel;
     private PdfGenerator pdfGenerator;
     private boolean isEditing;
-    private Document documentToEdit;
+    private Document documentToEdit, currentDocument;
     private DocumentController documentController;
     private final ObservableList<ImageWrapper> pictures;
     private final ObservableList<ImagePreview> imagePreviews = FXCollections.observableArrayList();
@@ -93,21 +95,26 @@ public class AddDocumentController extends AddController implements Initializabl
     private CustomerType customerType;
     private Date lastContract;
     private List<User> technicians;
+    private BooleanProperty isInputChanged;
 
     public AddDocumentController() {
         documentModel = DocumentModel.getInstance();
         customerModel = CustomerModel.getInstance();
-        pdfGenerator = new PdfGenerator();
-        pictures = FXCollections.observableArrayList();
+        executorService = ThreadPool.getInstance();
         alertManager = AlertManager.getInstance();
+        pdfGenerator = new PdfGenerator();
+
         technicians = new ArrayList<>();
         temporaryId = UUID.randomUUID();
-        executorService = ThreadPool.getInstance();
+        pictures = FXCollections.observableArrayList();
         allTechnicians = FXCollections.observableArrayList();
 
         if (UserModel.getInstance().getLoggedInUser() != null
                 && UserModel.getInstance().getLoggedInUser().getUserRole() == UserRole.TECHNICIAN)
             technicians.add(UserModel.getInstance().getLoggedInUser());
+        //TODO bind the save button to the isInputChanged property
+        //TODO changing the order of pictures in the flowpane is not detected as a change
+        isInputChanged = new SimpleBooleanProperty(false);
     }
 
     @Override
@@ -130,6 +137,7 @@ public class AddDocumentController extends AddController implements Initializabl
         dateLastContract.setValue(LocalDate.now());
 
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
+        btnSave.disableProperty().bind(isInputChanged.not());
     }
 
     @FXML
@@ -167,23 +175,24 @@ public class AddDocumentController extends AddController implements Initializabl
                 .filter(c -> c.getCustomerEmail().equals(email))
                 .findFirst()
                 .orElse(new Customer(name, email, phoneNumber, address, customerType, lastContract));
-        Document document = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
-        document.setTechnicians(technicians);
-        document.setDocumentImages(pictures);
+        currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
+        currentDocument.setTechnicians(technicians);
+        currentDocument.setDocumentImages(pictures);
 
         if (isEditing) {
-            document.setDocumentID(documentToEdit.getDocumentID());
+            currentDocument.setDocumentID(documentToEdit.getDocumentID());
             customer.setCustomerID(documentToEdit.getCustomer().getCustomerID());
             address.setAddressID(documentToEdit.getCustomer().getCustomerAddress().getAddressID());
         }
 
-        Task<TaskState> task = new SaveTask<>(document, isEditing, documentModel);
+        Task<TaskState> task = new SaveTask<>(currentDocument, isEditing, documentModel);
         setUpSaveTask(task, documentController, txtCity.getScene().getWindow());
         executorService.execute(task);
 
-        documentToEdit = document;
+        setDocumentToEdit(currentDocument);
         pdfTab.setDisable(false);
-        btnSave.setDisable(true);
+        //btnSave.setDisable(true);
+        isInputChanged.set(false);
     }
 
     @FXML
@@ -215,6 +224,8 @@ public class AddDocumentController extends AddController implements Initializabl
         }
     }
 
+
+    // region Listeners
     /**
      * Disables switching to the next tab if any of the required job text fields are empty.
      */
@@ -278,21 +289,29 @@ public class AddDocumentController extends AddController implements Initializabl
     private final ChangeListener<Tab> tabChangeListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
-            if (newValue.equals(pdfTab) && isEditing && isInputChanged(documentToEdit)) {
-                Optional<ButtonType> result = alertManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
-                if (result.isPresent() && result.get().equals(ButtonType.OK)) {
-                    saveAction(null);
+            if (newValue.equals(pdfTab) || newValue.equals(picturesTab)) {
+                if (isEditing) {
+                    isInputChanged(documentToEdit);
+                } else {
+                    isInputChanged(currentDocument);
+                }
+
+                if (isInputChanged.get() && newValue.equals(pdfTab)) {
+                    Optional<ButtonType> result = alertManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
+                    if (result.isPresent() && result.get().equals(ButtonType.OK)) {
+                        saveAction(null);
+                    }
                 }
             }
         }
     };
-
+    // endregion
 
     // region Utilities, helpers and setters
     public void setDocumentToEdit(Document document) {
         isEditing = true;
         documentToEdit = document;
-        btnSave.setDisable(false);
+        //btnSave.setDisable(false);
         btnDelete.setDisable(false);
         pdfTab.setDisable(false);
 
@@ -461,9 +480,8 @@ public class AddDocumentController extends AddController implements Initializabl
                     imagePreviews.add(earlierIndex, removedLater);
                     imagePreviews.add(laterIndex, removedEarlier);
 
-                    imagePreviews.forEach(ip -> {
-                        System.out.println(ip.getImageWrapper().getName() + " " + imagePreviews.indexOf(ip));
-                    });
+                    pictures.clear();
+                    pictures.addAll(imagePreviews.stream().map(ImagePreview::getImageWrapper).toList());
 
                     success = true;
                 } catch (NumberFormatException e) {
@@ -477,7 +495,6 @@ public class AddDocumentController extends AddController implements Initializabl
 
     private void setUpComboBox() {
         comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerNotEditing);
-
         comboTechnicians.setConverter(new StringConverter<>() {
             @Override
             public String toString(User object) {
@@ -506,50 +523,53 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     public void createPdfAction(ActionEvent actionEvent) {
-        if(isInputChanged(documentToEdit)){
-            AlertManager.getInstance().showWarning("Unsaved changes", "Please save changes", txtCity.getScene().getWindow());
-        }
-        else pdfGenerator.generatePdf(documentToEdit);
+        pdfGenerator.generatePdf(documentToEdit);
     }
 
-    private boolean isInputChanged(Document document){
+    private void isInputChanged(Document document){
         // Check if job information has changed
-        if (!txtJobTitle.getText().trim().equals(document.getJobTitle()))
-            return true;
-        if (!txtJobDescription.getText().trim().equals(document.getJobDescription()))
-            return true;
-        if (!txtNotes.getText().trim().equals(document.getOptionalNotes()))
-            return true;
+        if (!txtJobTitle.getText().trim().equals(document.getJobTitle())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!txtJobDescription.getText().trim().equals(document.getJobDescription())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!txtNotes.getText().trim().equals(document.getOptionalNotes())) {
+            isInputChanged.setValue(true);
+            return;
+        }
 
         // Check if customer information has changed
-        if (!txtName.getText().trim().equals(document.getCustomer().getCustomerName()))
-            return true;
-        if (!txtPhoneNumber.getText().trim().equals(document.getCustomer().getCustomerPhoneNumber()))
-            return true;
-        if (!txtEmail.getText().trim().equals(document.getCustomer().getCustomerEmail()))
-            return true;
-        if (!toggleCustomerType.isSelected() == document.getCustomer().getCustomerType().equals(CustomerType.PRIVATE))
-            return true;
+        if (!txtName.getText().trim().equals(document.getCustomer().getCustomerName())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!txtPhoneNumber.getText().trim().equals(document.getCustomer().getCustomerPhoneNumber())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!txtEmail.getText().trim().equals(document.getCustomer().getCustomerEmail())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!toggleCustomerType.isSelected() == document.getCustomer().getCustomerType().equals(CustomerType.PRIVATE)) {
+            isInputChanged.setValue(true);
+            return;
+        }
 
         // Address
         Address customerAddress = document.getCustomer().getCustomerAddress();
-        if (!txtStreetName.getText().trim().equals(customerAddress.getStreetName()))
-            return true;
-        if (!txtHouseNumber.getText().trim().equals(customerAddress.getStreetNumber()))
-            return true;
-        if (!txtCity.getText().trim().equals(customerAddress.getTown()))
-            return true;
-        if (!txtPostcode.getText().trim().equals(customerAddress.getPostcode()))
-            return true;
-        if (!txtCountry.getText().trim().equals(customerAddress.getCountry()))
-            return true;
+        Address address = new Address(txtStreetName.getText().trim(), txtHouseNumber.getText().trim(),
+                txtPostcode.getText().trim(), txtCity.getText().trim(), txtCountry.getText().trim());
+        if (!customerAddress.equals(address)) {
+            isInputChanged.setValue(true);
+            return;
+        }
 
         // Other information
-        if (!Date.valueOf(dateLastContract.getValue()).equals(document.getCustomer().getLastContract()))
-            return true;
-        if (!pictures.equals(document.getDocumentImages()))
-            return true;
-        return false;
+        if (!Date.valueOf(dateLastContract.getValue()).equals(document.getCustomer().getLastContract())) {
+            isInputChanged.setValue(true);
+            return;
+        } if (!pictures.equals(document.getDocumentImages())) {
+            isInputChanged.setValue(true);
+        }
     }
 
     private void populateComboBox() {
@@ -560,6 +580,7 @@ public class AddDocumentController extends AddController implements Initializabl
     }
 
     private void setUpContextMenu() {
+        //TODO deleting pictures
         contextMenu = new MFXContextMenu(flowPanePictures);
         MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
                 .setText("Delete")

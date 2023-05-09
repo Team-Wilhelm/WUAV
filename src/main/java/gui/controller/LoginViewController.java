@@ -1,7 +1,6 @@
 package gui.controller;
 
 import be.User;
-import dal.UserDAO;
 import gui.SceneManager;
 import gui.model.UserModel;
 import gui.util.AlertManager;
@@ -22,7 +21,6 @@ import utils.HashPasswordHelper;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import static javafx.scene.input.KeyCode.ENTER;
@@ -36,6 +34,7 @@ public class LoginViewController implements Initializable {
     private MFXPasswordField passwordInput;
     private Parent root;
     private Stage stage;
+    private MenuController menuController;
     private final UserModel userModel = UserModel.getInstance();
     private HashPasswordHelper hashPasswordHelper = new HashPasswordHelper();
 
@@ -43,7 +42,9 @@ public class LoginViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         Platform.runLater(this::setEnterKeyAction);
         try {
-            root = FXMLLoader.load(getClass().getResource(SceneManager.MENU_SCENE));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.MENU_SCENE));
+            root = loader.load();
+            menuController = loader.getController();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -52,7 +53,7 @@ public class LoginViewController implements Initializable {
     public Boolean loginUser(Event event){
         User user = userModel.getUserByUsername(usernameInput.getText());
         if(userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText(), user.getPassword()[1]))){
-            userModel.setLoggedInUser(userModel.getUserByUsername(usernameInput.getText()));
+            userModel.setLoggedInUser(user);
             openMenuView();
             return true;
         }
@@ -67,6 +68,9 @@ public class LoginViewController implements Initializable {
         stage = (Stage) btnLogin.getScene().getWindow();
         Scene scene = new Scene(root);
         MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
+
+        menuController.userLoggedIn();
+
         stage.setScene(scene);
         stage.centerOnScreen();
         stage.setMaximized(true);

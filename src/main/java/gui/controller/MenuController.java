@@ -1,6 +1,9 @@
 package gui.controller;
 
+import be.User;
+import be.enums.UserRole;
 import gui.SceneManager;
+import gui.model.UserModel;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +18,7 @@ public class MenuController implements Initializable {
     @FXML
     private GridPane gridPane;
     private Node documentView, employeeView, currentScene;
+    private User user;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -44,5 +48,14 @@ public class MenuController implements Initializable {
 
     public void btnEmployeesAction() {
         switchScene(employeeView);
+    }
+
+    public void btnMyProfileAction() {}
+
+    public void userLoggedIn() {
+        user = UserModel.getInstance().getLoggedInUser();
+
+        if (user.getUserRole() == UserRole.ADMINISTRATOR) {
+        }
     }
 }

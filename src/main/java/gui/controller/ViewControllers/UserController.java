@@ -72,6 +72,7 @@ public class UserController extends ViewController implements Initializable {
 
     @Override
     public void bindProgressToTask(Task<TaskState> task) {
+        progressSpinner.setProgress(0);
         progressSpinner.progressProperty().bind(task.progressProperty());
         progressLabel.textProperty().bind(task.messageProperty());
     }

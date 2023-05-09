@@ -1,6 +1,7 @@
 package be.cards;
 
 import be.ImageWrapper;
+import javafx.beans.binding.Bindings;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,7 +11,11 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 public class ImagePreview extends VBox {
     private ImageWrapper imageWrapper;
@@ -32,6 +37,17 @@ public class ImagePreview extends VBox {
         imageView.setFitHeight(100);
 
         this.getChildren().addAll(imageView, fileName);
+
+        this.focusTraversableProperty().setValue(true);
+        this.setOnMouseClicked(e -> {
+            if (!this.isFocused())
+                this.requestFocus();
+        });
+
+        this.backgroundProperty().bind(Bindings
+                .when(this.focusedProperty())
+                .then(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, null)))
+                .otherwise(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, null))));
     }
 
     public ImageWrapper getImageWrapper() {
