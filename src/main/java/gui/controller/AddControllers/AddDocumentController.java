@@ -137,7 +137,7 @@ public class AddDocumentController extends AddController implements Initializabl
         dateLastContract.setValue(LocalDate.now());
 
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
-        //btnSave.visibleProperty().bind(isInputChanged);
+        btnSave.disableProperty().bind(isInputChanged.not());
     }
 
     @FXML
@@ -191,7 +191,7 @@ public class AddDocumentController extends AddController implements Initializabl
 
         setDocumentToEdit(currentDocument);
         pdfTab.setDisable(false);
-        btnSave.setDisable(true);
+        //btnSave.setDisable(true);
         isInputChanged.set(false);
     }
 
@@ -286,14 +286,14 @@ public class AddDocumentController extends AddController implements Initializabl
     private final ChangeListener<Tab> tabChangeListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
-            if (newValue.equals(pdfTab)) {
+            if (newValue.equals(pdfTab) || newValue.equals(picturesTab)) {
                 if (isEditing) {
                     isInputChanged(documentToEdit);
                 } else {
                     isInputChanged(currentDocument);
                 }
 
-                if (isInputChanged.get()) {
+                if (isInputChanged.get() && newValue.equals(pdfTab)) {
                     Optional<ButtonType> result = alertManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
                     if (result.isPresent() && result.get().equals(ButtonType.OK)) {
                         saveAction(null);
@@ -308,7 +308,7 @@ public class AddDocumentController extends AddController implements Initializabl
     public void setDocumentToEdit(Document document) {
         isEditing = true;
         documentToEdit = document;
-        btnSave.setDisable(false);
+        //btnSave.setDisable(false);
         btnDelete.setDisable(false);
         pdfTab.setDisable(false);
 
