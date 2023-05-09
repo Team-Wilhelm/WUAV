@@ -22,11 +22,11 @@ public class UserModel implements IModel<User> {
     private UserModel() {
         long start = System.currentTimeMillis();
         userManager = (UserManager) ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
+        allUsers = new HashMap<>();
         loadedCards = new HashMap<>();
         setAllUsersFromManager();
         createUserCards();
         long end = System.currentTimeMillis();
-        System.out.println("UserModel constructor took: " + (end - start) + "ms");
     }
 
     public static UserModel getInstance() {
@@ -41,7 +41,8 @@ public class UserModel implements IModel<User> {
         String message = userManager.add(user);
         CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
         return future.thenApplyAsync(users -> {
-            allUsers = (HashMap<UUID, User>) users;
+            allUsers.clear();
+            allUsers.putAll(users);
             return message;
         });
     }
@@ -51,7 +52,8 @@ public class UserModel implements IModel<User> {
         String message = userManager.update(user);
         CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
         return future.thenApplyAsync(users -> {
-            allUsers = (HashMap<UUID, User>) users;
+            allUsers.clear();
+            allUsers.putAll(users);
             return message;
         });
     }
@@ -61,7 +63,8 @@ public class UserModel implements IModel<User> {
         String message = userManager.delete(id);
         CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
         return future.thenApplyAsync(users -> {
-            allUsers = (HashMap<UUID, User>) users;
+            allUsers.clear();
+            allUsers.putAll(users);
             return message;
         });
     }
@@ -84,7 +87,8 @@ public class UserModel implements IModel<User> {
      * Reloads all users from the database
      */
     public void setAllUsersFromManager() {
-        this.allUsers = (HashMap<UUID, User>) userManager.getAll();;
+        allUsers.clear();
+        allUsers.putAll(userManager.getAll());
     }
 
     public User getLoggedInUser() {

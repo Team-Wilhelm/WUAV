@@ -91,7 +91,6 @@ public class DocumentController extends ViewController implements Initializable 
 
     @Override
     public void refreshItems(List<?> documentsToDisplay) {
-        //TODO refresh all cards with given customer
         // TODO fix this mess
         documentCards.clear();
 

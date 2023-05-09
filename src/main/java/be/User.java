@@ -127,7 +127,7 @@ public class User extends Observable<User> {
 
     public String getAssignation(Document document){
         if (assignedDocuments.containsValue(document))
-            return "ASSIGNED:";
+            return "ASSIGNED: ";
         else return "";
     }
 

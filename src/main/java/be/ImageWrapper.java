@@ -1,11 +1,13 @@
 package be;
 
+import be.cards.ImagePreview;
 import javafx.scene.image.Image;
 
 public class ImageWrapper {
     private String url;
     private String name;
     private Image image;
+    private ImagePreview imagePreview;
 
     public ImageWrapper(String url, String name, Image image) {
         this(url, name);
@@ -16,6 +18,7 @@ public class ImageWrapper {
         this.url = url;
         this.name = name;
         this.image = new Image(url);
+        this.imagePreview = new ImagePreview(this);
     }
 
     public String getUrl() {
@@ -26,5 +29,8 @@ public class ImageWrapper {
     }
     public Image getImage() {
         return image;
+    }
+    public ImagePreview getImagePreview() {
+        return imagePreview;
     }
 }
