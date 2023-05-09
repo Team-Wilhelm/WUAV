@@ -21,14 +21,7 @@ import com.itextpdf.layout.property.AreaBreakType;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
-import com.itextpdf.layout.renderer.IRenderer;
-import com.itextpdf.layout.renderer.TableRenderer;
-
-import javax.swing.text.html.parser.Element;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
 
 
 public class PdfGenerator {
@@ -108,6 +101,11 @@ public class PdfGenerator {
             doc.add(notes);
             doc.add(lineBreak3);
 
+            //List of technicians that did the job
+            Paragraph technicianList = new Paragraph(getTechnicianNames(document));
+            doc.add(technicianList);
+            System.out.println(document.getTechnicians().size());
+
             //Add images
             Table imageTable;
             if (!document.getDocumentImages().isEmpty()) {
@@ -125,8 +123,11 @@ public class PdfGenerator {
                     documentImage.setHeight(150).setHorizontalAlignment(HorizontalAlignment.CENTER);
                     imageTable.addCell(documentImage);
 
-                    //TODO add image description and remove border from cell
-                    imageTable.addFooterCell(document.getDocumentImages().get(i).getName()).setTextAlignment(TextAlignment.CENTER);
+                    //TODO add image description
+                    Cell footerCell = new Cell();
+                    footerCell.add(document.getDocumentImages().get(i).getName()).setTextAlignment(TextAlignment.CENTER);
+                    footerCell.setBorder(Border.NO_BORDER);
+                    imageTable.addFooterCell(footerCell);
 
                     imageTable.setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.MIDDLE);
                     removeBorder(imageTable);
@@ -135,10 +136,6 @@ public class PdfGenerator {
                     doc.add(imageTable);
                 }
             }
-                //List of technicians that did the job
-                String technicians = getTechnicianNames(document);
-                Paragraph technicianList = new Paragraph(technicians);
-                doc.add(technicianList);
 
 
             //Create page number header and website footer and add contents
@@ -190,11 +187,22 @@ public class PdfGenerator {
 
     private String getTechnicianNames(Document document){
         StringBuilder technicians = new StringBuilder();
+        int technicianCount = document.getTechnicians().size();
         if(!document.getTechnicians().isEmpty()) {
             technicians.append("Technician(s): ");
-            for (User user : document.getTechnicians()) {
-                technicians.append(user.getFullName());
+            for (int i = 0; i < technicianCount; i++) {
+                if(i != technicianCount-1) {
+                    technicians.append(document.getTechnicians().get(i).getFullName()).append(", ");
+                } else technicians.append(document.getTechnicians().get(i).getFullName());
             }
+
+
+//            for (int i = 0; i <= document.getTechnicians().size()-1; i++) {
+//                technicians.append(document.getTechnicians().get(i).getFullName());
+//                        if(i != document.getTechnicians().size()-1) {
+//                            technicians.append(", ");
+//                        }
+//            }
         }
         return technicians.toString();
     }

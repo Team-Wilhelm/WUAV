@@ -205,9 +205,12 @@ public class AddDocumentController extends AddController implements Initializabl
     public void assignUserToDocument(User technician) {
         if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
             technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
+            technicians.add(technician);
+            documentToEdit.getTechnicians().add(technician);
             documentModel.assignUserToDocument(technician, documentToEdit, true);
         } else {
             technician.getAssignedDocuments().remove(documentToEdit.getDocumentID());
+            technicians.remove(technician);
             documentModel.assignUserToDocument(technician, documentToEdit, false);
         }
     }
