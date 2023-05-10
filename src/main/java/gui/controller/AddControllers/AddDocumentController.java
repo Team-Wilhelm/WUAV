@@ -115,9 +115,10 @@ public class AddDocumentController extends AddController implements Initializabl
         pictures = FXCollections.observableArrayList();
         allTechnicians = FXCollections.observableArrayList();
 
-        if (UserModel.getInstance().getLoggedInUser() != null
+        /*if (UserModel.getInstance().getLoggedInUser() != null
                 && UserModel.getInstance().getLoggedInUser().getUserRole() == UserRole.TECHNICIAN)
             technicians.add(UserModel.getInstance().getLoggedInUser());
+         */
         isInputChanged = new SimpleBooleanProperty(true);
         isEditing = new SimpleBooleanProperty(false);
     }
@@ -343,6 +344,7 @@ public class AddDocumentController extends AddController implements Initializabl
         allTechnicians.stream().filter(technician -> technician.getAssignedDocuments().containsKey(document.getDocumentID())).forEach(technician -> {
             technicians.add(technician);
         });
+        documentToEdit.setTechnicians(technicians);
 
         // Switch the listeners to editing mode
         comboTechnicians.getSelectionModel().selectedItemProperty().removeListener(technicianListenerNotEditing);
@@ -578,7 +580,8 @@ public class AddDocumentController extends AddController implements Initializabl
         } if (!pictures.equals(document.getDocumentImages())) {
             isInputChanged.setValue(true);
             return;
-        } if (!technicians.equals(document.getTechnicians())){
+        } if (!(new HashSet<>(technicians).containsAll(document.getTechnicians())
+                && new HashSet<>(document.getTechnicians()).containsAll(technicians))) {
             isInputChanged.setValue(true);
         }
     }
