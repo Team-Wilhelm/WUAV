@@ -38,8 +38,7 @@ public class DocumentModel implements IModel<Document> {
         String message = documentManager.add(document);
         CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
         return future.thenApplyAsync(documents -> {
-            allDocuments.clear();
-            allDocuments.putAll(documents);
+            setAllDocuments();
             return message;
         });
     }
@@ -49,8 +48,7 @@ public class DocumentModel implements IModel<Document> {
         String message = documentManager.update(document);
         CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
         return future.thenApplyAsync(documents -> {
-            allDocuments.clear();
-            allDocuments.putAll(documents);
+            setAllDocuments();
             return message;
         });
     }
@@ -60,8 +58,7 @@ public class DocumentModel implements IModel<Document> {
         String message = documentManager.delete(id);
         CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
         return future.thenApplyAsync(documents -> {
-            allDocuments.clear();
-            allDocuments.putAll(documents);
+            setAllDocuments();
             return message;
         });
     }
@@ -77,20 +74,12 @@ public class DocumentModel implements IModel<Document> {
     }
 
     public void setAllDocuments() {
-        this.allDocuments = new HashMap<>();
+        this.allDocuments.clear();
         this.allDocuments.putAll(documentManager.getAll());
     }
 
     public HashMap<Document, DocumentCard> getCreatedDocumentCards() {
         return createdDocumentCards;
-    }
-
-    public void createDocumentCards() {
-        for (Document document: allDocuments.values()){
-            if(!createdDocumentCards.containsKey(document)){
-                createdDocumentCards.put(document, new DocumentCard(document));
-            }
-        }
     }
 
     public void assignUserToDocument(User user, Document document, boolean isAssigning){

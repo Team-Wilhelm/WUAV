@@ -179,6 +179,7 @@ public class AddDocumentController extends AddController implements Initializabl
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
+        technicians.forEach(t -> System.out.println(t.getFullName()));
 
         if (isEditing.get()) {
             currentDocument.setDocumentID(documentToEdit.getDocumentID());
@@ -260,6 +261,7 @@ public class AddDocumentController extends AddController implements Initializabl
             assignUserToDocument(newValue);
             comboTechnicians.getSelectionModel().clearSelection();
             populateComboBox();
+            System.out.println("Technicians: " + technicians.size());
         }
     };
 
@@ -335,6 +337,12 @@ public class AddDocumentController extends AddController implements Initializabl
 
         // Pictures
         pictures.setAll(document.getDocumentImages());
+
+        // Technicians
+        technicians.clear();
+        allTechnicians.stream().filter(technician -> technician.getAssignedDocuments().containsKey(document.getDocumentID())).forEach(technician -> {
+            technicians.add(technician);
+        });
 
         // Switch the listeners to editing mode
         comboTechnicians.getSelectionModel().selectedItemProperty().removeListener(technicianListenerNotEditing);
@@ -570,10 +578,7 @@ public class AddDocumentController extends AddController implements Initializabl
         } if (!pictures.equals(document.getDocumentImages())) {
             isInputChanged.setValue(true);
             return;
-        }
-
-        // Check if technician assignation has changed
-        if (!technicians.equals(document.getTechnicians())){
+        } if (!technicians.equals(document.getTechnicians())){
             isInputChanged.setValue(true);
         }
     }

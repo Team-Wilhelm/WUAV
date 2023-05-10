@@ -20,20 +20,17 @@ public class UserModel implements IModel<User> {
     private static User loggedInUser;
 
     private UserModel() {
-        long start = System.currentTimeMillis();
         userManager = (UserManager) ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
         allUsers = new HashMap<>();
         loadedCards = new HashMap<>();
         setAllUsersFromManager();
         createUserCards();
-        long end = System.currentTimeMillis();
     }
 
     public static UserModel getInstance() {
         if (instance == null) {
             instance = new UserModel();
-        }
-        return instance;
+        } return instance;
     }
 
     @Override
@@ -81,6 +78,10 @@ public class UserModel implements IModel<User> {
     @Override
     public User getById(UUID id) {
         return userManager.getById(id);
+    }
+
+    public User getByIDFFromModel(UUID id) {
+        return allUsers.get(id);
     }
 
     /**

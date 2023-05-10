@@ -191,7 +191,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 rs.getDate("DateOfCreation")
             );
         //TODO notify document when images are assigned to it, so it can update the view
-        //executorService.execute(() -> assignImagesToDocument(document));
         assignImagesToDocument(document);
         return document;
     }
@@ -242,7 +241,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     public HashMap<UUID, Document> getDocumentsByIDs(List<UUID> documentIDs) {
         HashMap<UUID, Document> documents = new HashMap<>();
-        if (documentIDs.isEmpty() || documentIDs == null) {
+        if (documentIDs.isEmpty()) {
             return documents;
         }
 
