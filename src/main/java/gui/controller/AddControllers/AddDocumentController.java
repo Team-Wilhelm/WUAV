@@ -14,6 +14,8 @@ import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.*;
+import io.github.palexdev.materialfx.controls.cell.MFXCheckListCell;
+import io.github.palexdev.materialfx.controls.cell.MFXListCell;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -36,6 +38,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import utils.BlobService;
@@ -62,6 +65,8 @@ public class AddDocumentController extends AddController implements Initializabl
     @FXML
     private FlowPane flowPanePictures;
     @FXML
+    private GridPane gridPanePdf;
+    @FXML
     private MFXButton btnDelete, btnSave, btnUploadPictures, btnCreatePdf, btnNextJobTab, btnNextCustomerTab;
     @FXML
     private MFXFilterComboBox<User> comboTechnicians;
@@ -73,12 +78,13 @@ public class AddDocumentController extends AddController implements Initializabl
     private MFXToggleButton toggleCustomerType;
     @FXML
     private MFXDatePicker dateLastContract;
+    @FXML
+    private MFXCheckListView<Document> checkListViewDocuments;
     private MFXContextMenu contextMenu;
 
     private DocumentModel documentModel;
     private CustomerModel customerModel;
     private PdfGenerator pdfGenerator;
-    private boolean isEditing;
     private Document documentToEdit, currentDocument;
     private DocumentController documentController;
     private final ObservableList<ImageWrapper> pictures;
@@ -95,7 +101,7 @@ public class AddDocumentController extends AddController implements Initializabl
     private CustomerType customerType;
     private Date lastContract;
     private List<User> technicians;
-    private BooleanProperty isInputChanged;
+    private BooleanProperty isInputChanged, isEditing;
 
     public AddDocumentController() {
         documentModel = DocumentModel.getInstance();
@@ -112,18 +118,12 @@ public class AddDocumentController extends AddController implements Initializabl
         if (UserModel.getInstance().getLoggedInUser() != null
                 && UserModel.getInstance().getLoggedInUser().getUserRole() == UserRole.TECHNICIAN)
             technicians.add(UserModel.getInstance().getLoggedInUser());
-        //TODO bind the save button to the isInputChanged property
-        //TODO changing the order of pictures in the flowpane is not detected as a change
         isInputChanged = new SimpleBooleanProperty(true);
+        isEditing = new SimpleBooleanProperty(false);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Disable the save button until the user has filled in the required fields
-        // Disable the delete button until the user has selected a document to delete
-        isEditing = false;
-        btnDelete.setDisable(true);
-
         btnNextJobTab.setDisable(true);
         btnNextCustomerTab.setDisable(true);
         customerInformationTab.setDisable(true);
@@ -138,6 +138,7 @@ public class AddDocumentController extends AddController implements Initializabl
 
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
         btnSave.disableProperty().bind(isInputChanged.not());
+        btnDelete.disableProperty().bind(isEditing.not());
     }
 
     @FXML
@@ -179,19 +180,18 @@ public class AddDocumentController extends AddController implements Initializabl
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
 
-        if (isEditing) {
+        if (isEditing.get()) {
             currentDocument.setDocumentID(documentToEdit.getDocumentID());
             customer.setCustomerID(documentToEdit.getCustomer().getCustomerID());
             address.setAddressID(documentToEdit.getCustomer().getCustomerAddress().getAddressID());
         }
 
-        Task<TaskState> task = new SaveTask<>(currentDocument, isEditing, documentModel);
+        Task<TaskState> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
         setUpSaveTask(task, documentController, txtCity.getScene().getWindow());
         executorService.execute(task);
 
         setDocumentToEdit(currentDocument);
         pdfTab.setDisable(false);
-        //btnSave.setDisable(true);
         isInputChanged.set(false);
     }
 
@@ -289,9 +289,9 @@ public class AddDocumentController extends AddController implements Initializabl
         @Override
         public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
             if (newValue.equals(pdfTab) || newValue.equals(picturesTab)) {
-                if (isEditing) {
+                if (isEditing.get()) {
                     isInputChanged(documentToEdit);
-                } else  if (currentDocument != null && !isEditing) {
+                } else if (currentDocument != null && !isEditing.get()) {
                     isInputChanged(currentDocument);
                 }
 
@@ -301,6 +301,7 @@ public class AddDocumentController extends AddController implements Initializabl
                         saveAction(null);
                     }
                 }
+                setUpPdfListView();
             }
         }
     };
@@ -308,12 +309,10 @@ public class AddDocumentController extends AddController implements Initializabl
 
     // region Utilities, helpers and setters
     public void setDocumentToEdit(Document document) {
-        isEditing = true;
+        isEditing.setValue(true);
         documentToEdit = document;
-        //btnSave.setDisable(false);
-        btnDelete.setDisable(false);
         pdfTab.setDisable(false);
-        isInputChanged.setValue(false);
+        isInputChanged.set(false);
 
         // Customer information
         txtName.setText(document.getCustomer().getCustomerName());
@@ -341,6 +340,7 @@ public class AddDocumentController extends AddController implements Initializabl
         comboTechnicians.getSelectionModel().selectedItemProperty().removeListener(technicianListenerNotEditing);
         comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerIsEditing);
 
+        setUpPdfListView();
         refreshItems();
     }
 
@@ -499,7 +499,7 @@ public class AddDocumentController extends AddController implements Initializabl
             @Override
             public String toString(User object) {
                 if (object != null) {
-                    if (isEditing) {
+                    if (isEditing.get()) {
                         return object.getAssignation(object.getAssignedDocuments().get(documentToEdit.getDocumentID()))
                                 + " " + object.getFullName() + " (" + object.getUsername() + ")";
                     } else {
@@ -601,6 +601,21 @@ public class AddDocumentController extends AddController implements Initializabl
         contextMenu.getItems().add(deleteItem);
         Platform.runLater(() -> flowPanePictures.getScene().setOnContextMenuRequested(
                 event -> contextMenu.show(flowPanePictures, event.getScreenX(), event.getScreenY())));
+    }
+
+    private void setUpPdfListView() {
+        DocumentPropertiesList propertiesList = new DocumentPropertiesList(documentToEdit);
+
+        propertiesList.prefWidthProperty().bind(gridPanePdf.widthProperty());
+        propertiesList.prefHeightProperty().bind(gridPanePdf.heightProperty().subtract(btnCreatePdf.heightProperty()));
+        propertiesList.widthProperty().addListener((obs, oldWidth, newWidth) -> {
+            // Handle the updated width of propertiesList here
+            System.out.println("List: " + newWidth);
+            System.out.println("Gridpane: " + gridPanePdf.getWidth());
+        });
+
+        gridPanePdf.getChildren().removeIf(node -> node instanceof DocumentPropertiesList);
+        gridPanePdf.add(propertiesList, 0, 0);
     }
     // endregion
 }
