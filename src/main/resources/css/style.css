@@ -3,11 +3,11 @@
 }
 
 .root {
-    -fx-font-size: 14pt ;
+    -fx-font-size: 13pt ;
 }
 
 .background {
-    -fx-background-color: #f9fbfb;
+    -fx-background-color: white;
 }
 
 .menu{
@@ -16,11 +16,18 @@
     -fx-text-fill: dark-blue-grey;
 }
 
+.mfx-button{
+    -fx-background-color: white;
+    -fx-border-color: dark-blue-grey;
+    -fx-text-fill: dark-blue-grey;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+}
+
 .addButton {
     -fx-background-color: dark-blue-grey;
     -fx-border-color: dark-blue-grey;
     -fx-text-fill: white;
-    -fx-font-size: 14;
 }
 
 .document-view {
@@ -68,6 +75,8 @@
     -fx-background-radius: 5px;
 }
 
+
+/*Removal of default materialFX purple colour*/
 .mfx-text-field {
     -mfx-main: dark-blue-grey;
 }
@@ -118,7 +127,6 @@
     -fx-text-fill: dark-blue-grey;
 }
 
-
 .mfx-date-cell:current {
     -fx-text-fill: dark-blue-grey;
     -fx-background-color: #f6f7f9;
@@ -131,4 +139,8 @@
 
 .mfx-text-field .text-field {
     -fx-highlight-fill: #d8eaf8; /* Selected text highlight */
+}
+
+.mfx-checkbox {
+    -mfx-main: dark-blue-grey;
 }
