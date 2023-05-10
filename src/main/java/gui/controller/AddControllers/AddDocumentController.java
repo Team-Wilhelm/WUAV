@@ -144,6 +144,7 @@ public class AddDocumentController extends AddController implements Initializabl
 
     @FXML
     private void uploadPicturesAction(ActionEvent actionEvent) throws Exception {
+        //TODO fix uploading/saving pictures
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.jpeg"),
@@ -163,6 +164,8 @@ public class AddDocumentController extends AddController implements Initializabl
             String path = BlobService.getInstance().UploadFile(selectedFile.getAbsolutePath(), customerId);
             ImageWrapper image = new ImageWrapper(path, selectedFile.getName());
             pictures.add(image);
+            if (isEditing.get())
+                isInputChanged(documentToEdit);
         }
         refreshItems();
     }
@@ -494,6 +497,8 @@ public class AddDocumentController extends AddController implements Initializabl
                     pictures.addAll(imagePreviews.stream().map(ImagePreview::getImageWrapper).toList());
 
                     success = true;
+                    if (isEditing.get())
+                        isInputChanged(documentToEdit);
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
@@ -579,6 +584,8 @@ public class AddDocumentController extends AddController implements Initializabl
             return;
         } if (!pictures.equals(document.getDocumentImages())) {
             isInputChanged.setValue(true);
+            System.out.println("Pictures: " + Arrays.toString(pictures.toArray()));
+            System.out.println("Document: " + Arrays.toString(document.getDocumentImages().toArray()));
             return;
         } if (!(new HashSet<>(technicians).containsAll(document.getTechnicians())
                 && new HashSet<>(document.getTechnicians()).containsAll(technicians))) {
@@ -602,6 +609,7 @@ public class AddDocumentController extends AddController implements Initializabl
                 .setOnAction(event -> {
                     ImageWrapper image = lastFocused.getImageWrapper();
                     pictures.remove(image);
+                    refreshItems();
                 })
                 .setIcon(new MFXFontIcon("fas-delete-left", 16))
                 .get();
