@@ -1,6 +1,8 @@
 package gui.controller.AddControllers;
 
 import be.*;
+import be.enums.DocumentPropertyType;
+import gui.nodes.DocumentPropertyCheckboxWrapper;
 import gui.nodes.ImagePreview;
 import be.enums.CustomerType;
 import be.enums.UserRole;
@@ -79,6 +81,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private MFXDatePicker dateLastContract;
     private MFXTextFieldWithAutofill txtName;
     private MFXContextMenu contextMenu;
+    private DocumentPropertiesList propertiesList;
 
     private DocumentModel documentModel;
     private CustomerModel customerModel;
@@ -223,6 +226,14 @@ public class AddDocumentController extends AddController<Document> implements In
             technicians.remove(technician);
             documentModel.assignUserToDocument(technician, documentToEdit, false);
         }
+    }
+
+    public void createPdfAction(ActionEvent actionEvent) {
+        // Get the selected checkboxes
+        List<DocumentPropertyCheckboxWrapper> checkboxWrappers = propertiesList.getCheckBoxes().stream()
+                .filter(DocumentPropertyCheckboxWrapper::isSelected)
+                .toList();
+        pdfGenerator.generatePdf(documentToEdit, checkboxWrappers);
     }
 
     // region Listeners
@@ -446,11 +457,13 @@ public class AddDocumentController extends AddController<Document> implements In
 
             imagePreviews.add(imagePreview);
         });
-
     }
 
-    // Event handler for when the user drops an image preview on the flow pane
-    private EventHandler<MouseEvent> dragDetected = new EventHandler<MouseEvent>() {
+    // region Drag and drop
+    /**
+     * Event handler for when the user drops an image preview on the flow pane.
+     */
+    private EventHandler<MouseEvent> dragDetected = new EventHandler<>() {
         @Override
         public void handle(MouseEvent event) {
             ImagePreview imagePreview = (ImagePreview) event.getSource();
@@ -520,7 +533,7 @@ public class AddDocumentController extends AddController<Document> implements In
             event.setDropCompleted(success);
         }
     };
-
+    // endregion
 
     private void setUpComboBox() {
         comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerNotEditing);
@@ -549,10 +562,6 @@ public class AddDocumentController extends AddController<Document> implements In
 
     public void setDocumentController(DocumentController documentController) {
         this.documentController = documentController;
-    }
-
-    public void createPdfAction(ActionEvent actionEvent) {
-        pdfGenerator.generatePdf(documentToEdit);
     }
 
     private void isInputChanged(Document document){
@@ -631,8 +640,8 @@ public class AddDocumentController extends AddController<Document> implements In
                 event -> contextMenu.show(flowPanePictures, event.getScreenX(), event.getScreenY())));
     }
 
-    private void setUpPdfListView() {
-        DocumentPropertiesList propertiesList = new DocumentPropertiesList(documentToEdit);
+    public void setUpPdfListView() {
+        propertiesList = new DocumentPropertiesList(documentToEdit);
         gridPanePdf.getChildren().removeIf(node -> node instanceof DocumentPropertiesList);
         gridPanePdf.add(propertiesList, 0, 0);
     }

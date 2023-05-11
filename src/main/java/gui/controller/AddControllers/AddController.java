@@ -1,5 +1,6 @@
 package gui.controller.AddControllers;
 
+import be.Document;
 import gui.controller.ViewControllers.ViewController;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
@@ -27,6 +28,9 @@ public abstract class AddController<T> {
                 if (taskState == TaskState.SUCCESSFUL) {
                     controller.refreshItems();
                     addController.setIsEditing(task.getObjectToSave());
+                    if (addController instanceof AddDocumentController) {
+                        ((AddDocumentController) addController).setUpPdfListView();
+                    }
                 } else if (task.getValue() == TaskState.DUPLICATE_DATA) {
                     alertManager.showError("Username already exists!", "Username already exists!", owner);
                 } else {

@@ -4,6 +4,7 @@ import be.Address;
 import be.Document;
 import be.ImageWrapper;
 import be.User;
+import be.enums.DocumentPropertyType;
 import com.itextpdf.io.font.FontConstants;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -21,14 +22,17 @@ import com.itextpdf.layout.property.AreaBreakType;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
+import gui.nodes.DocumentPropertyCheckboxWrapper;
+
 import java.io.IOException;
+import java.util.List;
 
 
 public class PdfGenerator {
     private static PdfFont FONT;
     private static final int FONT_SIZE = 12;
 
-    public void generatePdf(Document document) {
+    public void generatePdf(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes) {
         try {
             FONT = PdfFontFactory.createFont(FontConstants.HELVETICA);
 
@@ -94,27 +98,38 @@ public class PdfGenerator {
             } else optionalNotes = "";
             Paragraph notes = new Paragraph(optionalNotes);
 
-            doc.add(date);
-            doc.add(lineBreak);
-            doc.add(jobTitle);
-            doc.add(jobDescription);
-            doc.add(notes);
-            doc.add(lineBreak3);
-
-            //List of technicians that did the job
-            Paragraph technicianList = new Paragraph(document.getTechnicianNames());
-            doc.add(technicianList);
+            // Determine which properties to add to the document
+            for (DocumentPropertyCheckboxWrapper checkboxWrapper: checkBoxes) {
+                if (checkboxWrapper.getProperty() == DocumentPropertyType.DATE_OF_CREATION) {
+                    doc.add(date);
+                    doc.add(lineBreak);
+                }
+                if (checkboxWrapper.getProperty() == DocumentPropertyType.JOB_TITLE) {
+                    doc.add(jobTitle);
+                }
+                if (checkboxWrapper.getProperty() == DocumentPropertyType.JOB_DESCRIPTION) {
+                    doc.add(jobDescription);
+                }
+                if (checkboxWrapper.getProperty() == DocumentPropertyType.NOTES) {
+                    doc.add(notes);
+                    doc.add(lineBreak3);
+                } if (checkboxWrapper.getProperty() == DocumentPropertyType.TECHNICIANS) {
+                    Paragraph technicianList = new Paragraph(document.getTechnicianNames());
+                    doc.add(technicianList);
+                }
+            }
 
             //Add images
             Table imageTable;
-            if (!document.getDocumentImages().isEmpty()) {
-                for (int i = 0; i < document.getDocumentImages().size(); i++) {
+            List<DocumentPropertyCheckboxWrapper> imageCheckboxes = checkBoxes.stream().filter(checkbox -> checkbox.getProperty() == DocumentPropertyType.IMAGE).toList();
+            if (!imageCheckboxes.isEmpty()) {
+                for (int i = 0; i < imageCheckboxes.size(); i++) {
                     if (i % 2 != 0) {
                         doc.add(pageBreak);
                     }
                     imageTable = new Table(1);
 
-                    ImageData imageData = ImageDataFactory.create(document.getDocumentImages().get(i).getUrl());
+                    ImageData imageData = ImageDataFactory.create(imageCheckboxes.get(i).getImage().getUrl());
                     Image documentImage = new Image(imageData);
                     documentImage.setHorizontalAlignment(HorizontalAlignment.CENTER);
                     documentImage.setAutoScale(true);
