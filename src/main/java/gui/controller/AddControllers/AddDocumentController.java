@@ -14,8 +14,6 @@ import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.*;
-import io.github.palexdev.materialfx.controls.cell.MFXCheckListCell;
-import io.github.palexdev.materialfx.controls.cell.MFXListCell;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -34,7 +32,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.FlowPane;
@@ -57,7 +54,7 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class AddDocumentController extends AddController implements Initializable {
+public class AddDocumentController extends AddController<Document> implements Initializable {
     @FXML
     private TabPane tabPane;
     @FXML
@@ -144,7 +141,6 @@ public class AddDocumentController extends AddController implements Initializabl
 
     @FXML
     private void uploadPicturesAction(ActionEvent actionEvent) throws Exception {
-        //TODO fix uploading/saving pictures
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.jpeg"),
@@ -183,7 +179,7 @@ public class AddDocumentController extends AddController implements Initializabl
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
-        technicians.forEach(t -> System.out.println(t.getFullName()));
+        System.out.println("Pictures: " + currentDocument.getDocumentImages().size());
 
         if (isEditing.get()) {
             currentDocument.setDocumentID(documentToEdit.getDocumentID());
@@ -191,13 +187,11 @@ public class AddDocumentController extends AddController implements Initializabl
             address.setAddressID(documentToEdit.getCustomer().getCustomerAddress().getAddressID());
         }
 
-        Task<TaskState> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
-        setUpSaveTask(task, documentController, txtCity.getScene().getWindow());
+        SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
+        setUpSaveTask(task, documentController, txtCity.getScene().getWindow(), this);
         executorService.execute(task);
 
-        setDocumentToEdit(currentDocument);
         pdfTab.setDisable(false);
-        isInputChanged.set(false);
     }
 
     @FXML
@@ -265,7 +259,6 @@ public class AddDocumentController extends AddController implements Initializabl
             assignUserToDocument(newValue);
             comboTechnicians.getSelectionModel().clearSelection();
             populateComboBox();
-            System.out.println("Technicians: " + technicians.size());
         }
     };
 
@@ -314,7 +307,7 @@ public class AddDocumentController extends AddController implements Initializabl
     // endregion
 
     // region Utilities, helpers and setters
-    public void setDocumentToEdit(Document document) {
+    public void setIsEditing(Document document) {
         isEditing.setValue(true);
         documentToEdit = document;
         pdfTab.setDisable(false);
@@ -340,7 +333,8 @@ public class AddDocumentController extends AddController implements Initializabl
         txtNotes.setText(document.getOptionalNotes());
 
         // Pictures
-        pictures.setAll(document.getDocumentImages());
+        List<ImageWrapper> documentImages = new ArrayList<>(document.getDocumentImages());
+        pictures.setAll(documentImages);
 
         // Technicians
         technicians.clear();
@@ -584,8 +578,6 @@ public class AddDocumentController extends AddController implements Initializabl
             return;
         } if (!pictures.equals(document.getDocumentImages())) {
             isInputChanged.setValue(true);
-            System.out.println("Pictures: " + Arrays.toString(pictures.toArray()));
-            System.out.println("Document: " + Arrays.toString(document.getDocumentImages().toArray()));
             return;
         } if (!(new HashSet<>(technicians).containsAll(document.getTechnicians())
                 && new HashSet<>(document.getTechnicians()).containsAll(technicians))) {
@@ -626,8 +618,8 @@ public class AddDocumentController extends AddController implements Initializabl
         propertiesList.prefHeightProperty().bind(gridPanePdf.heightProperty().subtract(btnCreatePdf.heightProperty()));
         propertiesList.widthProperty().addListener((obs, oldWidth, newWidth) -> {
             // Handle the updated width of propertiesList here
-            System.out.println("List: " + newWidth);
-            System.out.println("Gridpane: " + gridPanePdf.getWidth());
+            //System.out.println("List: " + newWidth);
+            //System.out.println("Gridpane: " + gridPanePdf.getWidth());
         });
 
         gridPanePdf.getChildren().removeIf(node -> node instanceof DocumentPropertiesList);

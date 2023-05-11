@@ -8,8 +8,6 @@ import gui.model.DocumentModel;
 import gui.tasks.TaskState;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
-import io.github.palexdev.materialfx.enums.SortState;
-import io.github.palexdev.materialfx.filter.StringFilter;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -196,7 +194,7 @@ public class DocumentController extends ViewController implements Initializable 
                 try {
                     AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
                     controller.setDocumentController(this);
-                    controller.setDocumentToEdit(tblDocument.getSelectionModel().getSelectedValue());
+                    controller.setIsEditing(tblDocument.getSelectionModel().getSelectedValue());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

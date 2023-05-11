@@ -29,7 +29,7 @@ public class Document {
 
     public Document(UUID documentID, Customer customer, String jobDescription, String optionalNotes, String jobTitle, Date dateOfCreation) {
        this(customer, jobDescription, optionalNotes, jobTitle, dateOfCreation);
-         this.documentID = documentID;
+       this.documentID = documentID;
     }
 
     public UUID getDocumentID() {

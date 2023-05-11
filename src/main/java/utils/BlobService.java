@@ -105,6 +105,5 @@ class startup{
             throw new RuntimeException(e);
         }
         var out = blobService.DeleteBlob(url);
-        System.out.println(out);
     }
 }

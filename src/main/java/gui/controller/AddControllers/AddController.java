@@ -1,10 +1,10 @@
 package gui.controller.AddControllers;
 
+import be.Document;
 import gui.controller.ViewControllers.ViewController;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import io.github.palexdev.materialfx.controls.MFXTextField;
-import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
@@ -12,12 +12,13 @@ import javafx.scene.control.TextArea;
 import javafx.stage.Window;
 import gui.util.AlertManager;
 
-public abstract class AddController {
+public abstract class AddController<T> {
     protected abstract void assignInputToVariables();
     protected abstract void assignListenersToTextFields();
+    protected abstract void setIsEditing(T objectToEdit);
     private final AlertManager alertManager = AlertManager.getInstance();
 
-    protected void setUpSaveTask(Task<TaskState> task, ViewController controller, Window owner) {
+    protected void setUpSaveTask(SaveTask<T> task, ViewController controller, Window owner, AddController<T> addController) {
         setUpTask(task, controller, owner);
 
         task.setOnSucceeded(event -> {
@@ -44,6 +45,7 @@ public abstract class AddController {
              */
             } else if (task.getValue() == TaskState.SUCCESSFUL) {
                 controller.refreshItems();
+                addController.setIsEditing(task.getObjectToSave());
             } else {
                 alertManager.showError("Oops...", "Something went wrong!", owner);
             }

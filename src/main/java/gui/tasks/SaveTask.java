@@ -50,4 +50,8 @@ public class SaveTask<T> extends Task<TaskState> {
     public boolean isEditing() {
         return isEditing;
     }
+
+    public T getObjectToSave() {
+        return objectToSave;
+    }
 }
