@@ -2,6 +2,8 @@ package gui.controller.AddControllers;
 
 import be.*;
 import be.enums.DocumentPropertyType;
+import be.interfaces.Observable;
+import be.interfaces.Observer;
 import gui.nodes.DocumentPropertyCheckboxWrapper;
 import gui.nodes.ImagePreview;
 import be.enums.CustomerType;
@@ -41,6 +43,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 import utils.BlobService;
 import utils.ThreadPool;
@@ -58,7 +61,7 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class AddDocumentController extends AddController<Document> implements Initializable {
+public class AddDocumentController extends AddController<Document> implements Initializable, Observer<ImagePreview> {
     @FXML
     private TabPane tabPane;
     @FXML
@@ -133,12 +136,13 @@ public class AddDocumentController extends AddController<Document> implements In
         setTxtCustomerNameAutoComplete();
         assignListenersToTextFields();
         setUpComboBox();
-        setUpContextMenu();
         dateLastContract.setValue(LocalDate.now());
 
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
         btnSave.disableProperty().bind(isInputChanged.not());
         btnDelete.disableProperty().bind(isEditing.not());
+
+        addTooltips();
     }
 
     @FXML
@@ -430,6 +434,7 @@ public class AddDocumentController extends AddController<Document> implements In
         imagePreviews.clear();
         pictures.forEach(image -> {
             ImagePreview imagePreview = image.getImagePreview();
+            imagePreview.addObserver(this);
             imagePreview.setOnMouseClicked(e -> {
                 if (!imagePreview.isFocused()) {
                     imagePreview.requestFocus();
@@ -450,10 +455,25 @@ public class AddDocumentController extends AddController<Document> implements In
                 }
             });
 
+            // Add delete functionality to the image preview
+            imagePreview.setOnKeyPressed(e -> {
+                if (e.getCode().equals(KeyCode.DELETE)) {
+                    imagePreviews.remove(imagePreview);
+                    pictures.remove(image);
+                }
+            });
+
             // Add drag and drop functionality to the image preview
             imagePreview.setOnDragDetected(dragDetected);
             imagePreview.setOnDragOver(dragOver);
             imagePreview.setOnDragDropped(dragDropped);
+
+            // Set delete button action
+            imagePreview.setOnDelete(event -> {
+                imagePreviews.remove(imagePreview);
+                pictures.remove(image);
+                refreshItems();
+            });
 
             imagePreviews.add(imagePreview);
         });
@@ -621,25 +641,6 @@ public class AddDocumentController extends AddController<Document> implements In
         comboTechnicians.setItems(allTechnicians);
     }
 
-    private void setUpContextMenu() {
-        //TODO deleting pictures
-        contextMenu = new MFXContextMenu(flowPanePictures);
-        MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
-                .setText("Delete")
-                .setAccelerator("Ctrl + D")
-                .setOnAction(event -> {
-                    ImageWrapper image = lastFocused.getImageWrapper();
-                    pictures.remove(image);
-                    refreshItems();
-                })
-                .setIcon(new MFXFontIcon("fas-delete-left", 16))
-                .get();
-
-        contextMenu.getItems().add(deleteItem);
-        Platform.runLater(() -> flowPanePictures.getScene().setOnContextMenuRequested(
-                event -> contextMenu.show(flowPanePictures, event.getScreenX(), event.getScreenY())));
-    }
-
     public void setUpPdfListView() {
         propertiesList = new DocumentPropertiesList(documentToEdit);
         gridPanePdf.getChildren().removeIf(node -> node instanceof DocumentPropertiesList);
@@ -659,6 +660,9 @@ public class AddDocumentController extends AddController<Document> implements In
     }
 
     private void addTooltips() {
+        Tooltip flowPaneTooltip = new Tooltip("Drag and drop pictures to reorder them.");
+        flowPaneTooltip.setShowDelay(Duration.millis(100));
+        Tooltip.install(flowPanePictures, flowPaneTooltip);
     }
 
     private String addAddressToCustomerName(Customer customer) {
@@ -696,6 +700,11 @@ public class AddDocumentController extends AddController<Document> implements In
                     dateLastContract.setValue(customer.getLastContract().toLocalDate());}
             }
         });
+    }
+
+    @Override
+    public void update(Observable<ImagePreview> o, ImagePreview arg) {
+        isInputChanged.setValue(true);
     }
     // endregion
 }

@@ -88,8 +88,8 @@ public class UserController extends ViewController<User> implements Initializabl
 
     @Override
     public void refreshLastFocusedCard() {
-        if (lastFocusedCard != null)
-            lastFocusedCard.update(userModel.getAll().get(lastFocusedCard.getUser().getUserID()), userModel.getAll().get(lastFocusedCard.getUser().getUserID()));
+        //if (lastFocusedCard != null)
+            //lastFocusedCard.update(userModel.getAll().get(lastFocusedCard.getUser().getUserID()), userModel.getAll().get(lastFocusedCard.getUser().getUserID()));
     }
 
     @Override

@@ -11,7 +11,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
-public class UserCard extends VBox implements Observer<User> {
+public class UserCard extends VBox {
     private final User user;
     private Label nameLabel, positionLabel;
     private ImageView profileImage;
@@ -69,10 +69,11 @@ public class UserCard extends VBox implements Observer<User> {
         return user;
     }
 
-    @Override
+    //TODO look into observer pattern for this
+    /*@Override
     public void update(Observable<User> o, User arg) {
         nameLabel.setText(user.getFullName());
         positionLabel.setText(user.getUserRole().toString());
         profileImage.setImage(user.getProfilePicture());
-    }
+    }*/
 }

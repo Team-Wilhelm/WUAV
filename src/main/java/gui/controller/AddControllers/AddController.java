@@ -79,7 +79,7 @@ public abstract class AddController<T> {
         });
     }
 
-    protected void setUpDeleteTask(Task<TaskState> task, ViewController viewController, Window owner) {
+    protected void setUpDeleteTask(Task<TaskState> task, ViewController<T> viewController, Window owner) {
         setUpTask(task, viewController, owner);
 
         task.setOnSucceeded(event -> {
