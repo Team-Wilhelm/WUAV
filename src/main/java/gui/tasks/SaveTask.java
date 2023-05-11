@@ -4,12 +4,12 @@ import gui.model.IModel;
 import javafx.concurrent.Task;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 
 public class SaveTask<T> extends Task<TaskState> {
     private final T objectToSave;
     private final boolean isEditing;
     private final IModel<T> model;
+    private Callback callback;
 
     public SaveTask(T objectToSave, boolean isEditing, IModel<T> model) {
         this.objectToSave = objectToSave;
@@ -53,5 +53,17 @@ public class SaveTask<T> extends Task<TaskState> {
 
     public T getObjectToSave() {
         return objectToSave;
+    }
+
+    public Callback getCallback() {
+        return callback;
+    }
+
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
+    public interface Callback {
+        void onTaskCompleted(TaskState taskState);
     }
 }

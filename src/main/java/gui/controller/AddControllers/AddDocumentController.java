@@ -77,8 +77,6 @@ public class AddDocumentController extends AddController<Document> implements In
     private MFXToggleButton toggleCustomerType;
     @FXML
     private MFXDatePicker dateLastContract;
-    @FXML
-    private MFXCheckListView<Document> checkListViewDocuments;
     private MFXTextFieldWithAutofill txtName;
     private MFXContextMenu contextMenu;
 
@@ -226,7 +224,6 @@ public class AddDocumentController extends AddController<Document> implements In
             documentModel.assignUserToDocument(technician, documentToEdit, false);
         }
     }
-
 
     // region Listeners
     /**
@@ -636,15 +633,6 @@ public class AddDocumentController extends AddController<Document> implements In
 
     private void setUpPdfListView() {
         DocumentPropertiesList propertiesList = new DocumentPropertiesList(documentToEdit);
-
-        propertiesList.prefWidthProperty().bind(gridPanePdf.widthProperty());
-        propertiesList.prefHeightProperty().bind(gridPanePdf.heightProperty().subtract(btnCreatePdf.heightProperty()));
-        propertiesList.widthProperty().addListener((obs, oldWidth, newWidth) -> {
-            // Handle the updated width of propertiesList here
-            //System.out.println("List: " + newWidth);
-            //System.out.println("Gridpane: " + gridPanePdf.getWidth());
-        });
-
         gridPanePdf.getChildren().removeIf(node -> node instanceof DocumentPropertiesList);
         gridPanePdf.add(propertiesList, 0, 0);
     }

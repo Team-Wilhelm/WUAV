@@ -102,7 +102,7 @@ public class PdfGenerator {
             doc.add(lineBreak3);
 
             //List of technicians that did the job
-            Paragraph technicianList = new Paragraph(getTechnicianNames(document));
+            Paragraph technicianList = new Paragraph(document.getTechnicianNames());
             doc.add(technicianList);
 
             //Add images
@@ -182,28 +182,6 @@ public class PdfGenerator {
                 + "\n" + customerAddress.getPostcode() + " " + customerAddress.getTown()
                 + "\n" + document.getCustomer().getCustomerPhoneNumber()
                 + "\n" + document.getCustomer().getCustomerEmail();
-    }
-
-    private String getTechnicianNames(Document document){
-        StringBuilder technicians = new StringBuilder();
-        int technicianCount = document.getTechnicians().size();
-        if(!document.getTechnicians().isEmpty()) {
-            technicians.append("Technician(s): ");
-            for (int i = 0; i < technicianCount; i++) {
-                if(i != technicianCount-1) {
-                    technicians.append(document.getTechnicians().get(i).getFullName()).append(", ");
-                } else technicians.append(document.getTechnicians().get(i).getFullName());
-            }
-
-
-//            for (int i = 0; i <= document.getTechnicians().size()-1; i++) {
-//                technicians.append(document.getTechnicians().get(i).getFullName());
-//                        if(i != document.getTechnicians().size()-1) {
-//                            technicians.append(", ");
-//                        }
-//            }
-        }
-        return technicians.toString();
     }
 
     private void removeBorder(Table table)

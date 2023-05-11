@@ -96,6 +96,20 @@ public class Document {
         this.optionalNotes = optionalNotes;
     }
 
+    public String getTechnicianNames() {
+        StringBuilder technicianString = new StringBuilder();
+        int technicianCount = technicians.size();
+        if (!technicians.isEmpty()) {
+            technicianString.append("Technician(s): ");
+            for (int i = 0; i < technicianCount; i++) {
+                if (i != technicianCount - 1) {
+                    technicianString.append(technicians.get(i).getFullName()).append(", ");
+                } else technicianString.append(technicians.get(i).getFullName());
+            }
+        }
+        return technicianString.toString();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

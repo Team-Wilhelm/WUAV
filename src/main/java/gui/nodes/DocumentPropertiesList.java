@@ -28,27 +28,22 @@ public class DocumentPropertiesList extends GridPane {
         super();
         this.document = document;
 
-        //this.maxWidth(Double.MAX_VALUE);
-        //this.maxHeight(Double.MAX_VALUE);
+        setHgap(10);
+        setVgap(10);
         setPadding(new Insets(10));
-        this.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
 
         checkBoxes = new HashMap<>();
-        displayProperties();
 
         // Column constraints
         colLabel = new ColumnConstraints();
-        //colLabel.setHgrow(Priority.ALWAYS);
-        colLabel.setPercentWidth(20);
+        colLabel.setHgrow(Priority.SOMETIMES);
 
         colValue = new ColumnConstraints();
-        //colValue.setHgrow(Priority.ALWAYS);
-        colValue.setPercentWidth(70);
+        colValue.setHgrow(Priority.ALWAYS);
 
         colCheckbox = new ColumnConstraints();
-        //colCheckbox.setHgrow(Priority.ALWAYS);
-        colCheckbox.setPercentWidth(10);
-        //colCheckbox.setHalignment(HPos.RIGHT);
+        colCheckbox.setHgrow(Priority.SOMETIMES);
+        colCheckbox.setHalignment(HPos.RIGHT);
 
         getColumnConstraints().addAll(colLabel, colValue, colCheckbox);
 
@@ -61,6 +56,8 @@ public class DocumentPropertiesList extends GridPane {
             }
         });
         add(toggleAll, 2, 0);
+
+        displayProperties();
     }
 
     private void displayProperties() {
@@ -72,7 +69,7 @@ public class DocumentPropertiesList extends GridPane {
         addProperty("Job title: ", document.getJobTitle(), row++);
         addProperty("Job description: ", document.getJobDescription(), row++);
         addProperty("Notes: ", document.getOptionalNotes(), row++);
-        addProperty("Technicians: ", "", row++);
+        addProperty("Technicians: ", document.getTechnicianNames(), row++);
 
         for (ImageWrapper imageWrapper : document.getDocumentImages()) {
             addProperty("Image: " + imageWrapper.getName(), imageWrapper, row++);
@@ -97,5 +94,9 @@ public class DocumentPropertiesList extends GridPane {
         MFXCheckbox checkBox = new MFXCheckbox();
         checkBoxes.put(label, checkBox);
         add(checkBox, 2, row);
+    }
+
+    public HashMap<String, CheckBox> getCheckBoxes() {
+        return checkBoxes;
     }
 }

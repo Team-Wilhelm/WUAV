@@ -1,6 +1,5 @@
 package gui.controller.AddControllers;
 
-import be.Document;
 import gui.controller.ViewControllers.ViewController;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
@@ -12,21 +11,34 @@ import javafx.scene.control.TextArea;
 import javafx.stage.Window;
 import gui.util.AlertManager;
 
+import java.util.Timer;
+
 public abstract class AddController<T> {
     protected abstract void assignInputToVariables();
     protected abstract void assignListenersToTextFields();
     protected abstract void setIsEditing(T objectToEdit);
     private final AlertManager alertManager = AlertManager.getInstance();
 
-    protected void setUpSaveTask(SaveTask<T> task, ViewController controller, Window owner, AddController<T> addController) {
+    protected void setUpSaveTask(SaveTask<T> task, ViewController<T> controller, Window owner, AddController<T> addController) {
         setUpTask(task, controller, owner);
 
         task.setOnSucceeded(event -> {
+            task.setCallback(taskState -> {
+                if (taskState == TaskState.SUCCESSFUL) {
+                    controller.refreshItems();
+                    addController.setIsEditing(task.getObjectToSave());
+                } else if (task.getValue() == TaskState.DUPLICATE_DATA) {
+                    alertManager.showError("Username already exists!", "Username already exists!", owner);
+                } else {
+                    alertManager.showError("Oops...", "Something went wrong!", owner);
+                }
+            });
+
             // unbind the progress label and spinner from the task and set spinner to 100%
             controller.unbindProgress();
 
             // after 3 seconds, the progress bar will be hidden
-            new java.util.Timer().schedule(
+            new Timer().schedule(
                     new java.util.TimerTask() {
                         @Override
                         public void run() {
@@ -36,23 +48,13 @@ public abstract class AddController<T> {
                     3000
             );
 
-            if (task.getValue() == TaskState.DUPLICATE_DATA) {
-                alertManager.showError("Username already exists!", "Username already exists!", owner);
-            /*} else if (task.getValue() == TaskState.SUCCESSFUL && ((SaveTask<?>) task).isEditing()) {
-                controller.refreshLastFocusedCard();
-                //TODO observer pattern
-
-             */
-            } else if (task.getValue() == TaskState.SUCCESSFUL) {
-                controller.refreshItems();
-                addController.setIsEditing(task.getObjectToSave());
-            } else {
-                alertManager.showError("Oops...", "Something went wrong!", owner);
+            if (task.getCallback() != null) {
+                task.getCallback().onTaskCompleted(task.getValue());
             }
         });
     }
 
-    private void setUpTask(Task<TaskState> task, ViewController controller, Window owner) {
+    private void setUpTask(Task<TaskState> task, ViewController<T> controller, Window owner) {
         task.setOnRunning(event -> {
             controller.bindProgressToTask(task);
             controller.setProgressVisibility(true);

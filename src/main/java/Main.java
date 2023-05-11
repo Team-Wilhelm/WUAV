@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class Main extends Application {
+    //TODO check for customers who have been in the system for over 48 months and delete them
     @Override
     public void start(Stage primaryStage) throws Exception {
         long start = System.currentTimeMillis();
