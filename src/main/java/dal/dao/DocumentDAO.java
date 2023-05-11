@@ -1,11 +1,12 @@
-package dal;
+package dal.dao;
 
 import be.Document;
 import be.ImageWrapper;
 import be.User;
+import dal.DBConnection;
+import dal.DocumentImageFactory;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
-import javafx.scene.image.Image;
 import utils.ThreadPool;
 
 import java.sql.Connection;
@@ -208,7 +209,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             while (rs.next()) {
                 String filepath = rs.getString("Filepath");
                 String filename = rs.getString("FileName");
-                images.add(new ImageWrapper(filepath, filename, imageFactory.create(filepath)));
+                String description = rs.getString("Description");
+                images.add(new ImageWrapper(filepath, filename, imageFactory.create(filepath), description));
             }
             document.setDocumentImages(images);
         } catch (Exception e) {
@@ -272,7 +274,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     private void saveImagesForDocument(Connection connection, Document document) throws SQLException {
         //Save and link image filepaths to document
-        String sql = "INSERT INTO Document_Image_Link (DocumentID, Filepath, FileName, PictureIndex) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Document_Image_Link (DocumentID, Filepath, FileName, PictureIndex, Description) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = connection.prepareStatement(sql);
         String documentID = document.getDocumentID().toString();
         for (int i = 0; i < document.getDocumentImages().size(); i++) {
@@ -281,6 +283,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             ps.setString(2, image.getUrl());
             ps.setString(3, image.getName());
             ps.setInt(4, i);
+            ps.setString(5, image.getDescription());
             ps.addBatch();
         }
         ps.executeBatch();

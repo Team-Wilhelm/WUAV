@@ -2,14 +2,12 @@ package gui.model;
 
 import be.Document;
 import be.User;
-import be.cards.DocumentCard;
-import bll.DocumentManager;
-import bll.IManager;
+import gui.nodes.DocumentCard;
+import bll.manager.DocumentManager;
 import bll.ManagerFactory;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 
 public class DocumentModel implements IModel<Document> {
     private static DocumentModel instance;

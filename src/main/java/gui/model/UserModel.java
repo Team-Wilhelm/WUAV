@@ -1,10 +1,9 @@
 package gui.model;
 
 import be.User;
-import be.cards.UserCard;
-import bll.IManager;
+import gui.nodes.UserCard;
 import bll.ManagerFactory;
-import bll.UserManager;
+import bll.manager.UserManager;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -125,7 +124,7 @@ public class UserModel implements IModel<User> {
         for (User user : allUsers.values()) {
             UserCard userCard = new UserCard(user);
             loadedCards.put(user, userCard);
-            user.addObserver(userCard);
+            //user.addObserver(userCard);
         }
     }
 
@@ -136,7 +135,7 @@ public class UserModel implements IModel<User> {
     public UserCard addUserCard(User user){
         UserCard userCard = new UserCard(user);
         loadedCards.put(user, userCard);
-        user.addObserver(userCard);
+        //user.addObserver(userCard);
         return userCard;
     }
 }

@@ -1,7 +1,8 @@
-package dal;
+package dal.dao;
 
 import be.User;
 import be.enums.UserRole;
+import dal.DBConnection;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
 

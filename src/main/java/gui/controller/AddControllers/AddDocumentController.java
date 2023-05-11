@@ -1,7 +1,11 @@
 package gui.controller.AddControllers;
 
 import be.*;
-import be.cards.ImagePreview;
+import be.enums.DocumentPropertyType;
+import be.interfaces.Observable;
+import be.interfaces.Observer;
+import gui.nodes.DocumentPropertyCheckboxWrapper;
+import gui.nodes.ImagePreview;
 import be.enums.CustomerType;
 import be.enums.UserRole;
 import bll.PdfGenerator;
@@ -9,13 +13,13 @@ import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
 import gui.model.UserModel;
+import gui.nodes.MFXTextFieldWithAutofill;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
+import gui.nodes.DocumentPropertiesList;
 import io.github.palexdev.materialfx.controls.*;
-import io.github.palexdev.materialfx.controls.cell.MFXCheckListCell;
-import io.github.palexdev.materialfx.controls.cell.MFXListCell;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -34,12 +38,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 import utils.BlobService;
 import utils.ThreadPool;
@@ -57,7 +61,7 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class AddDocumentController extends AddController implements Initializable {
+public class AddDocumentController extends AddController<Document> implements Initializable, Observer<ImagePreview> {
     @FXML
     private TabPane tabPane;
     @FXML
@@ -65,22 +69,22 @@ public class AddDocumentController extends AddController implements Initializabl
     @FXML
     private FlowPane flowPanePictures;
     @FXML
-    private GridPane gridPanePdf;
+    private GridPane gridPanePdf, gridPaneCustomer, gridPaneJob;
     @FXML
     private MFXButton btnDelete, btnSave, btnUploadPictures, btnCreatePdf, btnNextJobTab, btnNextCustomerTab;
     @FXML
     private MFXFilterComboBox<User> comboTechnicians;
     @FXML
-    private MFXTextField txtCity, txtCountry, txtEmail, txtHouseNumber, txtJobTitle, txtName, txtPhoneNumber, txtPostcode, txtStreetName;
+    private MFXTextField txtCity, txtCountry, txtEmail, txtHouseNumber, txtJobTitle, txtPhoneNumber, txtPostcode, txtStreetName;
     @FXML
     private TextArea txtJobDescription, txtNotes;
     @FXML
     private MFXToggleButton toggleCustomerType;
     @FXML
     private MFXDatePicker dateLastContract;
-    @FXML
-    private MFXCheckListView<Document> checkListViewDocuments;
+    private MFXTextFieldWithAutofill txtName;
     private MFXContextMenu contextMenu;
+    private DocumentPropertiesList propertiesList;
 
     private DocumentModel documentModel;
     private CustomerModel customerModel;
@@ -102,6 +106,7 @@ public class AddDocumentController extends AddController implements Initializabl
     private Date lastContract;
     private List<User> technicians;
     private BooleanProperty isInputChanged, isEditing;
+    private Customer customer;
 
     public AddDocumentController() {
         documentModel = DocumentModel.getInstance();
@@ -115,10 +120,6 @@ public class AddDocumentController extends AddController implements Initializabl
         pictures = FXCollections.observableArrayList();
         allTechnicians = FXCollections.observableArrayList();
 
-        /*if (UserModel.getInstance().getLoggedInUser() != null
-                && UserModel.getInstance().getLoggedInUser().getUserRole() == UserRole.TECHNICIAN)
-            technicians.add(UserModel.getInstance().getLoggedInUser());
-         */
         isInputChanged = new SimpleBooleanProperty(true);
         isEditing = new SimpleBooleanProperty(false);
     }
@@ -132,14 +133,16 @@ public class AddDocumentController extends AddController implements Initializabl
         pdfTab.setDisable(true);
         tabPane.getSelectionModel().selectedItemProperty().addListener(tabChangeListener);
 
+        setTxtCustomerNameAutoComplete();
         assignListenersToTextFields();
         setUpComboBox();
-        setUpContextMenu();
         dateLastContract.setValue(LocalDate.now());
 
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
         btnSave.disableProperty().bind(isInputChanged.not());
         btnDelete.disableProperty().bind(isEditing.not());
+
+        addTooltips();
     }
 
     @FXML
@@ -163,38 +166,42 @@ public class AddDocumentController extends AddController implements Initializabl
             String path = BlobService.getInstance().UploadFile(selectedFile.getAbsolutePath(), customerId);
             ImageWrapper image = new ImageWrapper(path, selectedFile.getName());
             pictures.add(image);
+            if (isEditing.get())
+                isInputChanged(documentToEdit);
         }
         refreshItems();
     }
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
-        //TODO change the way we're dealing with customers
         assignInputToVariables();
 
         Address address = new Address(streetName, houseNumber, postcode, city, country);
-        Customer customer = customerModel.getAll().values().stream()
-                .filter(c -> c.getCustomerEmail().equals(email))
-                .findFirst()
-                .orElse(new Customer(name, email, phoneNumber, address, customerType, lastContract));
+        if (customer == null) {
+            customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
+        } else {
+            customer.setCustomerName(name);
+            customer.setCustomerEmail(email);
+            customer.setCustomerPhoneNumber(phoneNumber);
+            customer.setCustomerAddress(address);
+            address.setAddressID(customer.getCustomerAddress().getAddressID());
+            customer.setCustomerType(customerType);
+            customer.setLastContract(lastContract);
+        }
+
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
-        technicians.forEach(t -> System.out.println(t.getFullName()));
 
         if (isEditing.get()) {
             currentDocument.setDocumentID(documentToEdit.getDocumentID());
-            customer.setCustomerID(documentToEdit.getCustomer().getCustomerID());
-            address.setAddressID(documentToEdit.getCustomer().getCustomerAddress().getAddressID());
         }
 
-        Task<TaskState> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
-        setUpSaveTask(task, documentController, txtCity.getScene().getWindow());
+        SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
+        setUpSaveTask(task, documentController, txtCity.getScene().getWindow(), this);
         executorService.execute(task);
 
-        setDocumentToEdit(currentDocument);
         pdfTab.setDisable(false);
-        isInputChanged.set(false);
     }
 
     @FXML
@@ -225,6 +232,13 @@ public class AddDocumentController extends AddController implements Initializabl
         }
     }
 
+    public void createPdfAction(ActionEvent actionEvent) {
+        // Get the selected checkboxes
+        List<DocumentPropertyCheckboxWrapper> checkboxWrappers = propertiesList.getCheckBoxes().stream()
+                .filter(DocumentPropertyCheckboxWrapper::isSelected)
+                .toList();
+        pdfGenerator.generatePdf(documentToEdit, checkboxWrappers);
+    }
 
     // region Listeners
     /**
@@ -251,6 +265,25 @@ public class AddDocumentController extends AddController implements Initializabl
                     || isInputEmpty(txtCity) || isInputEmpty(txtCountry);
             btnNextCustomerTab.setDisable(isNotFilled);
             picturesTab.setDisable(isNotFilled);
+            if (observable == txtName.textProperty()) {
+                if (oldValue.length() > 0 && newValue.length() == 0) {
+                    clearCustomerTextFields();
+                    customer = null;
+                }
+            }
+        }
+    };
+
+    private final ChangeListener<String> customerListener = new ChangeListener<>() {
+        @Override
+        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+            if (newValue != null && !newValue.isEmpty()) {
+                List<String> names = customerModel.getAll().values().stream().map(c -> addAddressToCustomerName(c))
+                        .filter(customerName -> customerName.toLowerCase().contains(newValue.toLowerCase().trim()))
+                        .toList();
+                txtName.getEntries().clear();
+                txtName.getEntries().addAll(names);
+            }
         }
     };
 
@@ -262,7 +295,6 @@ public class AddDocumentController extends AddController implements Initializabl
             assignUserToDocument(newValue);
             comboTechnicians.getSelectionModel().clearSelection();
             populateComboBox();
-            System.out.println("Technicians: " + technicians.size());
         }
     };
 
@@ -283,7 +315,6 @@ public class AddDocumentController extends AddController implements Initializabl
             populateComboBox();
         }
     };
-
 
     /**
      * Listens for changes in the tab selection and prompts the user to save the document if they are editing it.
@@ -311,7 +342,7 @@ public class AddDocumentController extends AddController implements Initializabl
     // endregion
 
     // region Utilities, helpers and setters
-    public void setDocumentToEdit(Document document) {
+    public void setIsEditing(Document document) {
         isEditing.setValue(true);
         documentToEdit = document;
         pdfTab.setDisable(false);
@@ -337,7 +368,8 @@ public class AddDocumentController extends AddController implements Initializabl
         txtNotes.setText(document.getOptionalNotes());
 
         // Pictures
-        pictures.setAll(document.getDocumentImages());
+        List<ImageWrapper> documentImages = new ArrayList<>(document.getDocumentImages());
+        pictures.setAll(documentImages);
 
         // Technicians
         technicians.clear();
@@ -402,6 +434,7 @@ public class AddDocumentController extends AddController implements Initializabl
         imagePreviews.clear();
         pictures.forEach(image -> {
             ImagePreview imagePreview = image.getImagePreview();
+            imagePreview.addObserver(this);
             imagePreview.setOnMouseClicked(e -> {
                 if (!imagePreview.isFocused()) {
                     imagePreview.requestFocus();
@@ -422,18 +455,37 @@ public class AddDocumentController extends AddController implements Initializabl
                 }
             });
 
+            // Add delete functionality to the image preview
+            imagePreview.setOnKeyPressed(e -> {
+                if (e.getCode().equals(KeyCode.DELETE)) {
+                    imagePreviews.remove(imagePreview);
+                    pictures.remove(image);
+                } if (e.isControlDown() && e.getCode().equals(KeyCode.E)) {
+                    imagePreview.openDescriptionDialogue();
+                }
+            });
+
             // Add drag and drop functionality to the image preview
             imagePreview.setOnDragDetected(dragDetected);
             imagePreview.setOnDragOver(dragOver);
             imagePreview.setOnDragDropped(dragDropped);
 
+            // Set delete button action
+            imagePreview.setOnDelete(event -> {
+                imagePreviews.remove(imagePreview);
+                pictures.remove(image);
+                refreshItems();
+            });
+
             imagePreviews.add(imagePreview);
         });
-
     }
 
-    // Event handler for when the user drops an image preview on the flow pane
-    private EventHandler<MouseEvent> dragDetected = new EventHandler<MouseEvent>() {
+    // region Drag and drop
+    /**
+     * Event handler for when the user drops an image preview on the flow pane.
+     */
+    private EventHandler<MouseEvent> dragDetected = new EventHandler<>() {
         @Override
         public void handle(MouseEvent event) {
             ImagePreview imagePreview = (ImagePreview) event.getSource();
@@ -494,6 +546,8 @@ public class AddDocumentController extends AddController implements Initializabl
                     pictures.addAll(imagePreviews.stream().map(ImagePreview::getImageWrapper).toList());
 
                     success = true;
+                    if (isEditing.get())
+                        isInputChanged(documentToEdit);
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
@@ -501,7 +555,7 @@ public class AddDocumentController extends AddController implements Initializabl
             event.setDropCompleted(success);
         }
     };
-
+    // endregion
 
     private void setUpComboBox() {
         comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerNotEditing);
@@ -530,10 +584,6 @@ public class AddDocumentController extends AddController implements Initializabl
 
     public void setDocumentController(DocumentController documentController) {
         this.documentController = documentController;
-    }
-
-    public void createPdfAction(ActionEvent actionEvent) {
-        pdfGenerator.generatePdf(documentToEdit);
     }
 
     private void isInputChanged(Document document){
@@ -593,37 +643,71 @@ public class AddDocumentController extends AddController implements Initializabl
         comboTechnicians.setItems(allTechnicians);
     }
 
-    private void setUpContextMenu() {
-        //TODO deleting pictures
-        contextMenu = new MFXContextMenu(flowPanePictures);
-        MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
-                .setText("Delete")
-                .setAccelerator("Ctrl + D")
-                .setOnAction(event -> {
-                    ImageWrapper image = lastFocused.getImageWrapper();
-                    pictures.remove(image);
-                })
-                .setIcon(new MFXFontIcon("fas-delete-left", 16))
-                .get();
-
-        contextMenu.getItems().add(deleteItem);
-        Platform.runLater(() -> flowPanePictures.getScene().setOnContextMenuRequested(
-                event -> contextMenu.show(flowPanePictures, event.getScreenX(), event.getScreenY())));
-    }
-
-    private void setUpPdfListView() {
-        DocumentPropertiesList propertiesList = new DocumentPropertiesList(documentToEdit);
-
-        propertiesList.prefWidthProperty().bind(gridPanePdf.widthProperty());
-        propertiesList.prefHeightProperty().bind(gridPanePdf.heightProperty().subtract(btnCreatePdf.heightProperty()));
-        propertiesList.widthProperty().addListener((obs, oldWidth, newWidth) -> {
-            // Handle the updated width of propertiesList here
-            System.out.println("List: " + newWidth);
-            System.out.println("Gridpane: " + gridPanePdf.getWidth());
-        });
-
+    public void setUpPdfListView() {
+        propertiesList = new DocumentPropertiesList(documentToEdit);
         gridPanePdf.getChildren().removeIf(node -> node instanceof DocumentPropertiesList);
         gridPanePdf.add(propertiesList, 0, 0);
+    }
+
+    private void clearCustomerTextFields() {
+        txtName.clear();
+        txtEmail.clear();
+        txtPhoneNumber.clear();
+        txtStreetName.clear();
+        txtHouseNumber.clear();
+        txtCity.clear();
+        txtPostcode.clear();
+        txtCountry.clear();
+        dateLastContract.setValue(LocalDate.now());
+    }
+
+    private void addTooltips() {
+        Tooltip flowPaneTooltip = new Tooltip("Drag and drop pictures to reorder them.");
+        flowPaneTooltip.setShowDelay(Duration.millis(1000));
+        flowPaneTooltip.setShowDuration(Duration.millis(2000));
+        Tooltip.install(flowPanePictures, flowPaneTooltip);
+    }
+
+    private String addAddressToCustomerName(Customer customer) {
+        return customer.getCustomerName()
+                + " (" + customer.getCustomerAddress().getStreetName() + " "
+                + customer.getCustomerAddress().getStreetNumber() + ")";
+    }
+
+    private void setTxtCustomerNameAutoComplete() {
+        gridPaneCustomer.getChildren().remove(gridPaneCustomer.lookup("#txtName"));
+        txtName = new MFXTextFieldWithAutofill();
+        txtName.setId("txtName");
+        txtName.setFloatingText("Name");
+        txtName.setMaxWidth(Double.MAX_VALUE);
+        txtName.textProperty().addListener(customerInputListener);
+        txtName.textProperty().addListener(customerListener);
+        gridPaneCustomer.add(txtName, 0, 0);
+
+        txtName.setSelectionCallback(selectedSuggestion -> {
+            if (txtName.getText() != null) {
+                String trimmedSuggestion = selectedSuggestion.substring(0, selectedSuggestion.lastIndexOf("(")).trim();
+                customer = customerModel.getByName(trimmedSuggestion);
+
+                if (customer != null && addAddressToCustomerName(customer).equals(selectedSuggestion)) {
+                    txtName.setText(trimmedSuggestion);
+                    txtName.positionCaret(txtName.getText().length());
+                    txtEmail.setText(customer.getCustomerEmail());
+                    txtPhoneNumber.setText(customer.getCustomerPhoneNumber());
+                    txtStreetName.setText(customer.getCustomerAddress().getStreetName());
+                    txtHouseNumber.setText(customer.getCustomerAddress().getStreetNumber());
+                    txtPostcode.setText(customer.getCustomerAddress().getPostcode());
+                    txtCity.setText(customer.getCustomerAddress().getTown());
+                    txtCountry.setText(customer.getCustomerAddress().getCountry());
+                    toggleCustomerType.setSelected(customer.getCustomerType() == CustomerType.PRIVATE);
+                    dateLastContract.setValue(customer.getLastContract().toLocalDate());}
+            }
+        });
+    }
+
+    @Override
+    public void update(Observable<ImagePreview> o, ImagePreview arg) {
+        isInputChanged.setValue(true);
     }
     // endregion
 }

@@ -5,8 +5,7 @@ public enum UserRole {
     SALESPERSON("Salesperson"),
     PROJECT_MANAGER("Project Manager"),
     ADMINISTRATOR("Administrator"),
-    ALL("All")
-    ;
+    ALL("All");
 
     private final String name;
 
