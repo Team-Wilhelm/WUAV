@@ -169,7 +169,6 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
-        //TODO change the way we're dealing with customers
         assignInputToVariables();
 
         Address address = new Address(streetName, houseNumber, postcode, city, country);
@@ -183,16 +182,6 @@ public class AddDocumentController extends AddController<Document> implements In
             customer.setCustomerType(customerType);
             customer.setLastContract(lastContract);
         }
-        /*customer = customerModel.getAll().values().stream()
-                .filter(c -> c.getCustomerEmail().equals(email)
-                        && c.getCustomerName().equals(name)
-                        && c.getCustomerPhoneNumber().equals(phoneNumber)
-                        && c.getCustomerType().equals(customerType)
-                        && c.getCustomerAddress().equals(address))
-                .findFirst()
-                .orElse(new Customer(name, email, phoneNumber, address, customerType, lastContract));
-
-         */
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
@@ -267,6 +256,7 @@ public class AddDocumentController extends AddController<Document> implements In
             if (observable == txtName.textProperty()) {
                 if (oldValue.length() > 0 && newValue.length() == 0) {
                     clearCustomerTextFields();
+                    customer = null;
                 }
             }
         }
@@ -694,6 +684,7 @@ public class AddDocumentController extends AddController<Document> implements In
             if (txtName.getText() != null) {
                 String trimmedSuggestion = selectedSuggestion.substring(0, selectedSuggestion.lastIndexOf("(")).trim();
                 customer = customerModel.getByName(trimmedSuggestion);
+                System.out.println(customer.getCustomerID());
 
                 if (customer != null && addAddressToCustomerName(customer).equals(selectedSuggestion)) {
                     txtName.setText(trimmedSuggestion);
