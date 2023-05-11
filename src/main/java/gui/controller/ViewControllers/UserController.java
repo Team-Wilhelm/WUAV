@@ -1,7 +1,7 @@
 package gui.controller.ViewControllers;
 
 import be.User;
-import be.cards.UserCard;
+import gui.nodes.UserCard;
 import gui.SceneManager;
 import gui.controller.AddControllers.AddUserController;
 import gui.model.UserModel;

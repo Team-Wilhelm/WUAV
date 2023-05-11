@@ -1,5 +1,7 @@
-package be;
+package gui.nodes;
 
+import be.Document;
+import be.ImageWrapper;
 import io.github.palexdev.materialfx.controls.MFXCheckbox;
 import io.github.palexdev.materialfx.controls.MFXToggleButton;
 import javafx.geometry.HPos;
@@ -12,6 +14,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 
 public class DocumentPropertiesList extends GridPane {
@@ -63,7 +67,8 @@ public class DocumentPropertiesList extends GridPane {
         //TODO throws exception when document is null
         int row = 1;
 
-        addProperty("Date of creation: ", document.getDateOfCreation().toString(), row++);
+        Date date = document.getDateOfCreation() != null ? document.getDateOfCreation() : Date.valueOf(LocalDate.now());
+        addProperty("Date of creation: ", date.toString(), row++);
         addProperty("Job title: ", document.getJobTitle(), row++);
         addProperty("Job description: ", document.getJobDescription(), row++);
         addProperty("Notes: ", document.getOptionalNotes(), row++);

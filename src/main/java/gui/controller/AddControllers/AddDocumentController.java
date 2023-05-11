@@ -1,7 +1,7 @@
 package gui.controller.AddControllers;
 
 import be.*;
-import be.cards.ImagePreview;
+import gui.nodes.ImagePreview;
 import be.enums.CustomerType;
 import be.enums.UserRole;
 import bll.PdfGenerator;
@@ -9,10 +9,12 @@ import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
 import gui.model.UserModel;
+import gui.nodes.MFXTextFieldWithAutofill;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
+import gui.nodes.DocumentPropertiesList;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.application.Platform;
@@ -62,13 +64,13 @@ public class AddDocumentController extends AddController<Document> implements In
     @FXML
     private FlowPane flowPanePictures;
     @FXML
-    private GridPane gridPanePdf;
+    private GridPane gridPanePdf, gridPaneCustomer, gridPaneJob;
     @FXML
     private MFXButton btnDelete, btnSave, btnUploadPictures, btnCreatePdf, btnNextJobTab, btnNextCustomerTab;
     @FXML
     private MFXFilterComboBox<User> comboTechnicians;
     @FXML
-    private MFXTextField txtCity, txtCountry, txtEmail, txtHouseNumber, txtJobTitle, txtName, txtPhoneNumber, txtPostcode, txtStreetName;
+    private MFXTextField txtCity, txtCountry, txtEmail, txtHouseNumber, txtJobTitle, txtPhoneNumber, txtPostcode, txtStreetName;
     @FXML
     private TextArea txtJobDescription, txtNotes;
     @FXML
@@ -77,6 +79,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private MFXDatePicker dateLastContract;
     @FXML
     private MFXCheckListView<Document> checkListViewDocuments;
+    private MFXTextFieldWithAutofill txtName;
     private MFXContextMenu contextMenu;
 
     private DocumentModel documentModel;
@@ -99,6 +102,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private Date lastContract;
     private List<User> technicians;
     private BooleanProperty isInputChanged, isEditing;
+    private Customer customer;
 
     public AddDocumentController() {
         documentModel = DocumentModel.getInstance();
@@ -112,10 +116,6 @@ public class AddDocumentController extends AddController<Document> implements In
         pictures = FXCollections.observableArrayList();
         allTechnicians = FXCollections.observableArrayList();
 
-        /*if (UserModel.getInstance().getLoggedInUser() != null
-                && UserModel.getInstance().getLoggedInUser().getUserRole() == UserRole.TECHNICIAN)
-            technicians.add(UserModel.getInstance().getLoggedInUser());
-         */
         isInputChanged = new SimpleBooleanProperty(true);
         isEditing = new SimpleBooleanProperty(false);
     }
@@ -129,6 +129,7 @@ public class AddDocumentController extends AddController<Document> implements In
         pdfTab.setDisable(true);
         tabPane.getSelectionModel().selectedItemProperty().addListener(tabChangeListener);
 
+        setTxtCustomerNameAutoComplete();
         assignListenersToTextFields();
         setUpComboBox();
         setUpContextMenu();
@@ -172,7 +173,17 @@ public class AddDocumentController extends AddController<Document> implements In
         assignInputToVariables();
 
         Address address = new Address(streetName, houseNumber, postcode, city, country);
-        Customer customer = customerModel.getAll().values().stream()
+        if (customer == null) {
+            customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
+        } else {
+            customer.setCustomerName(name);
+            customer.setCustomerEmail(email);
+            customer.setCustomerPhoneNumber(phoneNumber);
+            customer.setCustomerAddress(address);
+            customer.setCustomerType(customerType);
+            customer.setLastContract(lastContract);
+        }
+        /*customer = customerModel.getAll().values().stream()
                 .filter(c -> c.getCustomerEmail().equals(email)
                         && c.getCustomerName().equals(name)
                         && c.getCustomerPhoneNumber().equals(phoneNumber)
@@ -180,6 +191,8 @@ public class AddDocumentController extends AddController<Document> implements In
                         && c.getCustomerAddress().equals(address))
                 .findFirst()
                 .orElse(new Customer(name, email, phoneNumber, address, customerType, lastContract));
+
+         */
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
@@ -251,6 +264,24 @@ public class AddDocumentController extends AddController<Document> implements In
                     || isInputEmpty(txtCity) || isInputEmpty(txtCountry);
             btnNextCustomerTab.setDisable(isNotFilled);
             picturesTab.setDisable(isNotFilled);
+            if (observable == txtName.textProperty()) {
+                if (oldValue.length() > 0 && newValue.length() == 0) {
+                    clearCustomerTextFields();
+                }
+            }
+        }
+    };
+
+    private final ChangeListener<String> customerListener = new ChangeListener<>() {
+        @Override
+        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+            if (newValue != null && !newValue.isEmpty()) {
+                List<String> names = customerModel.getAll().values().stream().map(c -> addAddressToCustomerName(c))
+                        .filter(customerName -> customerName.toLowerCase().contains(newValue.toLowerCase().trim()))
+                        .toList();
+                txtName.getEntries().clear();
+                txtName.getEntries().addAll(names);
+            }
         }
     };
 
@@ -282,7 +313,6 @@ public class AddDocumentController extends AddController<Document> implements In
             populateComboBox();
         }
     };
-
 
     /**
      * Listens for changes in the tab selection and prompts the user to save the document if they are editing it.
@@ -627,6 +657,58 @@ public class AddDocumentController extends AddController<Document> implements In
 
         gridPanePdf.getChildren().removeIf(node -> node instanceof DocumentPropertiesList);
         gridPanePdf.add(propertiesList, 0, 0);
+    }
+
+    private void clearCustomerTextFields() {
+        txtName.clear();
+        txtEmail.clear();
+        txtPhoneNumber.clear();
+        txtStreetName.clear();
+        txtHouseNumber.clear();
+        txtCity.clear();
+        txtPostcode.clear();
+        txtCountry.clear();
+        dateLastContract.setValue(LocalDate.now());
+    }
+
+    private void addTooltips() {
+    }
+
+    private String addAddressToCustomerName(Customer customer) {
+        return customer.getCustomerName()
+                + " (" + customer.getCustomerAddress().getStreetName() + " "
+                + customer.getCustomerAddress().getStreetNumber() + ")";
+    }
+
+    private void setTxtCustomerNameAutoComplete() {
+        gridPaneCustomer.getChildren().remove(gridPaneCustomer.lookup("#txtName"));
+        txtName = new MFXTextFieldWithAutofill();
+        txtName.setId("txtName");
+        txtName.setFloatingText("Name");
+        txtName.setMaxWidth(Double.MAX_VALUE);
+        txtName.textProperty().addListener(customerInputListener);
+        txtName.textProperty().addListener(customerListener);
+        gridPaneCustomer.add(txtName, 0, 0);
+
+        txtName.setSelectionCallback(selectedSuggestion -> {
+            if (txtName.getText() != null) {
+                String trimmedSuggestion = selectedSuggestion.substring(0, selectedSuggestion.lastIndexOf("(")).trim();
+                customer = customerModel.getByName(trimmedSuggestion);
+
+                if (customer != null && addAddressToCustomerName(customer).equals(selectedSuggestion)) {
+                    txtName.setText(trimmedSuggestion);
+                    txtName.positionCaret(txtName.getText().length());
+                    txtEmail.setText(customer.getCustomerEmail());
+                    txtPhoneNumber.setText(customer.getCustomerPhoneNumber());
+                    txtStreetName.setText(customer.getCustomerAddress().getStreetName());
+                    txtHouseNumber.setText(customer.getCustomerAddress().getStreetNumber());
+                    txtPostcode.setText(customer.getCustomerAddress().getPostcode());
+                    txtCity.setText(customer.getCustomerAddress().getTown());
+                    txtCountry.setText(customer.getCustomerAddress().getCountry());
+                    toggleCustomerType.setSelected(customer.getCustomerType() == CustomerType.PRIVATE);
+                    dateLastContract.setValue(customer.getLastContract().toLocalDate());}
+            }
+        });
     }
     // endregion
 }

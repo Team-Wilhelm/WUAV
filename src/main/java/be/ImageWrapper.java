@@ -1,6 +1,6 @@
 package be;
 
-import be.cards.ImagePreview;
+import gui.nodes.ImagePreview;
 import javafx.scene.image.Image;
 
 public class ImageWrapper {

@@ -1,7 +1,8 @@
-package bll;
+package bll.manager;
 
 import be.Customer;
-import dal.CustomerDAO;
+import bll.IManager;
+import dal.dao.CustomerDAO;
 import dal.DAOFactory;
 
 import java.util.Map;

@@ -1,23 +1,28 @@
 package gui.controller.ViewControllers;
 
 import be.Document;
-import be.cards.DocumentCard;
+import gui.nodes.DocumentCard;
 import gui.SceneManager;
 import gui.controller.AddControllers.AddDocumentController;
 import gui.model.DocumentModel;
 import gui.tasks.TaskState;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import gui.util.AlertManager;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -55,6 +60,34 @@ public class DocumentController extends ViewController<Document> implements Init
 
         btnAddDocument.getStyleClass().addAll("addButton", "rounded");
         btnAddDocument.setText("");
+
+        addTooltips();
+        //TODO
+        Platform.runLater(() -> {
+            /*
+            (Stage) btnAddDocument.getScene().getWindow().setOnCloseRequest(event -> {
+                if (documentModel.isModified()) {
+                    AlertManager.showConfirmationAlert("Are you sure you want to exit?", "You have unsaved changes. Are you sure you want to exit?", () -> {
+                        documentModel.save();
+                        Platform.exit();
+                    });
+                } else {
+                    Platform.exit();
+                }
+            });
+        });
+
+             */
+            btnAddDocument.getScene().setOnKeyPressed(event -> {
+                if (event.isControlDown() && event.getCode().equals(KeyCode.N)) {
+                    try {
+                        addDocumentAction();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        });
     }
 
     //region progress methods
@@ -98,20 +131,6 @@ public class DocumentController extends ViewController<Document> implements Init
     public void refreshItems() {
         refreshItems(List.copyOf(documentModel.getAll().values()));
     }
-//
-//    private void editDocument(Window owner) {
-//        if (lastFocusedCard != null) {
-//            try {
-//                AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
-//                controller.setDocumentController(this);
-//                controller.setDocumentToEdit(lastFocusedCard.getDocument());
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        } else {
-//            AlertManager.getInstance().showWarning("No document selected", "Please select a document to edit", owner);
-//        }
-//    }
 
     public void addDocumentAction() throws IOException {
         ((AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController()).setDocumentController(this);
@@ -172,5 +191,9 @@ public class DocumentController extends ViewController<Document> implements Init
                 AlertManager.getInstance().showError("No document selected", "Please select a document", btnAddDocument.getScene().getWindow());
             }
         }
+    }
+
+    private void addTooltips() {
+        btnAddDocument.setTooltip(new Tooltip("Press Ctrl+N to add a new document"));
     }
 }

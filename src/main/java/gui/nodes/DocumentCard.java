@@ -1,4 +1,4 @@
-package be.cards;
+package gui.nodes;
 
 import be.Document;
 import gui.util.IconFactory;

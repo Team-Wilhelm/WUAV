@@ -1,8 +1,9 @@
-package dal;
+package dal.dao;
 
 import be.Address;
 import be.Customer;
 import be.enums.CustomerType;
+import dal.DBConnection;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
 

@@ -1,5 +1,8 @@
 package dal;
 
+import dal.dao.CustomerDAO;
+import dal.dao.DocumentDAO;
+import dal.dao.UserDAO;
 import dal.interfaces.IDAO;
 
 public class DAOFactory {

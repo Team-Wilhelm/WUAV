@@ -1,10 +1,9 @@
 package gui.model;
 
 import be.User;
-import be.cards.UserCard;
-import bll.IManager;
+import gui.nodes.UserCard;
 import bll.ManagerFactory;
-import bll.UserManager;
+import bll.manager.UserManager;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;

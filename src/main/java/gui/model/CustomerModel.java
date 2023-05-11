@@ -1,17 +1,13 @@
 package gui.model;
 
 import be.Customer;
-import be.Document;
-import bll.CustomerManager;
 import bll.IManager;
 import bll.ManagerFactory;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 
 public class CustomerModel implements IModel<Customer> {
     private static CustomerModel instance;
@@ -73,5 +69,15 @@ public class CustomerModel implements IModel<Customer> {
     @Override
     public Customer getById(UUID id) {
         return customerManager.getById(id);
+    }
+
+    public Customer getByName(String name) {
+        return allCustomers.values().stream().filter(customer ->
+                customer.getCustomerName().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    public Customer getByEmail(String email) {
+        return allCustomers.values().stream().filter(customer ->
+                customer.getCustomerEmail().equalsIgnoreCase(email)).findFirst().orElse(null);
     }
 }

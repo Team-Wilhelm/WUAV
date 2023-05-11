@@ -20,7 +20,7 @@
    <tabs>
       <Tab fx:id="jobInformationTab" text="Job information">
          <content>
-            <GridPane hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="background" stylesheets="@../../css/style.css" vgap="10.0">
+            <GridPane fx:id="gridPaneJob" hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="background" stylesheets="@../../css/style.css" vgap="10.0">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
@@ -57,7 +57,7 @@
       </Tab>
       <Tab fx:id="customerInformationTab" text="Customer information">
          <content>
-            <GridPane hgap="15.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <GridPane fx:id="gridPaneCustomer" hgap="15.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
               <columnConstraints>
                 <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
@@ -73,7 +73,7 @@
               </rowConstraints>
                <children>
                     <MFXTextField fx:id="txtName" floatingText="Name" maxWidth="1.7976931348623157E308" />
-                    <MFXDatePicker fx:id="dateLastContract" floatMode="INLINE" floatingText="Last contract" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" />
+                    <MFXDatePicker fx:id="dateLastContract" floatMode="INLINE" floatingText="Last contract" maxWidth="1.7976931348623157E308" selectable="false" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" />
                     <MFXTextField fx:id="txtEmail" floatingText="Email" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1" />
                     <MFXTextField fx:id="txtPhoneNumber" floatingText="Phone number" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
                     <MFXTextField fx:id="txtStreetName" floatingText="Street name" maxWidth="1.7976931348623157E308" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />

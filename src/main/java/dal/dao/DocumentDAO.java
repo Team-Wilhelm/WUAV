@@ -1,11 +1,12 @@
-package dal;
+package dal.dao;
 
 import be.Document;
 import be.ImageWrapper;
 import be.User;
+import dal.DBConnection;
+import dal.DocumentImageFactory;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
-import javafx.scene.image.Image;
 import utils.ThreadPool;
 
 import java.sql.Connection;
