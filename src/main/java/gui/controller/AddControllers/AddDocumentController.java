@@ -179,17 +179,17 @@ public class AddDocumentController extends AddController<Document> implements In
             customer.setCustomerEmail(email);
             customer.setCustomerPhoneNumber(phoneNumber);
             customer.setCustomerAddress(address);
+            address.setAddressID(customer.getCustomerAddress().getAddressID());
             customer.setCustomerType(customerType);
             customer.setLastContract(lastContract);
         }
+
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
 
         if (isEditing.get()) {
             currentDocument.setDocumentID(documentToEdit.getDocumentID());
-            customer.setCustomerID(documentToEdit.getCustomer().getCustomerID());
-            address.setAddressID(documentToEdit.getCustomer().getCustomerAddress().getAddressID());
         }
 
         SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
@@ -684,7 +684,6 @@ public class AddDocumentController extends AddController<Document> implements In
             if (txtName.getText() != null) {
                 String trimmedSuggestion = selectedSuggestion.substring(0, selectedSuggestion.lastIndexOf("(")).trim();
                 customer = customerModel.getByName(trimmedSuggestion);
-                System.out.println(customer.getCustomerID());
 
                 if (customer != null && addAddressToCustomerName(customer).equals(selectedSuggestion)) {
                     txtName.setText(trimmedSuggestion);
