@@ -17,10 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -92,6 +89,8 @@ public class ImagePreview extends VBox {
 
     private void setUpContextMenu() {
         contextMenu = new MFXContextMenu(this);
+        contextMenu.setHideOnEscape(true);
+        contextMenu.setAutoHide(true);
 
         deleteItem = MFXContextMenuItem.Builder.build()
                 .setText("Delete")
@@ -103,24 +102,35 @@ public class ImagePreview extends VBox {
                 .setText("Add description")
                 .setAccelerator("Ctrl + E")
                 .setOnAction(event -> {
-                    TextInputDialog dialog = new TextInputDialog();
-                    dialog.setTitle("Add description");
-                    dialog.setHeaderText("Add a description to the image");
-                    dialog.setContentText("Description:");
-                    dialog.getEditor().setText(imageWrapper.getDescription());
-                    Optional<String> result = dialog.showAndWait();
-                    result.ifPresent(imageWrapper::setDescription);
-                    notifyObservers(observable, this);
+                    openDescriptionDialogue();
                 })
                 .get();
 
         contextMenu.getItems().addAll(deleteItem, addDescriptionItem);
+        contextMenu.minWidthProperty().bind(addDescriptionItem.widthProperty().add(10));
 
         this.setOnMousePressed(e -> {
             if (e.isSecondaryButtonDown()) {
                 contextMenu.show(this, e.getScreenX(), e.getScreenY());
             }
         });
+
+        this.setOnKeyPressed(e -> {
+            if (e.isControlDown() && e.getCode().equals(KeyCode.E)) {
+                openDescriptionDialogue();
+            }
+        });
+    }
+
+    public void openDescriptionDialogue() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Add description");
+        dialog.setHeaderText("Add a description to the image");
+        dialog.setContentText("Description:");
+        dialog.getEditor().setText(imageWrapper.getDescription());
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(imageWrapper::setDescription);
+        notifyObservers(observable, this);
     }
 
     // Observer pattern implementation

@@ -5,6 +5,7 @@ import be.ImageWrapper;
 import be.enums.DocumentPropertyType;
 import io.github.palexdev.materialfx.controls.MFXCheckbox;
 import io.github.palexdev.materialfx.controls.MFXToggleButton;
+import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -29,7 +30,6 @@ public class DocumentPropertiesList extends GridPane {
 
     public DocumentPropertiesList(Document document) {
         super();
-        this.gridLinesVisibleProperty().set(true);
         this.document = document;
 
         setHgap(10);
@@ -60,7 +60,10 @@ public class DocumentPropertiesList extends GridPane {
             }
         });
         add(toggleAll, 2, 0);
-        toggleAll.getOnAction().handle(null);
+
+        // Toggle all checkboxes by default
+        //TODO idk why not working
+        toggleAll.fire();
 
         displayProperties();
     }

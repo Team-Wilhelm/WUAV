@@ -137,7 +137,6 @@ public class PdfGenerator {
                     documentImage.setHeight(150).setHorizontalAlignment(HorizontalAlignment.CENTER);
                     imageTable.addCell(documentImage);
 
-                    //TODO add image description
                     Cell footerCell = new Cell();
                     String description = imageCheckboxes.get(i).getImage().getDescription() == null ? "" : imageCheckboxes.get(i).getImage().getDescription();
                     footerCell.add(description).setTextAlignment(TextAlignment.CENTER);

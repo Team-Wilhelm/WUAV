@@ -460,6 +460,8 @@ public class AddDocumentController extends AddController<Document> implements In
                 if (e.getCode().equals(KeyCode.DELETE)) {
                     imagePreviews.remove(imagePreview);
                     pictures.remove(image);
+                } if (e.isControlDown() && e.getCode().equals(KeyCode.E)) {
+                    imagePreview.openDescriptionDialogue();
                 }
             });
 
@@ -661,7 +663,8 @@ public class AddDocumentController extends AddController<Document> implements In
 
     private void addTooltips() {
         Tooltip flowPaneTooltip = new Tooltip("Drag and drop pictures to reorder them.");
-        flowPaneTooltip.setShowDelay(Duration.millis(100));
+        flowPaneTooltip.setShowDelay(Duration.millis(1000));
+        flowPaneTooltip.setShowDuration(Duration.millis(2000));
         Tooltip.install(flowPanePictures, flowPaneTooltip);
     }
 
