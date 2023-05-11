@@ -60,6 +60,7 @@ public class DocumentPropertiesList extends GridPane {
     }
 
     private void displayProperties() {
+        //TODO throws exception when document is null
         int row = 1;
 
         addProperty("Date of creation: ", document.getDateOfCreation().toString(), row++);

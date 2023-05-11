@@ -173,13 +173,16 @@ public class AddDocumentController extends AddController<Document> implements In
 
         Address address = new Address(streetName, houseNumber, postcode, city, country);
         Customer customer = customerModel.getAll().values().stream()
-                .filter(c -> c.getCustomerEmail().equals(email))
+                .filter(c -> c.getCustomerEmail().equals(email)
+                        && c.getCustomerName().equals(name)
+                        && c.getCustomerPhoneNumber().equals(phoneNumber)
+                        && c.getCustomerType().equals(customerType)
+                        && c.getCustomerAddress().equals(address))
                 .findFirst()
                 .orElse(new Customer(name, email, phoneNumber, address, customerType, lastContract));
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
-        System.out.println("Pictures: " + currentDocument.getDocumentImages().size());
 
         if (isEditing.get()) {
             currentDocument.setDocumentID(documentToEdit.getDocumentID());

@@ -24,7 +24,7 @@ import java.net.URL;
 import java.sql.Date;
 import java.util.*;
 
-public class DocumentController extends ViewController implements Initializable {
+public class DocumentController extends ViewController<Document> implements Initializable {
     @FXML
     private MFXTableView<Document> tblDocument;
     @FXML
@@ -89,40 +89,9 @@ public class DocumentController extends ViewController implements Initializable 
     }
 
     @Override
-    public void refreshItems(List<?> documentsToDisplay) {
-        // TODO fix this mess
-        documentCards.clear();
-
-        HashMap<Document, DocumentCard> loadedCards = documentModel.getCreatedDocumentCards();
-        for (Document document : (List<Document>) documentsToDisplay) {
-            DocumentCard documentCard = loadedCards.get(document);
-            if (documentCard == null) {
-                documentCard = new DocumentCard(document);
-                documentModel.getCreatedDocumentCards().put(document, documentCard);
-            }
-
-            if (lastFocusedCard != null && documentCard.getDocument() == lastFocusedCard.getDocument()) {
-                documentCard = new DocumentCard(document);
-                documentModel.getCreatedDocumentCards().put(document, documentCard);
-                loadedCards.put(document, documentCard);
-            }
-
-            final DocumentCard finalDocumentCard = documentCard;
-            documentCard.focusedProperty().addListener((observable, oldValue, newValue) -> {
-                if (!newValue) lastFocusedCard = finalDocumentCard;
-            });
-
-            documentCard.setOnMouseClicked(e -> {
-                if (!finalDocumentCard.isFocused())
-                    finalDocumentCard.requestFocus();
-
-                if (e.getClickCount() == 2) {
-                    lastFocusedCard = finalDocumentCard;
-                    //editDocument(btnAddDocument.getScene().getWindow());
-                }
-            });
-            documentCards.add(documentCard);
-        }
+    public void refreshItems(List<Document> documentsToDisplay) {
+        documentList.clear();
+        documentList.addAll(documentsToDisplay);
     }
 
     @Override

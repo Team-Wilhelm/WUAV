@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class CustomerDAO extends DAO implements IDAO<Customer> {
-    private DBConnection dbConnection;
+    private final DBConnection dbConnection;
     public CustomerDAO() {
         dbConnection = DBConnection.getInstance();
     }

@@ -275,7 +275,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         String sql = "INSERT INTO Document_Image_Link (DocumentID, Filepath, FileName, PictureIndex) VALUES (?, ?, ?, ?)";
         PreparedStatement ps = connection.prepareStatement(sql);
         String documentID = document.getDocumentID().toString();
-        System.out.println("Document size: " + document.getDocumentImages().size());
         for (int i = 0; i < document.getDocumentImages().size(); i++) {
             ImageWrapper image = document.getDocumentImages().get(i);
             ps.setString(1, documentID);
