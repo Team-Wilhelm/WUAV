@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<HBox prefHeight="600.0" prefWidth="1600.0" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.CanvasController">
+    <VBox fx:id="toolbar" alignment="CENTER" prefWidth="350.0" spacing="10"
+          style="-fx-background-color: rgb(242,200,15)" styleClass="toolBox"/>
+    <VBox fx:id="canvasVbox" HBox.hgrow="ALWAYS" />
+</HBox>
