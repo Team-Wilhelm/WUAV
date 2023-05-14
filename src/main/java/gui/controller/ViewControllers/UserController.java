@@ -2,6 +2,7 @@ package gui.controller.ViewControllers;
 
 import be.User;
 import be.cards.UserCard;
+import be.enums.UserRole;
 import gui.SceneManager;
 import gui.controller.AddControllers.AddUserController;
 import gui.model.UserModel;
@@ -23,6 +24,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Window;
+import utils.permissions.Checker;
+import utils.permissions.RequiresPermission;
 
 import java.io.IOException;
 import java.net.URL;
@@ -47,6 +50,7 @@ public class UserController extends ViewController implements Initializable {
     private ObservableList<UserCard> userCards = FXCollections.observableArrayList();
     private final UserModel userModel = UserModel.getInstance();
     private UserCard lastFocusedCard;
+    private Checker checker = new Checker();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -149,8 +153,13 @@ public class UserController extends ViewController implements Initializable {
 
     @FXML
     private void addEmployeeAction(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
-        AddUserController controller = loader.getController();
-        controller.setUserController(this);
+            FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
+            AddUserController controller = loader.getController();
+            controller.setUserController(this);
+    }
+
+    private Window getWindow() {
+        Window window = btnAddEmployee.getScene().getWindow();
+        return window;
     }
 }

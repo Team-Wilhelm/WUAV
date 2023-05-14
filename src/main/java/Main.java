@@ -11,17 +11,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.aspectj.bridge.MessageHandler;
 import utils.ThreadPool;
 
 import java.util.Objects;
 import java.util.UUID;
 
+
 public class Main extends Application {
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         long start = System.currentTimeMillis();
         Parent root;
-        if (!true)
+        if (true)
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
         else {
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.MENU_SCENE)));

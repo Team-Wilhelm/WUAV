@@ -2,14 +2,13 @@ package gui.controller.ViewControllers;
 
 import be.Document;
 import be.cards.DocumentCard;
+import be.enums.UserRole;
 import gui.SceneManager;
 import gui.controller.AddControllers.AddDocumentController;
 import gui.model.DocumentModel;
 import gui.tasks.TaskState;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
-import io.github.palexdev.materialfx.enums.SortState;
-import io.github.palexdev.materialfx.filter.StringFilter;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,6 +19,9 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import gui.util.AlertManager;
+import javafx.stage.Window;
+import utils.permissions.Checker;
+import utils.permissions.RequiresPermission;
 
 import java.io.IOException;
 import java.net.URL;
@@ -42,6 +44,7 @@ public class DocumentController extends ViewController implements Initializable 
     private ObservableList<Document> documentList = FXCollections.observableArrayList();
     private final DocumentModel documentModel = DocumentModel.getInstance();
     private DocumentCard lastFocusedCard;
+    private Checker checker = new Checker();
 
     public DocumentController() {}
 
@@ -148,6 +151,10 @@ public class DocumentController extends ViewController implements Initializable 
 
     public void addDocumentAction() throws IOException {
         ((AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController()).setDocumentController(this);
+    }
+
+    private Window getWindow() {
+        return btnAddDocument.getScene().getWindow();
     }
 
     private void populateTableView(){

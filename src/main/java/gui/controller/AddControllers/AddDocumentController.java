@@ -96,8 +96,8 @@ public class AddDocumentController extends AddController implements Initializabl
 
     // Document and customer information
     private UUID temporaryId;
-    private String city, country, email, houseNumber, jobTitle, name, phoneNumber, postcode, streetName;
-    private String jobDescription, notes;
+    private String city, country, email, houseNumber, name, phoneNumber, postcode, streetName;
+    private String jobDescription, jobTitle, notes;
     private CustomerType customerType;
     private Date lastContract;
     private List<User> technicians;
