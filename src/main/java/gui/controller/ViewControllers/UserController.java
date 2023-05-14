@@ -1,8 +1,7 @@
 package gui.controller.ViewControllers;
 
 import be.User;
-import be.cards.UserCard;
-import be.enums.UserRole;
+import gui.nodes.UserCard;
 import gui.SceneManager;
 import gui.controller.AddControllers.AddUserController;
 import gui.model.UserModel;
@@ -33,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class UserController extends ViewController implements Initializable {
+public class UserController extends ViewController<User> implements Initializable {
     @FXML
     public FlowPane flowPane;
     @FXML
@@ -92,16 +91,16 @@ public class UserController extends ViewController implements Initializable {
 
     @Override
     public void refreshLastFocusedCard() {
-        if (lastFocusedCard != null)
-            lastFocusedCard.update(userModel.getAll().get(lastFocusedCard.getUser().getUserID()), userModel.getAll().get(lastFocusedCard.getUser().getUserID()));
+        //if (lastFocusedCard != null)
+            //lastFocusedCard.update(userModel.getAll().get(lastFocusedCard.getUser().getUserID()), userModel.getAll().get(lastFocusedCard.getUser().getUserID()));
     }
 
     @Override
-    public void refreshItems(List<?> items) {
+    public void refreshItems(List<User> items) {
         userCards.clear();
 
         HashMap<User, UserCard> loadedCards = (HashMap<User, UserCard>) userModel.getLoadedCards();
-        for (User user : (List<User>) items) {
+        for (User user : items) {
             UserCard userCard = loadedCards.get(user);
             if (userCard == null) {
                 userCard = userModel.addUserCard(user);

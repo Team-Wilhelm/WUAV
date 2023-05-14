@@ -1,10 +1,9 @@
 package gui.model;
 
 import be.User;
-import be.cards.UserCard;
-import bll.IManager;
+import gui.nodes.UserCard;
 import bll.ManagerFactory;
-import bll.UserManager;
+import bll.manager.UserManager;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -20,20 +19,17 @@ public class UserModel implements IModel<User> {
     private static User loggedInUser;
 
     private UserModel() {
-        long start = System.currentTimeMillis();
         userManager = (UserManager) ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
         allUsers = new HashMap<>();
         loadedCards = new HashMap<>();
         setAllUsersFromManager();
         createUserCards();
-        long end = System.currentTimeMillis();
     }
 
     public static UserModel getInstance() {
         if (instance == null) {
             instance = new UserModel();
-        }
-        return instance;
+        } return instance;
     }
 
     @Override
@@ -83,6 +79,10 @@ public class UserModel implements IModel<User> {
         return userManager.getById(id);
     }
 
+    public User getByIDFFromModel(UUID id) {
+        return allUsers.get(id);
+    }
+
     /**
      * Reloads all users from the database
      */
@@ -124,7 +124,7 @@ public class UserModel implements IModel<User> {
         for (User user : allUsers.values()) {
             UserCard userCard = new UserCard(user);
             loadedCards.put(user, userCard);
-            user.addObserver(userCard);
+            //user.addObserver(userCard);
         }
     }
 
@@ -135,7 +135,7 @@ public class UserModel implements IModel<User> {
     public UserCard addUserCard(User user){
         UserCard userCard = new UserCard(user);
         loadedCards.put(user, userCard);
-        user.addObserver(userCard);
+        //user.addObserver(userCard);
         return userCard;
     }
 }

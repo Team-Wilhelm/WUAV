@@ -3,6 +3,7 @@ package be;
 import be.enums.CustomerType;
 
 import java.sql.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Customer {
@@ -85,19 +86,16 @@ public class Customer {
         this.lastContract = lastContract;
     }
 
-    //Ensuring a customer is only compared by UUID
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Customer customer = (Customer) o;
-
-        return customerID.equals(customer.customerID);
+        return Objects.equals(customerName, customer.customerName) && Objects.equals(customerEmail, customer.customerEmail) && Objects.equals(customerPhoneNumber, customer.customerPhoneNumber) && customerType == customer.customerType;
     }
 
     @Override
     public int hashCode() {
-        return customerID.hashCode();
+        return Objects.hash(customerName, customerEmail, customerPhoneNumber, customerType);
     }
 }

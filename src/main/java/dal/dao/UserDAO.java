@@ -1,7 +1,8 @@
-package dal;
+package dal.dao;
 
 import be.User;
 import be.enums.UserRole;
+import dal.DBConnection;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
 
@@ -109,7 +110,7 @@ public class UserDAO extends DAO implements IDAO<User> {
                         documentIDs.add(UUID.fromString(documentIdStr));
                     }
                 }
-                User user = getUserFromResultSet(resultSet, documentIDs);
+                User user = getUserFromResultSet(resultSet, documentIDs, true);
                 users.put(user.getUserID(), user);
             }
         } catch (Exception e) {
@@ -122,9 +123,11 @@ public class UserDAO extends DAO implements IDAO<User> {
 
     @Override
     public User getById(UUID id) {
+        //TODO: Fix this
+        System.out.println("Getting user with ID: " + id);
         String sql = "SELECT * FROM SystemUser LEFT JOIN User_Document_Link " +
                 "ON SystemUser.UserID = User_Document_Link.UserID " +
-                "WHERE UserID = ?";
+                "WHERE SystemUser.UserID = ?";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
@@ -134,10 +137,18 @@ public class UserDAO extends DAO implements IDAO<User> {
 
             // Get a list of document IDs assigned to the user
             List<UUID> documentIDs = new ArrayList<>();
+            User user = null;
+            int i = 0;
             while (resultSet.next()) {
+                if (i == 0) {
+                    user = getUserFromResultSet(resultSet, documentIDs, false);
+                }
                 documentIDs.add(UUID.fromString(resultSet.getString("DocumentID")));
+                i++;
             }
-            return getUserFromResultSet(resultSet, documentIDs);
+            assert user != null;
+            user.setAssignedDocuments(new DocumentDAO().getDocumentsByIDs(documentIDs));
+            return user;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -166,7 +177,7 @@ public class UserDAO extends DAO implements IDAO<User> {
         return false;
     }
 
-    private User getUserFromResultSet(ResultSet resultSet, List<UUID> documentIDs) throws SQLException {
+    private User getUserFromResultSet(ResultSet resultSet, List<UUID> documentIDs, boolean assignDocuments) throws SQLException {
         User user = new User(
                 UUID.fromString(resultSet.getString("UserID")),
                 resultSet.getString("FullName"),
@@ -176,8 +187,9 @@ public class UserDAO extends DAO implements IDAO<User> {
                 UserRole.fromString(resultSet.getString("UserRole")),
                 resultSet.getString("ProfilePicture")
         );
-        long startTime = System.currentTimeMillis();
-        user.setAssignedDocuments(new DocumentDAO().getDocumentsByIDs(documentIDs));
+        if (assignDocuments) {
+            user.setAssignedDocuments(new DocumentDAO().getDocumentsByIDs(documentIDs));
+        }
         return user;
     }
 

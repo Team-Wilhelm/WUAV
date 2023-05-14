@@ -30,7 +30,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.*;
 
-public class AddUserController extends AddController implements Initializable {
+public class AddUserController extends AddController<User> implements Initializable {
     @FXML
     private ImageView imgProfilePicture;
     @FXML
@@ -106,13 +106,13 @@ public class AddUserController extends AddController implements Initializable {
             assignInputToVariables();
             byte[][] passwordHash = hashPasswordHelper.hashPassword(password);
             User user = new User(name, username, passwordHash, phoneNumber, userRole, profilePicturePath);
-            Task<TaskState> saveTask = new SaveTask<>(user, isEditing, userModel);
+            SaveTask<User> saveTask = new SaveTask<>(user, isEditing, userModel);
             if (isEditing) {
                 user.setUserID(userToUpdate.getUserID());
             }
-            setUpSaveTask(saveTask, userController, txtName.getScene().getWindow());
+            setUpSaveTask(saveTask, userController, txtName.getScene().getWindow(), this);
             executorService.execute(saveTask);
-            userToUpdate = user;
+            //userToUpdate = user;
         }
     }
 

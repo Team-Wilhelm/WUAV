@@ -1,8 +1,9 @@
-package dal;
+package dal.dao;
 
 import be.Address;
 import be.Customer;
 import be.enums.CustomerType;
+import dal.DBConnection;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
 
@@ -15,7 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class CustomerDAO extends DAO implements IDAO<Customer> {
-    private DBConnection dbConnection;
+    private final DBConnection dbConnection;
     public CustomerDAO() {
         dbConnection = DBConnection.getInstance();
     }

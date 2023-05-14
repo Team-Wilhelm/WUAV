@@ -1,5 +1,9 @@
 package bll;
 
+import bll.manager.CustomerManager;
+import bll.manager.DocumentManager;
+import bll.manager.UserManager;
+
 public class ManagerFactory {
     public enum ManagerType {
         CUSTOMER, USER, DOCUMENT

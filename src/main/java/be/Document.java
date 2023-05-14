@@ -29,7 +29,7 @@ public class Document {
 
     public Document(UUID documentID, Customer customer, String jobDescription, String optionalNotes, String jobTitle, Date dateOfCreation) {
        this(customer, jobDescription, optionalNotes, jobTitle, dateOfCreation);
-         this.documentID = documentID;
+       this.documentID = documentID;
     }
 
     public UUID getDocumentID() {
@@ -94,6 +94,20 @@ public class Document {
 
     public void setOptionalNotes(String optionalNotes) {
         this.optionalNotes = optionalNotes;
+    }
+
+    public String getTechnicianNames() {
+        StringBuilder technicianString = new StringBuilder();
+        int technicianCount = technicians.size();
+        if (!technicians.isEmpty()) {
+            technicianString.append("Technician(s): ");
+            for (int i = 0; i < technicianCount; i++) {
+                if (i != technicianCount - 1) {
+                    technicianString.append(technicians.get(i).getFullName()).append(", ");
+                } else technicianString.append(technicians.get(i).getFullName());
+            }
+        }
+        return technicianString.toString();
     }
 
     @Override

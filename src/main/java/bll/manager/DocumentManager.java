@@ -1,9 +1,10 @@
-package bll;
+package bll.manager;
 
 import be.Document;
 import be.User;
+import bll.IManager;
 import dal.DAOFactory;
-import dal.DocumentDAO;
+import dal.dao.DocumentDAO;
 
 import java.util.Map;
 import java.util.UUID;
