@@ -30,6 +30,11 @@ public class DeleteTask<T> extends Task<TaskState> {
                 updateMessage("Deleted successfully");
                 return TaskState.SUCCESSFUL;
             }
+
+            else if(message.equals("No Permission")){
+                return TaskState.NO_PERMISSION;
+            }
+
             else {
                 updateMessage("Deleting was not successful");
                 return TaskState.NOT_SUCCESSFUL;

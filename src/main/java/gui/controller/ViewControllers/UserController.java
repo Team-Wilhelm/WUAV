@@ -23,6 +23,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Window;
+import utils.permissions.AccessChecker;
 
 import java.io.IOException;
 import java.net.URL;
@@ -47,6 +48,7 @@ public class UserController extends ViewController<User> implements Initializabl
     private ObservableList<UserCard> userCards = FXCollections.observableArrayList();
     private final UserModel userModel = UserModel.getInstance();
     private UserCard lastFocusedCard;
+    private AccessChecker checker = new AccessChecker();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -149,8 +151,13 @@ public class UserController extends ViewController<User> implements Initializabl
 
     @FXML
     private void addEmployeeAction(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
-        AddUserController controller = loader.getController();
-        controller.setUserController(this);
+            FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
+            AddUserController controller = loader.getController();
+            controller.setUserController(this);
+    }
+
+    private Window getWindow() {
+        Window window = btnAddEmployee.getScene().getWindow();
+        return window;
     }
 }

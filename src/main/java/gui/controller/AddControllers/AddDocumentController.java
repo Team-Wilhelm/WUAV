@@ -97,8 +97,8 @@ public class AddDocumentController extends AddController<Document> implements In
 
     // Document and customer information
     private UUID temporaryId;
-    private String city, country, email, houseNumber, jobTitle, name, phoneNumber, postcode, streetName;
-    private String jobDescription, notes;
+    private String city, country, email, houseNumber, name, phoneNumber, postcode, streetName;
+    private String jobDescription, jobTitle, notes;
     private CustomerType customerType;
     private Date lastContract;
     private List<User> technicians;
@@ -138,6 +138,9 @@ public class AddDocumentController extends AddController<Document> implements In
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
         btnSave.disableProperty().bind(isInputChanged.not());
         btnDelete.disableProperty().bind(isEditing.not());
+
+        txtJobDescription.setWrapText(true);
+        txtNotes.setWrapText(true);
 
         addTooltips();
 
@@ -206,7 +209,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @FXML
     private void deleteAction(ActionEvent actionEvent) {
-        Optional<ButtonType> result = alertManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", txtName.getScene().getWindow());
+        Optional<ButtonType> result = alertManager.showConfirmation("Delete document", "Are you sure you want to delete this document?", txtName.getScene().getWindow());
         if (result.isPresent() && result.get().equals(ButtonType.OK)) {
             Task<TaskState> deleteTask = new DeleteTask<>(documentToEdit.getDocumentID(), documentModel);
             setUpDeleteTask(deleteTask, documentController, txtName.getScene().getWindow());
