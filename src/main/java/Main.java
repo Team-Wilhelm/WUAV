@@ -25,8 +25,9 @@ public class Main extends Application {
         if (!true)
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
         else {
+            //TODO change back
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.ADD_DOCUMENT_SCENE)));
-            primaryStage.setMaximized(true);
+            //primaryStage.setMaximized(true);
         }
 
         primaryStage.setTitle("WUAV Documentation Management System");

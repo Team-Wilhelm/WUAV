@@ -142,7 +142,7 @@ public class AddDocumentController extends AddController<Document> implements In
         addTooltips();
 
         gridPaneJob.getChildren().remove(txtJobDescription);
-        gridPaneJob.add(new TextAreaWithFloatingText("Job description"), 1, 1);
+        gridPaneJob.add(new TextAreaWithFloatingText("Job description"), 0, 1, 4, 2);
     }
 
     @FXML

@@ -163,35 +163,44 @@
     -mfx-main: dark-blue-grey;
 }
 
-.text-area {
+/************************************************************
+ * Floating Text Area
+ ************************************************************/
+
+.text-area-with-floating-text .text-area {
     /* TODO Remove the outer border */
-    -fx-highlight-fill: #d8eaf8; /* Selected text highlight */
-    -fx-highlight-text-fill: black; /* Selected text color */
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
     -fx-border-style: none;
     -fx-background-radius: 0;
     -fx-border-radius: 0;
+    -fx-background-color: -fx-control-inner-background;
 }
 
-.text-area .content {
-    -fx-background-color: white;
+.text-area-with-floating-text .text-area .content {
+    -fx-highlight-fill: #d8eaf8; /* Selected text highlight */
+    -fx-highlight-text-fill: black; /* Selected text color */
+    -fx-border-style: none;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-font-family: "Open Sans Regular";
+    -fx-background-color: -fx-control-inner-background;
+    -fx-border-color: red;
+}
+
+.text-area-with-floating-text {
+    fx-background-color: white;
     -fx-border-color: lightgray;
     -fx-background-radius: 5;
     -fx-border-radius: 5;
     -fx-padding: 5;
-    -fx-font-family: "Open Sans Regular";
 }
 
-.text-area:focused .content {
+.text-area-with-floating-text:focused {
     -fx-background-insets: 2;
     -fx-border-width: 2;
     -fx-border-color: dark-blue-grey;
     -fx-border-insets: -0.5;
-}
-
-.text-area .text {
-    -fx-font-smoothing-type: lcd;
 }
 
 
