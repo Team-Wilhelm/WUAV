@@ -190,10 +190,12 @@
 
 .text-area-with-floating-text {
     fx-background-color: white;
-    -fx-border-color: lightgray;
     -fx-background-radius: 5;
     -fx-border-radius: 5;
-    -fx-padding: 5;
+}
+
+.text-area-with-floating-text .floating-label {
+    -fx-font-family: "Open Sans Regular";
 }
 
 
