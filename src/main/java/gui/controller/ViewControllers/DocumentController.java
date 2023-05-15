@@ -15,7 +15,6 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
@@ -23,9 +22,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import gui.util.AlertManager;
 import javafx.stage.Window;
-import utils.permissions.Checker;
-import utils.permissions.RequiresPermission;
-import javafx.stage.Stage;
+import utils.permissions.AccessChecker;
 
 import java.io.IOException;
 import java.net.URL;
@@ -48,7 +45,7 @@ public class DocumentController extends ViewController<Document> implements Init
     private ObservableList<Document> documentList = FXCollections.observableArrayList();
     private final DocumentModel documentModel = DocumentModel.getInstance();
     private DocumentCard lastFocusedCard;
-    private Checker checker = new Checker();
+    private AccessChecker checker = new AccessChecker();
 
     public DocumentController() {}
 

@@ -23,8 +23,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Window;
-import utils.permissions.Checker;
-import utils.permissions.RequiresPermission;
+import utils.permissions.AccessChecker;
 
 import java.io.IOException;
 import java.net.URL;
@@ -49,7 +48,7 @@ public class UserController extends ViewController<User> implements Initializabl
     private ObservableList<UserCard> userCards = FXCollections.observableArrayList();
     private final UserModel userModel = UserModel.getInstance();
     private UserCard lastFocusedCard;
-    private Checker checker = new Checker();
+    private AccessChecker checker = new AccessChecker();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

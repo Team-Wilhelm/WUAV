@@ -40,7 +40,12 @@ public class SaveTask<T> extends Task<TaskState> {
             if (message.equals("saved") || message.equals("updated")) {
                 updateMessage("Saved successfully");
                 return TaskState.SUCCESSFUL;
-            } else {
+            }
+            else if (message.equals("No Permission")){
+                return TaskState.NO_PERMISSION;
+            }
+
+            else {
                 updateMessage("Saving was not successful");
                 return TaskState.NOT_SUCCESSFUL;
             }

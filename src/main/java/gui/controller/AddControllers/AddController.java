@@ -33,7 +33,11 @@ public abstract class AddController<T> {
                     }
                 } else if (task.getValue() == TaskState.DUPLICATE_DATA) {
                     alertManager.showError("Username already exists!", "Username already exists!", owner);
-                } else {
+                }
+                else if (task.getValue() == TaskState.NO_PERMISSION){
+                    alertManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
+                }
+                else {
                     alertManager.showError("Oops...", "Something went wrong!", owner);
                 }
             });
@@ -99,7 +103,13 @@ public abstract class AddController<T> {
 
             if (task.getValue() == TaskState.SUCCESSFUL) {
                 viewController.refreshItems();
-            } else {
+            }
+
+            else if (task.getValue() == TaskState.NO_PERMISSION){
+                alertManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
+            }
+
+            else {
                 alertManager.showError("Oops...", "Something went wrong!", owner);
             }
         });

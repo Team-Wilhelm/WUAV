@@ -112,7 +112,6 @@ public class PdfGenerator {
                 }
                 if (checkboxWrapper.getProperty() == DocumentPropertyType.NOTES) {
                     doc.add(notes);
-                    doc.add(lineBreak3);
                 } if (checkboxWrapper.getProperty() == DocumentPropertyType.TECHNICIANS) {
                     Paragraph technicianList = new Paragraph(document.getTechnicianNames());
                     doc.add(technicianList);
