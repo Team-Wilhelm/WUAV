@@ -136,7 +136,8 @@ public class DocumentController extends ViewController<Document> implements Init
         refreshItems(List.copyOf(documentModel.getAll().values()));
     }
 
-    public void addDocumentAction() throws IOException {
+    @FXML
+    private void addDocumentAction() throws IOException {
         ((AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController()).setDocumentController(this);
     }
 
