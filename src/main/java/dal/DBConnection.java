@@ -16,11 +16,18 @@ public class DBConnection {
     private final List<Connection> usedConnections = new ArrayList<>();
 
     private DBConnection() {
-        ds.setServerName("wuaveasv.database.windows.net");
-        ds.setDatabaseName("school");
+        //ds.setServerName("wuaveasv.database.windows.net");
+        //ds.setDatabaseName("school");
+        //ds.setPortNumber(1433);
+        //ds.setUser("mazur");
+        //ds.setPassword("P@ssw0rd.+");
+        //ds.setTrustServerCertificate(true);
+
+        ds.setServerName("10.176.111.34");
+        ds.setDatabaseName("CSe22B_WUAV_Wilhelm");
         ds.setPortNumber(1433);
-        ds.setUser("mazur");
-        ds.setPassword("P@ssw0rd.+");
+        ds.setUser("CSe2022B_e_16");
+        ds.setPassword("CSe2022BE16#");
         ds.setTrustServerCertificate(true);
     }
 
