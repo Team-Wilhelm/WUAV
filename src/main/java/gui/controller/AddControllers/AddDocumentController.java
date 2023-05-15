@@ -106,6 +106,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private Date lastContract;
     private List<User> technicians;
     private BooleanProperty isInputChanged, isEditing;
+    private boolean hasAccess = false;
     private Customer customer;
 
     public AddDocumentController() {
@@ -224,14 +225,16 @@ public class AddDocumentController extends AddController<Document> implements In
     }
 
     public void assignUserToDocument(User technician) {
-        if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
-            technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
-            technicians.add(technician);
-            documentModel.assignUserToDocument(technician, documentToEdit, true);
-        } else {
-            technician.getAssignedDocuments().remove(documentToEdit.getDocumentID());
-            technicians.remove(technician);
-            documentModel.assignUserToDocument(technician, documentToEdit, false);
+        if (documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())) {
+            if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
+                technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
+                technicians.add(technician);
+                documentModel.assignUserToDocument(technician, documentToEdit, true);
+            } else {
+                technician.getAssignedDocuments().remove(documentToEdit.getDocumentID());
+                technicians.remove(technician);
+                documentModel.assignUserToDocument(technician, documentToEdit, false);
+            }
         }
     }
 
@@ -642,7 +645,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private void populateComboBox() {
         allTechnicians.clear();
         allTechnicians.setAll(UserModel.getInstance().getAll().values().stream().filter(user ->
-                user.getUserRole() == UserRole.TECHNICIAN).collect(Collectors.toList()));
+                user.getUserRole() == UserRole.TECHNICIAN && !user.equals(UserModel.getLoggedInUser())).collect(Collectors.toList()));
         comboTechnicians.setItems(allTechnicians);
     }
 
@@ -711,6 +714,27 @@ public class AddDocumentController extends AddController<Document> implements In
     @Override
     public void update(Observable<ImagePreview> o, ImagePreview arg) {
         isInputChanged.setValue(true);
+    }
+
+    public void setVisibilityForUserRole() {
+        UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
+        if(loggedInUserRole == UserRole.ADMINISTRATOR
+                || loggedInUserRole == UserRole.PROJECT_MANAGER
+                || documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())){
+            hasAccess = true;
+        }
+        gridPaneJob.getChildren().stream().filter(node -> node instanceof MFXTextField).forEach(node -> {
+            ((MFXTextField) node).setEditable(hasAccess);
+        });
+        gridPaneCustomer.getChildren().stream().filter(node -> node instanceof MFXTextField).forEach(node -> {
+            ((MFXTextField) node).setEditable(hasAccess);
+        });
+        txtJobDescription.setEditable(hasAccess);
+        txtNotes.setEditable(hasAccess);
+        btnDelete.setVisible(hasAccess);
+        btnUploadPictures.setVisible(hasAccess);
+        btnSave.setVisible(hasAccess);
+        //TODO restrict context menu to hasAccess
     }
     // endregion
 }
