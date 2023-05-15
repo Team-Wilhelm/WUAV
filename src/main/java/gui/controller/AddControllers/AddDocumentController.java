@@ -4,8 +4,7 @@ import be.*;
 import be.enums.DocumentPropertyType;
 import be.interfaces.Observable;
 import be.interfaces.Observer;
-import gui.nodes.DocumentPropertyCheckboxWrapper;
-import gui.nodes.ImagePreview;
+import gui.nodes.*;
 import be.enums.CustomerType;
 import be.enums.UserRole;
 import bll.PdfGenerator;
@@ -13,12 +12,10 @@ import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
 import gui.model.UserModel;
-import gui.nodes.MFXTextFieldWithAutofill;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
-import gui.nodes.DocumentPropertiesList;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.application.Platform;
@@ -143,6 +140,9 @@ public class AddDocumentController extends AddController<Document> implements In
         btnDelete.disableProperty().bind(isEditing.not());
 
         addTooltips();
+
+        gridPaneJob.getChildren().remove(txtJobDescription);
+        gridPaneJob.add(new TextAreaWithFloatingText("Job description"), 1, 1);
     }
 
     @FXML

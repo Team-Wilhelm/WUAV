@@ -64,9 +64,7 @@
     -fx-background-image: url("/img/loginImage.png");
     -fx-background-size: cover;
     -fx-background-position-x: center;
-
 }
-
 
 .cardImage {
     -fx-background-image: url("https://whatfix.com/blog/wp-content/uploads/2021/09/Technical-Documentation-Guide-Whatfix.jpeg");
@@ -164,3 +162,36 @@
 .mfx-checkbox {
     -mfx-main: dark-blue-grey;
 }
+
+.text-area {
+    /* TODO Remove the outer border */
+    -fx-highlight-fill: #d8eaf8; /* Selected text highlight */
+    -fx-highlight-text-fill: black; /* Selected text color */
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-border-style: none;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.text-area .content {
+    -fx-background-color: white;
+    -fx-border-color: lightgray;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-padding: 5;
+    -fx-font-family: "Open Sans Regular";
+}
+
+.text-area:focused .content {
+    -fx-background-insets: 2;
+    -fx-border-width: 2;
+    -fx-border-color: dark-blue-grey;
+    -fx-border-insets: -0.5;
+}
+
+.text-area .text {
+    -fx-font-smoothing-type: lcd;
+}
+
+
