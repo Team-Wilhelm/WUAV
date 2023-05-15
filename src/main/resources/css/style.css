@@ -75,6 +75,26 @@
     -fx-background-radius: 5px;
 }
 
+.mfx-rectangle-toggle-node {
+    -fx-background-color: TRANSPARENT;
+    -fx-pref-height: 60;
+    -fx-border-width: 0;
+    -fx-max-height: 60;
+    -fx-pref-width: 85;
+}
+
+.mfx-rectangle-toggle-node:selected {
+    -fx-background-color: rgb(222,180,12);
+    -fx-background-radius: 5;
+    -fx-border-width: 0;
+    -fx-border-radius: 5;
+}
+
+.toolBox .label{
+    -fx-font-weight: bold;
+    -fx-font-size: 16;
+}
+
 
 /*Removal of default materialFX purple colour*/
 .mfx-text-field {

@@ -12,15 +12,15 @@ import java.util.List;
 public class DBConnection {
     private final SQLServerDataSource ds = new SQLServerDataSource();
     private static DBConnection instance;
-    private Deque<Connection> connectionPool = new ArrayDeque<>();
-    private List<Connection> usedConnections = new ArrayList<>();
+    private final Deque<Connection> connectionPool = new ArrayDeque<>();
+    private final List<Connection> usedConnections = new ArrayList<>();
 
     private DBConnection() {
-        ds.setServerName("10.176.111.34");
-        ds.setDatabaseName("CSe22B_WUAV_Wilhelm");
+        ds.setServerName("wuaveasv.database.windows.net");
+        ds.setDatabaseName("school");
         ds.setPortNumber(1433);
-        ds.setUser("CSe2022B_e_16");
-        ds.setPassword("CSe2022BE16#");
+        ds.setUser("mazur");
+        ds.setPassword("P@ssw0rd.+");
         ds.setTrustServerCertificate(true);
     }
 
