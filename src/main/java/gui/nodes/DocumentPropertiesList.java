@@ -6,6 +6,7 @@ import be.enums.DocumentPropertyType;
 import io.github.palexdev.materialfx.controls.MFXCheckbox;
 import io.github.palexdev.materialfx.controls.MFXToggleButton;
 import javafx.event.ActionEvent;
+import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,13 +17,15 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
+import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ResourceBundle;
 
-public class DocumentPropertiesList extends GridPane {
+public class DocumentPropertiesList extends GridPane implements Initializable {
     private Document document;
     private ColumnConstraints colLabel, colValue, colCheckbox;
     private MFXToggleButton toggleAll;
@@ -61,11 +64,13 @@ public class DocumentPropertiesList extends GridPane {
         });
         add(toggleAll, 2, 0);
 
-        // Toggle all checkboxes by default
-        //TODO idk why not working
-        toggleAll.fire();
-
         displayProperties();
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // Toggle all checkboxes by default
+        toggleAll.fire();
     }
 
     private void displayProperties() {

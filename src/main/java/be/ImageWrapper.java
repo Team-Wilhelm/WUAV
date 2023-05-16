@@ -21,8 +21,6 @@ public class ImageWrapper {
         this.imagePreview = new ImagePreview(this);
     }
 
-    //TODO add description to constructor
-
     public String getUrl() {
         return url;
     }

@@ -18,6 +18,10 @@
     -fx-text-fill: dark-blue-grey;
 }
 
+.menu-button {
+    -fx-border-color: transparent;
+}
+
 .mfx-button{
     -fx-background-color: white;
     -fx-border-color: dark-blue-grey;

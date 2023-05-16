@@ -44,8 +44,6 @@ public class AddUserController extends AddController<User> implements Initializa
     @FXML
     private MFXComboBox<UserRole> comboPosition;
     @FXML
-    private MFXListView<Document> listViewDocuments;
-    @FXML
     private MFXButton btnSave, btnDelete, btnEdit;
 
     private final UserModel userModel;
@@ -205,7 +203,6 @@ public class AddUserController extends AddController<User> implements Initializa
         txtUsername.setText(user.getUsername());
         txtPassword.setPromptText("Leave empty to keep current password");
         comboPosition.getSelectionModel().selectItem(user.getUserRole());
-        listViewDocuments.getItems().setAll(user.getAssignedDocuments().values());
         imgProfilePicture.setImage(user.getProfilePicture());
         profilePicturePath = user.getProfilePicturePath();
     }

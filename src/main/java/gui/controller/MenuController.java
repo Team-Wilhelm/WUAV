@@ -31,10 +31,9 @@ public class MenuController implements Initializable {
         try {
             documentView = documentLoader.load();
             employeeView = employeeLoader.load();
-            canvasView = canvasLoader.load();
             documentController = documentLoader.getController();
             userController = employeeLoader.getController();
-
+            canvasView = canvasLoader.load();
             currentScene = documentView;
             gridPane.add(currentScene, 2, 0, 1,gridPane.getRowCount());
         } catch (Exception e) {
@@ -68,6 +67,4 @@ public class MenuController implements Initializable {
         documentController.setVisibilityForUserRole();
         userController.setVisibilityForUserRole();
     }
-
-
 }

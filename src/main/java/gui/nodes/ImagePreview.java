@@ -1,21 +1,16 @@
 package gui.nodes;
 
 import be.ImageWrapper;
-import be.interfaces.Observable;
 import be.interfaces.Observer;
 import io.github.palexdev.materialfx.controls.MFXContextMenu;
 import io.github.palexdev.materialfx.controls.MFXContextMenuItem;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.Background;
@@ -35,8 +30,7 @@ public class ImagePreview extends VBox {
     private Tooltip tooltip;
     private MFXContextMenu contextMenu;
     private EventHandler<ActionEvent> onDeleteAction, onAddDescriptionAction;
-    private MFXContextMenuItem deleteItem, addDescriptionItem, editDescriptionItem;
-    private BooleanProperty isDescriptionChanged;
+    private MFXContextMenuItem deleteItem, addDescriptionItem, seeDescriptionItem;
 
     public ImagePreview(ImageWrapper imageWrapper) {
         super(10);
@@ -67,24 +61,9 @@ public class ImagePreview extends VBox {
                 .then(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, null)))
                 .otherwise(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, null))));
 
-        tooltip = new Tooltip("Right click for more options\nPress Delete to remove image");
+        tooltip = new Tooltip("Right click for more options");
         Tooltip.install(this, tooltip);
-
         setUpContextMenu();
-    }
-
-    public ImageWrapper getImageWrapper() {
-        return imageWrapper;
-    }
-
-    public void setOnDelete(EventHandler<ActionEvent> onDeleteAction) {
-        this.onDeleteAction = onDeleteAction;
-        deleteItem.setOnAction(onDeleteAction);
-    }
-
-    public void setOnAddDescription(EventHandler<ActionEvent> onAddDescriptionAction) {
-        this.onAddDescriptionAction = onAddDescriptionAction;
-        addDescriptionItem.setOnAction(onAddDescriptionAction);
     }
 
     private void setUpContextMenu() {
@@ -97,12 +76,11 @@ public class ImagePreview extends VBox {
                 .setAccelerator("Delete")
                 .setIcon(new MFXFontIcon("fas-delete-left", 16))
                 .get();
-
         addDescriptionItem = MFXContextMenuItem.Builder.build()
                 .setText("Add description")
                 .setAccelerator("Ctrl + E")
                 .setOnAction(event -> {
-                    openDescriptionDialogue();
+                    openAddDescriptionDialogue();
                 })
                 .get();
 
@@ -117,12 +95,12 @@ public class ImagePreview extends VBox {
 
         this.setOnKeyPressed(e -> {
             if (e.isControlDown() && e.getCode().equals(KeyCode.E)) {
-                openDescriptionDialogue();
+                openAddDescriptionDialogue();
             }
         });
     }
 
-    public void openDescriptionDialogue() {
+    public void openAddDescriptionDialogue() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add description");
         dialog.setHeaderText("Add a description to the image");
@@ -131,6 +109,51 @@ public class ImagePreview extends VBox {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(imageWrapper::setDescription);
         notifyObservers(observable, this);
+    }
+
+    public void openSeeDescriptionDialogue() {
+        Dialog<String> dialog = new Dialog<>();
+        ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().add(type);
+        dialog.setTitle("See description");
+        dialog.setHeaderText("See the description of the image");
+        String description = imageWrapper.getDescription() == null ? "No description" : imageWrapper.getDescription();
+        dialog.setContentText("Description:\n" + description);
+        dialog.showAndWait();
+    }
+
+    public void makeContextMenuNotEditable() {
+        contextMenu.getItems().clear();
+        contextMenu.minWidthProperty().unbind();
+        seeDescriptionItem = MFXContextMenuItem.Builder.build()
+                .setText("See description")
+                .setAccelerator("Ctrl + E")
+                .setOnAction(event -> {
+                    openSeeDescriptionDialogue();
+                })
+                .get();
+        contextMenu.getItems().addAll(seeDescriptionItem);
+        contextMenu.minWidthProperty().bind(seeDescriptionItem.widthProperty().add(10));
+
+        this.setOnKeyPressed(e -> {
+            if (e.isControlDown() && e.getCode().equals(KeyCode.E)) {
+                openSeeDescriptionDialogue();
+            }
+        });
+    }
+
+    public void setOnDelete(EventHandler<ActionEvent> onDeleteAction) {
+        this.onDeleteAction = onDeleteAction;
+        deleteItem.setOnAction(onDeleteAction);
+    }
+
+    public void setOnAddDescription(EventHandler<ActionEvent> onAddDescriptionAction) {
+        this.onAddDescriptionAction = onAddDescriptionAction;
+        addDescriptionItem.setOnAction(onAddDescriptionAction);
+    }
+
+    public ImageWrapper getImageWrapper() {
+        return imageWrapper;
     }
 
     // Observer pattern implementation
@@ -144,5 +167,13 @@ public class ImagePreview extends VBox {
 
     protected void notifyObservers(ImagePreviewObservable observable, ImagePreview arg) {
         observer.update(observable, arg);
+    }
+
+    public void openDescriptionDialogue(boolean hasAccess) {
+        if (hasAccess) {
+            openAddDescriptionDialogue();
+        } else {
+            openSeeDescriptionDialogue();
+        }
     }
 }

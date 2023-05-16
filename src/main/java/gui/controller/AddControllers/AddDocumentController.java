@@ -31,7 +31,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.FlowPane;
@@ -70,13 +69,11 @@ public class AddDocumentController extends AddController<Document> implements In
     @FXML
     private MFXTextField txtCity, txtCountry, txtEmail, txtHouseNumber, txtJobTitle, txtPhoneNumber, txtPostcode, txtStreetName;
     @FXML
-    private TextArea txtJobDescription, txtNotes;
-    @FXML
     private MFXToggleButton toggleCustomerType;
     @FXML
     private MFXDatePicker dateLastContract;
+    private TextAreaWithFloatingText txtJobDescription, txtNotes;
     private MFXTextFieldWithAutofill txtName;
-    private MFXContextMenu contextMenu;
     private DocumentPropertiesList propertiesList;
 
     private DocumentModel documentModel;
@@ -120,6 +117,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        swapTextAreas();
         btnNextJobTab.setDisable(true);
         btnNextCustomerTab.setDisable(true);
         customerInformationTab.setDisable(true);
@@ -137,13 +135,7 @@ public class AddDocumentController extends AddController<Document> implements In
         btnSave.disableProperty().bind(isInputChanged.not());
         btnDelete.disableProperty().bind(isEditing.not());
 
-        txtJobDescription.setWrapText(true);
-        txtNotes.setWrapText(true);
-
         addTooltips();
-
-        gridPaneJob.getChildren().remove(txtJobDescription);
-        gridPaneJob.add(new TextAreaWithFloatingText("Job description"), 0, 1, 4, 2);
     }
 
     @FXML
@@ -193,6 +185,7 @@ public class AddDocumentController extends AddController<Document> implements In
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
+        technicians.forEach(technician -> technician.addDocument(currentDocument));
 
         if (isEditing.get()) {
             currentDocument.setDocumentID(documentToEdit.getDocumentID());
@@ -202,6 +195,8 @@ public class AddDocumentController extends AddController<Document> implements In
         setUpSaveTask(task, documentController, txtCity.getScene().getWindow(), this);
         executorService.execute(task);
 
+        System.out.println(Arrays.toString(currentDocument.getTechnicians().toArray()));
+        System.out.println(Arrays.toString(UserModel.getLoggedInUser().getAssignedDocuments().values().toArray()));
         pdfTab.setDisable(false);
     }
 
@@ -250,7 +245,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private final ChangeListener<String> jobInputListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            boolean isNotFilled = isInputEmpty(txtJobTitle) || isInputEmpty(txtJobDescription);
+            boolean isNotFilled = isInputEmpty(txtJobTitle) || isInputEmpty(txtJobDescription.getTextArea());
             btnNextJobTab.setDisable(isNotFilled);
             customerInformationTab.setDisable(isNotFilled);
         }
@@ -310,8 +305,7 @@ public class AddDocumentController extends AddController<Document> implements In
             if (!technicians.contains(newValue)) {
                 newValue.getAssignedDocuments().put(temporaryId, documentToEdit);
                 technicians.add(newValue);
-            }
-            else if (!newValue.equals(UserModel.getLoggedInUser())) {
+            } else if (!newValue.equals(UserModel.getLoggedInUser())) {
                 technicians.remove(newValue);
                 newValue.getAssignedDocuments().remove(temporaryId);
             }
@@ -465,7 +459,7 @@ public class AddDocumentController extends AddController<Document> implements In
                     imagePreviews.remove(imagePreview);
                     pictures.remove(image);
                 } if (e.isControlDown() && e.getCode().equals(KeyCode.E)) {
-                    imagePreview.openDescriptionDialogue();
+                    imagePreview.openDescriptionDialogue(hasAccess);
                 }
             });
 
@@ -709,6 +703,15 @@ public class AddDocumentController extends AddController<Document> implements In
         });
     }
 
+    private void swapTextAreas() {
+        gridPaneJob.getChildren().remove(gridPaneJob.lookup("#txtJobDescription"));
+        gridPaneJob.getChildren().remove(gridPaneJob.lookup("#txtNotes"));
+        txtJobDescription = new TextAreaWithFloatingText("Job description");
+        txtNotes = new TextAreaWithFloatingText("Notes");
+        gridPaneJob.add(txtJobDescription, 0, 1, 4, 3);
+        gridPaneJob.add(txtNotes, 0, 4, 4, 2);
+    }
+
     @Override
     public void update(Observable<ImagePreview> o, ImagePreview arg) {
         isInputChanged.setValue(true);
@@ -736,7 +739,9 @@ public class AddDocumentController extends AddController<Document> implements In
         btnDelete.setVisible(hasAccess);
         btnUploadPictures.setVisible(hasAccess);
         btnSave.setVisible(hasAccess);
-        //TODO restrict context menu to hasAccess
+
+        if (!hasAccess)
+            imagePreviews.forEach(ImagePreview::makeContextMenuNotEditable);
     }
     // endregion
 }
