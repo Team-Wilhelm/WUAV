@@ -39,8 +39,8 @@
                 </rowConstraints>
                 <children>
                     <MFXTextField fx:id="txtJobTitle" floatingText="Job title" maxWidth="1.7976931348623157E308" GridPane.columnSpan="2" />
-                    <TextArea fx:id="txtJobDescription" prefHeight="200.0" prefWidth="200.0" promptText="Job description" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.rowSpan="3" />
-                    <TextArea fx:id="txtNotes" prefHeight="200.0" prefWidth="200.0" promptText="Notes" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" GridPane.rowSpan="2" />
+                    <TextArea fx:id="txtJobDescription" prefHeight="200.0" prefWidth="200.0" promptText="Job description" wrapText="true" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.rowSpan="3" />
+                    <TextArea fx:id="txtNotes" prefHeight="200.0" prefWidth="200.0" promptText="Notes" wrapText="true" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" GridPane.rowSpan="2" />
                     <MFXFilterComboBox fx:id="comboTechnicians" floatingText="Assign technicians" maxWidth="1.7976931348623157E308" selectable="true" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
                     <MFXButton fx:id="btnDelete" maxWidth="1.7976931348623157E308" onAction="#deleteAction" text="Delete" GridPane.rowIndex="7">
                         <GridPane.margin>

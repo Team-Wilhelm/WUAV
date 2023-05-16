@@ -3,8 +3,7 @@ package gui.controller.AddControllers;
 import be.*;
 import be.interfaces.Observable;
 import be.interfaces.Observer;
-import gui.nodes.DocumentPropertyCheckboxWrapper;
-import gui.nodes.ImagePreview;
+import gui.nodes.*;
 import be.enums.CustomerType;
 import be.enums.UserRole;
 import bll.PdfGenerator;
@@ -12,12 +11,10 @@ import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
 import gui.model.UserModel;
-import gui.nodes.MFXTextFieldWithAutofill;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
-import gui.nodes.DocumentPropertiesList;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -143,6 +140,9 @@ public class AddDocumentController extends AddController<Document> implements In
         txtNotes.setWrapText(true);
 
         addTooltips();
+
+        gridPaneJob.getChildren().remove(txtJobDescription);
+        gridPaneJob.add(new TextAreaWithFloatingText("Job description"), 0, 1, 4, 2);
     }
 
     @FXML
