@@ -49,9 +49,19 @@
             <version>7.0.4</version>
             <type>pom</type>
         </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>1.8.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.8.9</version>
+        </dependency>
+
 
     </dependencies>
-
 
 
     <build>
@@ -95,6 +105,31 @@
                 <plugin>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>3.0.0</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>aspectj-maven-plugin</artifactId>
+                    <version>1.14.0</version>
+                    <configuration>
+                        <complianceLevel>1.8</complianceLevel>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <showWeaveInfo>true</showWeaveInfo>
+                        <verbose>true</verbose>
+                        <Xlint>ignore</Xlint>
+                        <encoding>UTF-8 </encoding>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <!-- use this goal to weave all your main classes -->
+                                <goal>compile</goal>
+                                <!-- use this goal to weave all your test classes -->
+                                <goal>test-compile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

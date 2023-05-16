@@ -1,6 +1,7 @@
 package gui.controller.ViewControllers;
 
 import be.User;
+import be.enums.UserRole;
 import gui.nodes.UserCard;
 import gui.SceneManager;
 import gui.controller.AddControllers.AddUserController;
@@ -11,6 +12,8 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -23,6 +26,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Window;
+import utils.permissions.AccessChecker;
 
 import java.io.IOException;
 import java.net.URL;
@@ -47,6 +51,8 @@ public class UserController extends ViewController<User> implements Initializabl
     private ObservableList<UserCard> userCards = FXCollections.observableArrayList();
     private final UserModel userModel = UserModel.getInstance();
     private UserCard lastFocusedCard;
+    private boolean hasAccess = false;
+    private AccessChecker checker = new AccessChecker();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -134,6 +140,7 @@ public class UserController extends ViewController<User> implements Initializabl
                 AddUserController controller = loader.getController();
                 controller.setUserController(this);
                 controller.setIsEditing(lastFocusedCard.getUser());
+                controller.setVisibilityForUserRole();
             } catch (Exception e) {
                e.printStackTrace();
             }
@@ -149,8 +156,16 @@ public class UserController extends ViewController<User> implements Initializabl
 
     @FXML
     private void addEmployeeAction(ActionEvent actionEvent) throws IOException {
-        FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
-        AddUserController controller = loader.getController();
-        controller.setUserController(this);
+            FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
+            AddUserController controller = loader.getController();
+            controller.setUserController(this);
+    }
+
+    public void setVisibilityForUserRole() {
+        UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
+        if(loggedInUserRole == UserRole.ADMINISTRATOR){
+            hasAccess = true;
+        }
+        btnAddEmployee.setVisible(hasAccess);
     }
 }

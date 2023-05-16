@@ -1,11 +1,9 @@
 package gui.controller.AddControllers;
 
 import be.*;
-import be.enums.DocumentPropertyType;
 import be.interfaces.Observable;
 import be.interfaces.Observer;
-import gui.nodes.DocumentPropertyCheckboxWrapper;
-import gui.nodes.ImagePreview;
+import gui.nodes.*;
 import be.enums.CustomerType;
 import be.enums.UserRole;
 import bll.PdfGenerator;
@@ -13,15 +11,11 @@ import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
 import gui.model.UserModel;
-import gui.nodes.MFXTextFieldWithAutofill;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
-import gui.nodes.DocumentPropertiesList;
 import io.github.palexdev.materialfx.controls.*;
-import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -47,7 +41,6 @@ import javafx.util.Duration;
 import javafx.util.StringConverter;
 import utils.BlobService;
 import utils.ThreadPool;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
@@ -96,12 +89,13 @@ public class AddDocumentController extends AddController<Document> implements In
     private AlertManager alertManager;
     private ObservableList<User> allTechnicians;
     private final ThreadPool executorService;
+    private boolean hasAccess = false;
     private ImagePreview lastFocused;
 
     // Document and customer information
     private UUID temporaryId;
-    private String city, country, email, houseNumber, jobTitle, name, phoneNumber, postcode, streetName;
-    private String jobDescription, notes;
+    private String city, country, email, houseNumber, name, phoneNumber, postcode, streetName;
+    private String jobDescription, jobTitle, notes;
     private CustomerType customerType;
     private Date lastContract;
     private List<User> technicians;
@@ -142,7 +136,13 @@ public class AddDocumentController extends AddController<Document> implements In
         btnSave.disableProperty().bind(isInputChanged.not());
         btnDelete.disableProperty().bind(isEditing.not());
 
+        txtJobDescription.setWrapText(true);
+        txtNotes.setWrapText(true);
+
         addTooltips();
+
+        gridPaneJob.getChildren().remove(txtJobDescription);
+        gridPaneJob.add(new TextAreaWithFloatingText("Job description"), 0, 1, 4, 2);
     }
 
     @FXML
@@ -206,7 +206,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @FXML
     private void deleteAction(ActionEvent actionEvent) {
-        Optional<ButtonType> result = alertManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", txtName.getScene().getWindow());
+        Optional<ButtonType> result = alertManager.showConfirmation("Delete document", "Are you sure you want to delete this document?", txtName.getScene().getWindow());
         if (result.isPresent() && result.get().equals(ButtonType.OK)) {
             Task<TaskState> deleteTask = new DeleteTask<>(documentToEdit.getDocumentID(), documentModel);
             setUpDeleteTask(deleteTask, documentController, txtName.getScene().getWindow());
@@ -221,14 +221,16 @@ public class AddDocumentController extends AddController<Document> implements In
     }
 
     public void assignUserToDocument(User technician) {
-        if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
-            technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
-            technicians.add(technician);
-            documentModel.assignUserToDocument(technician, documentToEdit, true);
-        } else {
-            technician.getAssignedDocuments().remove(documentToEdit.getDocumentID());
-            technicians.remove(technician);
-            documentModel.assignUserToDocument(technician, documentToEdit, false);
+        if (documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())) {
+            if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
+                technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
+                technicians.add(technician);
+                documentModel.assignUserToDocument(technician, documentToEdit, true);
+            } else {
+                technician.getAssignedDocuments().remove(documentToEdit.getDocumentID());
+                technicians.remove(technician);
+                documentModel.assignUserToDocument(technician, documentToEdit, false);
+            }
         }
     }
 
@@ -291,7 +293,7 @@ public class AddDocumentController extends AddController<Document> implements In
      * Assigns the user to the document in the database.
      */
     private final ChangeListener<User> technicianListenerIsEditing = (observable, oldValue, newValue) -> {
-        if (newValue != null) {
+        if (newValue != null && !newValue.equals(UserModel.getLoggedInUser())) {
             assignUserToDocument(newValue);
             comboTechnicians.getSelectionModel().clearSelection();
             populateComboBox();
@@ -304,10 +306,11 @@ public class AddDocumentController extends AddController<Document> implements In
      */
     private final ChangeListener<User> technicianListenerNotEditing = (observable, oldValue, newValue) -> {
         if (newValue != null) {
-            if (!technicians.contains(newValue)) {
+            if (!technicians.contains(newValue) && !newValue.equals(UserModel.getLoggedInUser())) {
                 newValue.getAssignedDocuments().put(temporaryId, documentToEdit);
                 technicians.add(newValue);
-            } else {
+            }
+            else if (!newValue.equals(UserModel.getLoggedInUser())) {
                 technicians.remove(newValue);
                 newValue.getAssignedDocuments().remove(temporaryId);
             }
@@ -708,6 +711,27 @@ public class AddDocumentController extends AddController<Document> implements In
     @Override
     public void update(Observable<ImagePreview> o, ImagePreview arg) {
         isInputChanged.setValue(true);
+    }
+
+    public void setVisibilityForUserRole() {
+        UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
+        if(loggedInUserRole == UserRole.ADMINISTRATOR
+                || loggedInUserRole == UserRole.PROJECT_MANAGER
+                || documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())){
+            hasAccess = true;
+        }
+        gridPaneJob.getChildren().stream().filter(node -> node instanceof MFXTextField).forEach(node -> {
+            ((MFXTextField) node).setEditable(hasAccess);
+        });
+        gridPaneCustomer.getChildren().stream().filter(node -> node instanceof MFXTextField).forEach(node -> {
+            ((MFXTextField) node).setEditable(hasAccess);
+        });
+        txtJobDescription.setEditable(hasAccess);
+        txtNotes.setEditable(hasAccess);
+        btnDelete.setVisible(hasAccess);
+        btnUploadPictures.setVisible(hasAccess);
+        btnSave.setVisible(hasAccess);
+        //TODO restrict context menu to hasAccess
     }
     // endregion
 }

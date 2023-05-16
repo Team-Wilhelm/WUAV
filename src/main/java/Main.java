@@ -11,10 +11,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.aspectj.bridge.MessageHandler;
 import utils.ThreadPool;
 
 import java.util.Objects;
 import java.util.UUID;
+
 
 public class Main extends Application {
     //TODO check for customers who have been in the system for over 48 months and delete them
@@ -22,11 +24,12 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         long start = System.currentTimeMillis();
         Parent root;
-        if (!true)
+        if (true)
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
         else {
-            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.MENU_SCENE)));
-            primaryStage.setMaximized(true);
+            //TODO change back
+            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.ADD_DOCUMENT_SCENE)));
+            //primaryStage.setMaximized(true);
         }
 
         primaryStage.setTitle("WUAV Documentation Management System");

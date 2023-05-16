@@ -69,7 +69,7 @@ public class LoginViewController implements Initializable {
         Scene scene = new Scene(root);
         MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
 
-        menuController.userLoggedIn();
+        menuController.setVisibilityForUserRole();
 
         stage.setScene(scene);
         stage.centerOnScreen();
@@ -85,4 +85,6 @@ public class LoginViewController implements Initializable {
             }
         });
     }
+
+
 }

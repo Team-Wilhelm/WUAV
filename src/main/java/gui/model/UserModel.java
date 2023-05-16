@@ -91,7 +91,7 @@ public class UserModel implements IModel<User> {
         allUsers.putAll(userManager.getAll());
     }
 
-    public User getLoggedInUser() {
+    public static User getLoggedInUser() {
         return loggedInUser;
     }
 

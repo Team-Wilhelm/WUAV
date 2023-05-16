@@ -12,6 +12,8 @@ import gui.util.AlertManager;
 import gui.util.ImageCropper;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -57,6 +59,7 @@ public class AddUserController extends AddController<User> implements Initializa
     private Image profilePicture;
     private UserRole userRole;
     private final ThreadPool executorService;
+    private boolean hasAccess = false;
 
     public AddUserController() {
         userModel = UserModel.getInstance();
@@ -243,6 +246,20 @@ public class AddUserController extends AddController<User> implements Initializa
         // Delete the physical file
         File file = new File(profilePicturePath);
         file.delete();
+    }
+
+    public void setVisibilityForUserRole() {
+        UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
+        if(loggedInUserRole == UserRole.ADMINISTRATOR){
+            hasAccess = true;
+        }
+        btnDelete.setVisible(hasAccess);
+
+        if(loggedInUserRole == UserRole.ADMINISTRATOR || userToUpdate.equals(UserModel.getLoggedInUser())){
+            hasAccess = true;
+        }
+        btnEdit.setVisible(hasAccess);
+        btnSave.setVisible(hasAccess);
     }
     //endregion
 }
