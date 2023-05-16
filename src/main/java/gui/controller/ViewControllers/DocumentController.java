@@ -220,13 +220,11 @@ public class DocumentController extends ViewController<Document> implements Init
 
     public void setVisibilityForUserRole() {
         UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
-        if(!(loggedInUserRole == UserRole.TECHNICIAN)){
-            tblDocument.getTableColumns().remove(tblDocument.getTableColumns().size() - 1);
-        }
-
-
         if(loggedInUserRole == UserRole.ADMINISTRATOR || loggedInUserRole == UserRole.PROJECT_MANAGER || loggedInUserRole == UserRole.TECHNICIAN){
             hasAccess = true;
+        }
+        if(!(loggedInUserRole == UserRole.TECHNICIAN)){
+            tblDocument.getTableColumns().remove(tblDocument.getTableColumns().size() - 1);
         }
         btnAddDocument.setVisible(hasAccess);
         //TODO make gridpane take all available space

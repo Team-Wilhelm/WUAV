@@ -61,7 +61,7 @@
 
         <HBox>
             <MFXButton fx:id="btnDrawDocumentation" onAction="#btnDrawAction" alignment="CENTER_LEFT" styleClass="menu-button"
-                       prefWidth="200.0" text="Draw documentation" HBox.hgrow="ALWAYS" graphicTextGap="20">
+                       prefWidth="200.0" text="Create Drawing" HBox.hgrow="ALWAYS" graphicTextGap="20">
                 <graphic>
                     <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                         <Image url="/img/draw_icon.png" />
