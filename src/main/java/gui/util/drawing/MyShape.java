@@ -38,6 +38,8 @@ public abstract class MyShape implements EventResponsible {
      * it should create a new shape in the next mouse click.
      */
     protected Runnable didFinishDrawingCallback;
+    final double borderSpacing = 5; // Adjust the spacing value as desired
+
 
     /**
      * Constructs a shape object.
@@ -178,5 +180,8 @@ public abstract class MyShape implements EventResponsible {
         final Point2D bottomRight = getBottomRightPoint();
         final Point2D delta = bottomRight.subtract(topLeft);
         return new Rectangle(topLeft.getX(), topLeft.getY(), delta.getX(), delta.getY());
+    }
+    double roundToNearestMultiple(double value, double multiple) {
+        return Math.round(value / multiple) * multiple;
     }
 }

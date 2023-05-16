@@ -12,10 +12,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Date;
 
 /**
@@ -163,7 +165,7 @@ public class MyToolBar extends VBox {
         // Add save button
         MFXButton saveButton = new MFXButton("Save");
         saveButton.setOnAction(e -> {
-            WritableImage wi = new WritableImage(1600, 900);
+            WritableImage wi = new WritableImage(1000, 600);
             Image snapshot = canvas.snapshot(null, wi);
             File output = new File("snapshot" + new Date().getTime() + ".png");
             try {
@@ -181,7 +183,7 @@ public class MyToolBar extends VBox {
         getChildren().addAll(
                 new Label("Toolbox"),
                 handleBox,
-                new Label("Shapes"),
+                new HBox(new Label("Shapes"), spacer,colorPicker),
                 controls,
                 new Label("Entities"),
                 entityBox,
@@ -197,8 +199,13 @@ public class MyToolBar extends VBox {
      * Sets up handlers.
      */
     private void setupHandlers() {
+        canvas.deselectAll();
         group.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
-            selectedTool = (Tool) group.getSelectedToggle().getUserData();
+            try {
+                selectedTool = (Tool) group.getSelectedToggle().getUserData();
+            }catch (NullPointerException e) {
+                selectedTool = Tool.SELECT;
+            }
             canvas.setEventHandler(createEventHandler());
         });
 
@@ -210,6 +217,7 @@ public class MyToolBar extends VBox {
      * @return a new event handler
      */
     private EventResponsible createEventHandler() {
+        canvas.deselectAll();
         Color selectedColor = colorPicker.getValue();
         switch (selectedTool) {
             case OVAL -> {
@@ -224,17 +232,16 @@ public class MyToolBar extends VBox {
             case RECTANGLE -> {
                 return new DrawingTool(canvas, Rectangle::new, selectedColor);
             }
-            case POLYGON -> {
-                return new DrawingTool(canvas, Polygon::new, selectedColor);
-            }
             case ICON -> {
                 var current = (MFXRectangleToggleNode) group.getSelectedToggle();
                 var iconPath = ((ImageView) current.getGraphic()).getImage().getUrl();
-                System.out.println(iconPath);
                 return new DrawingTool(canvas, () -> new Icon(iconPath), selectedColor);
             }
             case CABLE -> {
-                return new DrawingTool(canvas, Line::new, selectedColor);
+                var current = (MFXRectangleToggleNode) group.getSelectedToggle();
+                String filename = ((ImageView) current.getGraphic()).getImage().getUrl().replaceAll("^.*/|\\.[^.]+$", "");
+                var cable = Cable.valueOf(filename.toUpperCase());
+                return new DrawingTool(canvas, () -> new Line(cable.color), selectedColor);
             }
             case SELECT -> {
                 return new SelectionTool(canvas);
