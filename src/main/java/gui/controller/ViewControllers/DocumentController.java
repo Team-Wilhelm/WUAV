@@ -1,6 +1,8 @@
 package gui.controller.ViewControllers;
 
 import be.Document;
+import be.enums.UserRole;
+import gui.model.UserModel;
 import gui.nodes.DocumentCard;
 import gui.SceneManager;
 import gui.controller.AddControllers.AddDocumentController;
@@ -15,15 +17,17 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import gui.util.AlertManager;
 import javafx.stage.Window;
 import utils.permissions.AccessChecker;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Date;
@@ -44,6 +48,7 @@ public class DocumentController extends ViewController<Document> implements Init
     private ObservableList<DocumentCard> documentCards = FXCollections.observableArrayList();
     private ObservableList<Document> documentList = FXCollections.observableArrayList();
     private final DocumentModel documentModel = DocumentModel.getInstance();
+    private boolean hasAccess = false;
     private DocumentCard lastFocusedCard;
     private AccessChecker checker = new AccessChecker();
 
@@ -135,7 +140,8 @@ public class DocumentController extends ViewController<Document> implements Init
 
     @FXML
     private void addDocumentAction() throws IOException {
-        ((AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController()).setDocumentController(this);
+        AddDocumentController controller = (AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
+        controller.setDocumentController(this);
     }
 
     private Window getWindow() {
@@ -150,6 +156,7 @@ public class DocumentController extends ViewController<Document> implements Init
         MFXTableColumn<Document> dateOfCreation = new MFXTableColumn<>("Date of Creation", false, Comparator.comparing(Document::getDateOfCreation));
         MFXTableColumn<Document> customerName = new MFXTableColumn<>("Customer Name", false, Comparator.comparing(d -> d.getCustomer().getCustomerName()));
         MFXTableColumn<Document> customerEmail = new MFXTableColumn<>("Customer Email", false, Comparator.comparing(d -> d.getCustomer().getCustomerEmail()));
+        MFXTableColumn<Document> myDocument = new MFXTableColumn<>("My Document", false, Comparator.comparing(d -> UserModel.getLoggedInUser().getAssignedDocuments().containsValue(d)));
 
         jobTitle.setRowCellFactory(document -> {
             MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(Document::getJobTitle);
@@ -176,7 +183,14 @@ public class DocumentController extends ViewController<Document> implements Init
             return row;
         });
 
-        tblDocument.getTableColumns().addAll(jobTitle, dateOfCreation, customerName, customerEmail);
+        myDocument.setRowCellFactory(document -> {
+            MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(d -> UserModel.getLoggedInUser().getAssignedDocuments().containsValue(d) ? "✔" : "");
+            row.setOnMouseClicked(this::tableViewDoubleClickAction);
+            return row;
+        });
+
+
+        tblDocument.getTableColumns().addAll(jobTitle, dateOfCreation, customerName, customerEmail, myDocument);
         tblDocument.autosizeColumnsOnInitialization();
         tblDocument.setFooterVisible(false);
     }
@@ -189,6 +203,7 @@ public class DocumentController extends ViewController<Document> implements Init
                     AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
                     controller.setDocumentController(this);
                     controller.setIsEditing(tblDocument.getSelectionModel().getSelectedValue());
+                    controller.setVisibilityForUserRole();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -201,5 +216,14 @@ public class DocumentController extends ViewController<Document> implements Init
 
     private void addTooltips() {
         btnAddDocument.setTooltip(new Tooltip("Press Ctrl+N to add a new document"));
+    }
+
+    public void setVisibilityForUserRole() {
+        UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
+        if(loggedInUserRole == UserRole.ADMINISTRATOR || loggedInUserRole == UserRole.PROJECT_MANAGER || loggedInUserRole == UserRole.TECHNICIAN){
+            hasAccess = true;
+        }
+        btnAddDocument.setVisible(hasAccess);
+        //TODO make gridpane take all available space
     }
 }

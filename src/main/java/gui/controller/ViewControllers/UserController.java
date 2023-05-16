@@ -1,6 +1,7 @@
 package gui.controller.ViewControllers;
 
 import be.User;
+import be.enums.UserRole;
 import gui.nodes.UserCard;
 import gui.SceneManager;
 import gui.controller.AddControllers.AddUserController;
@@ -11,6 +12,8 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -48,6 +51,7 @@ public class UserController extends ViewController<User> implements Initializabl
     private ObservableList<UserCard> userCards = FXCollections.observableArrayList();
     private final UserModel userModel = UserModel.getInstance();
     private UserCard lastFocusedCard;
+    private boolean hasAccess = false;
     private AccessChecker checker = new AccessChecker();
 
     @Override
@@ -136,6 +140,7 @@ public class UserController extends ViewController<User> implements Initializabl
                 AddUserController controller = loader.getController();
                 controller.setUserController(this);
                 controller.setIsEditing(lastFocusedCard.getUser());
+                controller.setVisibilityForUserRole();
             } catch (Exception e) {
                e.printStackTrace();
             }
@@ -156,8 +161,11 @@ public class UserController extends ViewController<User> implements Initializabl
             controller.setUserController(this);
     }
 
-    private Window getWindow() {
-        Window window = btnAddEmployee.getScene().getWindow();
-        return window;
+    public void setVisibilityForUserRole() {
+        UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
+        if(loggedInUserRole == UserRole.ADMINISTRATOR){
+            hasAccess = true;
+        }
+        btnAddEmployee.setVisible(hasAccess);
     }
 }

@@ -1,7 +1,6 @@
 package gui.controller.AddControllers;
 
 import be.*;
-import be.enums.DocumentPropertyType;
 import be.interfaces.Observable;
 import be.interfaces.Observer;
 import gui.nodes.*;
@@ -17,8 +16,6 @@ import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.*;
-import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -44,7 +41,6 @@ import javafx.util.Duration;
 import javafx.util.StringConverter;
 import utils.BlobService;
 import utils.ThreadPool;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
@@ -93,6 +89,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private AlertManager alertManager;
     private ObservableList<User> allTechnicians;
     private final ThreadPool executorService;
+    private boolean hasAccess = false;
     private ImagePreview lastFocused;
 
     // Document and customer information
@@ -224,14 +221,16 @@ public class AddDocumentController extends AddController<Document> implements In
     }
 
     public void assignUserToDocument(User technician) {
-        if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
-            technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
-            technicians.add(technician);
-            documentModel.assignUserToDocument(technician, documentToEdit, true);
-        } else {
-            technician.getAssignedDocuments().remove(documentToEdit.getDocumentID());
-            technicians.remove(technician);
-            documentModel.assignUserToDocument(technician, documentToEdit, false);
+        if (documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())) {
+            if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
+                technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
+                technicians.add(technician);
+                documentModel.assignUserToDocument(technician, documentToEdit, true);
+            } else {
+                technician.getAssignedDocuments().remove(documentToEdit.getDocumentID());
+                technicians.remove(technician);
+                documentModel.assignUserToDocument(technician, documentToEdit, false);
+            }
         }
     }
 
@@ -294,7 +293,7 @@ public class AddDocumentController extends AddController<Document> implements In
      * Assigns the user to the document in the database.
      */
     private final ChangeListener<User> technicianListenerIsEditing = (observable, oldValue, newValue) -> {
-        if (newValue != null) {
+        if (newValue != null && !newValue.equals(UserModel.getLoggedInUser())) {
             assignUserToDocument(newValue);
             comboTechnicians.getSelectionModel().clearSelection();
             populateComboBox();
@@ -307,10 +306,11 @@ public class AddDocumentController extends AddController<Document> implements In
      */
     private final ChangeListener<User> technicianListenerNotEditing = (observable, oldValue, newValue) -> {
         if (newValue != null) {
-            if (!technicians.contains(newValue)) {
+            if (!technicians.contains(newValue) && !newValue.equals(UserModel.getLoggedInUser())) {
                 newValue.getAssignedDocuments().put(temporaryId, documentToEdit);
                 technicians.add(newValue);
-            } else {
+            }
+            else if (!newValue.equals(UserModel.getLoggedInUser())) {
                 technicians.remove(newValue);
                 newValue.getAssignedDocuments().remove(temporaryId);
             }
@@ -711,6 +711,27 @@ public class AddDocumentController extends AddController<Document> implements In
     @Override
     public void update(Observable<ImagePreview> o, ImagePreview arg) {
         isInputChanged.setValue(true);
+    }
+
+    public void setVisibilityForUserRole() {
+        UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
+        if(loggedInUserRole == UserRole.ADMINISTRATOR
+                || loggedInUserRole == UserRole.PROJECT_MANAGER
+                || documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())){
+            hasAccess = true;
+        }
+        gridPaneJob.getChildren().stream().filter(node -> node instanceof MFXTextField).forEach(node -> {
+            ((MFXTextField) node).setEditable(hasAccess);
+        });
+        gridPaneCustomer.getChildren().stream().filter(node -> node instanceof MFXTextField).forEach(node -> {
+            ((MFXTextField) node).setEditable(hasAccess);
+        });
+        txtJobDescription.setEditable(hasAccess);
+        txtNotes.setEditable(hasAccess);
+        btnDelete.setVisible(hasAccess);
+        btnUploadPictures.setVisible(hasAccess);
+        btnSave.setVisible(hasAccess);
+        //TODO restrict context menu to hasAccess
     }
     // endregion
 }

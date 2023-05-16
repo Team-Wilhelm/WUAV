@@ -2,6 +2,8 @@ package gui.controller;
 
 import be.User;
 import gui.SceneManager;
+import gui.controller.ViewControllers.DocumentController;
+import gui.controller.ViewControllers.UserController;
 import gui.controller.ViewControllers.ViewController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,8 +18,11 @@ import java.util.ResourceBundle;
 public class MenuController implements Initializable {
     @FXML
     private GridPane gridPane;
+    private Node documentView, employeeView, currentScene;
+    private DocumentController documentController;
+    private UserController userController;
     private Node documentView, employeeView, canvasView, currentScene;
-    private ViewController<?> documentController, employeeController;
+    private ViewController<?> documentController, userController;
     private User user;
 
     @Override
@@ -29,7 +34,7 @@ public class MenuController implements Initializable {
             documentView = documentLoader.load();
             employeeView = employeeLoader.load();
             documentController = documentLoader.getController();
-            employeeController = employeeLoader.getController();
+            userController = employeeLoader.getController();
 
             currentScene = documentView;
             gridPane.add(currentScene, 2, 0, 1,gridPane.getRowCount());
@@ -59,4 +64,11 @@ public class MenuController implements Initializable {
     public void btnDrawAction(ActionEvent actionEvent) {
         switchScene(canvasView);
     }
+
+    public void setVisibilityForUserRole() {
+        documentController.setVisibilityForUserRole();
+        userController.setVisibilityForUserRole();
+    }
+
+
 }

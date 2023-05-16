@@ -33,7 +33,6 @@ public class UserManager implements IManager<User> {
     @Override
     @RequiresPermission(UserRole.ADMINISTRATOR)
     public String update(User user) {
-        //TODO is there another way to get logged in user?
         if (user.equals(UserModel.getLoggedInUser()) || checker.hasAccess(this.getClass())) {
             return dao.update(user);
         }
