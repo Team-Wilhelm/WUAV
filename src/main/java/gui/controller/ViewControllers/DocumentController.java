@@ -156,7 +156,7 @@ public class DocumentController extends ViewController<Document> implements Init
         MFXTableColumn<Document> dateOfCreation = new MFXTableColumn<>("Date of Creation", false, Comparator.comparing(Document::getDateOfCreation));
         MFXTableColumn<Document> customerName = new MFXTableColumn<>("Customer Name", false, Comparator.comparing(d -> d.getCustomer().getCustomerName()));
         MFXTableColumn<Document> customerEmail = new MFXTableColumn<>("Customer Email", false, Comparator.comparing(d -> d.getCustomer().getCustomerEmail()));
-        MFXTableColumn<Document> myDocument = new MFXTableColumn<>("My Document", false, Comparator.comparing(d -> d.getTechnicians().contains(UserModel.getLoggedInUser())));
+        MFXTableColumn<Document> myDocument = new MFXTableColumn<>("My Document", false, Comparator.comparing(d -> UserModel.getLoggedInUser().getAssignedDocuments().containsValue(d)));
 
         jobTitle.setRowCellFactory(document -> {
             MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(Document::getJobTitle);
@@ -183,12 +183,12 @@ public class DocumentController extends ViewController<Document> implements Init
             return row;
         });
 
-        //TODO add images instead of text
         myDocument.setRowCellFactory(document -> {
-            MFXTableRowCell<Document, Boolean> row = new MFXTableRowCell<>(d -> d.getTechnicians().contains(UserModel.getLoggedInUser()));
+            MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(d -> UserModel.getLoggedInUser().getAssignedDocuments().containsValue(d) ? "✔" : "");
             row.setOnMouseClicked(this::tableViewDoubleClickAction);
             return row;
         });
+
 
         tblDocument.getTableColumns().addAll(jobTitle, dateOfCreation, customerName, customerEmail, myDocument);
         tblDocument.autosizeColumnsOnInitialization();
@@ -225,6 +225,5 @@ public class DocumentController extends ViewController<Document> implements Init
         }
         btnAddDocument.setVisible(hasAccess);
         //TODO make gridpane take all available space
-        btnAddDocument.setManaged(!hasAccess);
     }
 }

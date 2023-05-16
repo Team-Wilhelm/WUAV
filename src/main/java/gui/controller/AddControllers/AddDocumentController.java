@@ -1,7 +1,6 @@
 package gui.controller.AddControllers;
 
 import be.*;
-import be.enums.DocumentPropertyType;
 import be.interfaces.Observable;
 import be.interfaces.Observer;
 import gui.nodes.DocumentPropertyCheckboxWrapper;
@@ -20,8 +19,6 @@ import gui.tasks.TaskState;
 import gui.util.AlertManager;
 import gui.nodes.DocumentPropertiesList;
 import io.github.palexdev.materialfx.controls.*;
-import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -47,7 +44,6 @@ import javafx.util.Duration;
 import javafx.util.StringConverter;
 import utils.BlobService;
 import utils.ThreadPool;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
@@ -96,6 +92,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private AlertManager alertManager;
     private ObservableList<User> allTechnicians;
     private final ThreadPool executorService;
+    private boolean hasAccess = false;
     private ImagePreview lastFocused;
 
     // Document and customer information
@@ -106,7 +103,6 @@ public class AddDocumentController extends AddController<Document> implements In
     private Date lastContract;
     private List<User> technicians;
     private BooleanProperty isInputChanged, isEditing;
-    private boolean hasAccess = false;
     private Customer customer;
 
     public AddDocumentController() {
@@ -297,7 +293,7 @@ public class AddDocumentController extends AddController<Document> implements In
      * Assigns the user to the document in the database.
      */
     private final ChangeListener<User> technicianListenerIsEditing = (observable, oldValue, newValue) -> {
-        if (newValue != null) {
+        if (newValue != null && !newValue.equals(UserModel.getLoggedInUser())) {
             assignUserToDocument(newValue);
             comboTechnicians.getSelectionModel().clearSelection();
             populateComboBox();
@@ -310,10 +306,11 @@ public class AddDocumentController extends AddController<Document> implements In
      */
     private final ChangeListener<User> technicianListenerNotEditing = (observable, oldValue, newValue) -> {
         if (newValue != null) {
-            if (!technicians.contains(newValue)) {
+            if (!technicians.contains(newValue) && !newValue.equals(UserModel.getLoggedInUser())) {
                 newValue.getAssignedDocuments().put(temporaryId, documentToEdit);
                 technicians.add(newValue);
-            } else {
+            }
+            else if (!newValue.equals(UserModel.getLoggedInUser())) {
                 technicians.remove(newValue);
                 newValue.getAssignedDocuments().remove(temporaryId);
             }
@@ -645,7 +642,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private void populateComboBox() {
         allTechnicians.clear();
         allTechnicians.setAll(UserModel.getInstance().getAll().values().stream().filter(user ->
-                user.getUserRole() == UserRole.TECHNICIAN && !user.equals(UserModel.getLoggedInUser())).collect(Collectors.toList()));
+                user.getUserRole() == UserRole.TECHNICIAN).collect(Collectors.toList()));
         comboTechnicians.setItems(allTechnicians);
     }
 
