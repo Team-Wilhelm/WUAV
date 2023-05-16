@@ -13,6 +13,10 @@ public class DocumentCard extends VBox {
     private Label customerName, dateOfCreation, jobTitle;
     private IconFactory iconFactory = IconFactory.getInstance();
 
+    public DocumentCard(){
+        this(new Document());
+    }
+
     public DocumentCard(Document document){
         super();
         this.document = document;

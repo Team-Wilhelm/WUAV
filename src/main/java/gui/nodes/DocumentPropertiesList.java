@@ -25,11 +25,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class DocumentPropertiesList extends GridPane implements Initializable {
+public class DocumentPropertiesList extends GridPane {
     private Document document;
     private ColumnConstraints colLabel, colValue, colCheckbox;
     private MFXToggleButton toggleAll;
     private List<DocumentPropertyCheckboxWrapper> checkBoxes;
+
+    public DocumentPropertiesList() {
+        this(new Document());
+    }
 
     public DocumentPropertiesList(Document document) {
         super();
@@ -65,11 +69,6 @@ public class DocumentPropertiesList extends GridPane implements Initializable {
         add(toggleAll, 2, 0);
 
         displayProperties();
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        // Toggle all checkboxes by default
         toggleAll.fire();
     }
 
@@ -111,8 +110,10 @@ public class DocumentPropertiesList extends GridPane implements Initializable {
         imageView.setFitHeight(50);
         imageView.setFitWidth(50);
 
-        add(new Label(label + imageWrapper.getName()), 0, row);
-        add(imageView, 1, row);
+        add(new Label(label), 0, row);
+        HBox hBox = new HBox(new HBox(new Label(imageWrapper.getName()), imageView));
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        add(hBox, 1, row);
         MFXCheckbox checkBox = new MFXCheckbox();
         checkBoxes.add(new DocumentPropertyCheckboxWrapper(DocumentPropertyType.fromString(label), checkBox, imageWrapper));
         add(checkBox, 2, row);
