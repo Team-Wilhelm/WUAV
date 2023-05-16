@@ -739,6 +739,7 @@ public class AddDocumentController extends AddController<Document> implements In
         btnDelete.setVisible(hasAccess);
         btnUploadPictures.setVisible(hasAccess);
         btnSave.setVisible(hasAccess);
+        toggleCustomerType.disableProperty().setValue(!hasAccess);
 
         if (!hasAccess)
             imagePreviews.forEach(ImagePreview::makeContextMenuNotEditable);
