@@ -12,8 +12,12 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
+
+import java.security.Key;
 
 
 public class TextAreaWithFloatingText extends StackPane {
@@ -106,21 +110,21 @@ public class TextAreaWithFloatingText extends StackPane {
                 .setIcon(new MFXFontIcon("fas-copy", 14))
                 .setText(I18N.getOrDefault("textField.contextMenu.copy"))
                 .setAccelerator("Ctrl + C")
-                .setOnAction(event -> copy())
+                .setOnAction(event -> textArea.copy())
                 .get();
 
         MFXContextMenuItem cutItem = MFXContextMenuItem.Builder.build()
                 .setIcon(new MFXFontIcon("fas-scissors", 14))
                 .setText(I18N.getOrDefault("textField.contextMenu.cut"))
                 .setAccelerator("Ctrl + X")
-                .setOnAction(event -> cut())
+                .setOnAction(event -> textArea.cut())
                 .get();
 
         MFXContextMenuItem pasteItem = MFXContextMenuItem.Builder.build()
                 .setIcon(new MFXFontIcon("fas-paste", 14))
                 .setText(I18N.getOrDefault("textField.contextMenu.paste"))
                 .setAccelerator("Ctrl + V")
-                .setOnAction(event -> paste())
+                .setOnAction(event -> textArea.paste())
                 .get();
 
         MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
@@ -134,7 +138,7 @@ public class TextAreaWithFloatingText extends StackPane {
                 .setIcon(new MFXFontIcon("fas-check-double", 16))
                 .setText(I18N.getOrDefault("textField.contextMenu.selectAll"))
                 .setAccelerator("Ctrl + A")
-                .setOnAction(event -> selectAll())
+                .setOnAction(event -> textArea.selectAll())
                 .get();
 
         MFXContextMenuItem redoItem = MFXContextMenuItem.Builder.build()
@@ -153,30 +157,43 @@ public class TextAreaWithFloatingText extends StackPane {
                 .get();
         undoItem.disableProperty().bind(textArea.undoableProperty().not());
 
-        contextMenu = MFXContextMenu.Builder.build(this)
+        contextMenu = MFXContextMenu.Builder.build(textArea)
                 .addItems(copyItem, cutItem, pasteItem, deleteItem, selectAllItem)
                 .addLineSeparator()
                 .addItems(redoItem, undoItem)
-                .setPopupStyleableParent(this)
+                .setPopupStyleableParent(textArea)
                 .installAndGet();
+
+        textArea.setOnContextMenuRequested(event -> {
+            contextMenu.show(textArea, event.getScreenX(), event.getScreenY());
+        });
+
+        setUpShortcuts();
     }
 
-    public void copy() {
-        textArea.copy();
-    }
+    private void setUpShortcuts() {
+        textArea.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.ESCAPE) {
+                contextMenu.hide();
+            } else if (event.isControlDown()) {
+                switch (event.getCode()) {
+                    case C -> textArea.copy();
+                    case X -> textArea.cut();
+                    case V -> textArea.paste();
+                    case D -> textArea.deleteText(textArea.getSelection());
+                    case A -> textArea.selectAll();
+                    case Y -> textArea.redo();
+                    case Z -> textArea.undo();
+                }
+            }
+        });
 
-    public void cut() {
-        textArea.cut();
+        textArea.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                contextMenu.hide();
+            }
+        });
     }
-
-    public void paste() {
-        textArea.paste();
-    }
-
-    public void selectAll() {
-        textArea.selectAll();
-    }
-
 
     // region Getters and Setters
     public String getFloatingText() {

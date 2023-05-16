@@ -21,11 +21,11 @@
     -fx-background-radius: 0;
     -fx-border-radius: 0;
     -fx-background-color: -fx-control-inner-background;
+    -fx-highlight-fill: #d8eaf8; /* Selected text highlight */
+    -fx-highlight-text-fill: black; /* Selected text color */
 }
 
 .text-area-with-floating-text .text-area .content {
-    -fx-highlight-fill: #d8eaf8; /* Selected text highlight */
-    -fx-highlight-text-fill: black; /* Selected text color */
     -fx-border-style: none;
     -fx-background-radius: 0;
     -fx-border-radius: 0;
@@ -36,3 +36,5 @@
 .text-area-with-floating-text .floating-label .label {
     -fx-font-family: "Open Sans Regular";
 }
+
+/*TODO change scroll bar */
