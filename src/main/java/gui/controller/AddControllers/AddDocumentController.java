@@ -69,11 +69,13 @@ public class AddDocumentController extends AddController<Document> implements In
     @FXML
     private MFXTextField txtCity, txtCountry, txtEmail, txtHouseNumber, txtJobTitle, txtPhoneNumber, txtPostcode, txtStreetName;
     @FXML
+    private MFXTextFieldWithAutofill txtName;
+    @FXML
     private MFXToggleButton toggleCustomerType;
     @FXML
     private MFXDatePicker dateLastContract;
+    @FXML
     private TextAreaWithFloatingText txtJobDescription, txtNotes;
-    private MFXTextFieldWithAutofill txtName;
     private DocumentPropertiesList propertiesList;
 
     private DocumentModel documentModel;
@@ -117,7 +119,6 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        swapTextAreas();
         btnNextJobTab.setDisable(true);
         btnNextCustomerTab.setDisable(true);
         customerInformationTab.setDisable(true);
@@ -447,6 +448,7 @@ public class AddDocumentController extends AddController<Document> implements In
                         File file = new File(downloadPath);
                         ImageIO.write(SwingFXUtils.fromFXImage(imageToOpen, null), "png", file);
                         Desktop.getDesktop().open(file);
+                        file.deleteOnExit(); // Delete the file after closing the image viewer
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -673,14 +675,8 @@ public class AddDocumentController extends AddController<Document> implements In
     }
 
     private void setTxtCustomerNameAutoComplete() {
-        gridPaneCustomer.getChildren().remove(gridPaneCustomer.lookup("#txtName"));
-        txtName = new MFXTextFieldWithAutofill();
-        txtName.setId("txtName");
-        txtName.setFloatingText("Name");
-        txtName.setMaxWidth(Double.MAX_VALUE);
         txtName.textProperty().addListener(customerInputListener);
         txtName.textProperty().addListener(customerListener);
-        gridPaneCustomer.add(txtName, 0, 0);
 
         txtName.setSelectionCallback(selectedSuggestion -> {
             if (txtName.getText() != null) {
@@ -701,15 +697,6 @@ public class AddDocumentController extends AddController<Document> implements In
                     dateLastContract.setValue(customer.getLastContract().toLocalDate());}
             }
         });
-    }
-
-    private void swapTextAreas() {
-        gridPaneJob.getChildren().remove(gridPaneJob.lookup("#txtJobDescription"));
-        gridPaneJob.getChildren().remove(gridPaneJob.lookup("#txtNotes"));
-        txtJobDescription = new TextAreaWithFloatingText("Job description");
-        txtNotes = new TextAreaWithFloatingText("Notes");
-        gridPaneJob.add(txtJobDescription, 0, 1, 4, 3);
-        gridPaneJob.add(txtNotes, 0, 4, 4, 2);
     }
 
     @Override

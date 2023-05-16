@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import gui.nodes.MFXTextFieldWithAutofill?>
+<?import gui.nodes.TextAreaWithFloatingText?>
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import io.github.palexdev.materialfx.controls.MFXDatePicker?>
 <?import io.github.palexdev.materialfx.controls.MFXFilterComboBox?>
@@ -9,7 +11,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
@@ -39,8 +40,7 @@
                 </rowConstraints>
                 <children>
                     <MFXTextField fx:id="txtJobTitle" floatingText="Job title" maxWidth="1.7976931348623157E308" GridPane.columnSpan="2" />
-                    <TextArea fx:id="txtJobDescription" prefHeight="200.0" prefWidth="200.0" promptText="Job description" wrapText="true" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.rowSpan="3" />
-                    <TextArea fx:id="txtNotes" prefHeight="200.0" prefWidth="200.0" promptText="Notes" wrapText="true" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" GridPane.rowSpan="2" />
+                  <TextAreaWithFloatingText fx:id="txtJobDescription" floatingText="Job description" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.rowSpan="3" />
                     <MFXFilterComboBox fx:id="comboTechnicians" floatingText="Assign technicians" maxWidth="1.7976931348623157E308" selectable="true" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
                     <MFXButton fx:id="btnDelete" maxWidth="1.7976931348623157E308" onAction="#deleteAction" text="Delete" GridPane.rowIndex="7">
                         <GridPane.margin>
@@ -48,6 +48,7 @@
                         </GridPane.margin>
                     </MFXButton>
                   <MFXButton fx:id="btnNextJobTab" maxWidth="1.7976931348623157E308" onAction="#nextAction" text="Next" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+                  <TextAreaWithFloatingText fx:id="txtNotes" floatingText="Notes" GridPane.columnSpan="2147483647" GridPane.rowIndex="4" GridPane.rowSpan="2" />
                 </children>
                 <padding>
                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
@@ -72,7 +73,7 @@
                   <RowConstraints percentHeight="20.0" />
               </rowConstraints>
                <children>
-                    <MFXTextField fx:id="txtName" floatingText="Name" maxWidth="1.7976931348623157E308" />
+                  <MFXTextFieldWithAutofill fx:id="txtName" floatingText="Name" maxWidth="1.7976931348623157E308" />
                     <MFXDatePicker fx:id="dateLastContract" floatMode="INLINE" floatingText="Last contract" maxWidth="1.7976931348623157E308" selectable="false" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" />
                     <MFXTextField fx:id="txtEmail" floatingText="Email" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1" />
                     <MFXTextField fx:id="txtPhoneNumber" floatingText="Phone number" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
