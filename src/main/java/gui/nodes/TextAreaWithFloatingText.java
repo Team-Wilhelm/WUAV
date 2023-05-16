@@ -1,34 +1,66 @@
 package gui.nodes;
 
-import io.github.palexdev.materialfx.beans.PositionBean;
-import io.github.palexdev.materialfx.utils.PositionUtils;
+import io.github.palexdev.materialfx.controls.MFXContextMenu;
+import io.github.palexdev.materialfx.controls.MFXContextMenuItem;
+import io.github.palexdev.materialfx.i18n.I18N;
+import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
-import javafx.geometry.HPos;
+import javafx.css.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.transform.Scale;
-import javafx.scene.transform.Transform;
-import javafx.scene.transform.Translate;
-import org.w3c.dom.css.RGBColor;
+
+import java.security.Key;
 
 
 public class TextAreaWithFloatingText extends StackPane {
-    private final TextArea textArea;
-    private final Label floatingLabel;
+    // Child nodes
+    private TextArea textArea;
+    private Label floatingLabel;
+    private MFXContextMenu contextMenu;
+
+    // Properties
     private final StringProperty floatingTextProperty = new SimpleStringProperty();
     private final BooleanProperty isFloatingProperty = new SimpleBooleanProperty(false);
+    private int fontSize = 16;
+
+    public TextAreaWithFloatingText() {
+        this("");
+    }
 
     public TextAreaWithFloatingText(String floatingText) {
         super();
-        getStyleClass().add("text-area-with-floating-text");
+        getStyleClass().setAll("text-area-with-floating-text");
 
+        // StackPane, textArea and floatingLabel
+        setUpNodes(floatingText);
+
+        this.setOnMouseClicked(e -> {
+            if (!textArea.isFocused()) {
+                textArea.requestFocus();
+                textArea.deselect();
+                textArea.positionCaret(textArea.getText().length());
+                pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), true);
+                textArea.selectPositionCaret(textArea.getText().length());
+            }
+        });
+
+        createBindings();
+        defaultContextMenu();
+    }
+
+    private void resizeChildren() {
+        StackPane.setMargin(textArea, new Insets(floatingLabel.getHeight() + 5, 0, 0, 0));
+    }
+
+    private void setUpNodes(String floatingText) {
         setMaxWidth(Double.MAX_VALUE);
         setMaxHeight(Double.MAX_VALUE);
         floatingTextProperty().set(floatingText);
@@ -48,47 +80,119 @@ public class TextAreaWithFloatingText extends StackPane {
         this.getChildren().addAll(textArea, floatingLabel);
         StackPane.setAlignment(floatingLabel, Pos.TOP_LEFT);
         StackPane.setAlignment(textArea, Pos.CENTER_LEFT);
+    }
 
-        textArea.prefWidthProperty().bind(this.widthProperty());
-        textArea.maxHeightProperty().bind(this.heightProperty().subtract(floatingLabel.heightProperty()));
-
-        this.setOnMouseClicked(e -> {
-            if (!this.isFocused()) {
-                textArea.requestFocus();
-            }
+    private void createBindings() {
+        textArea.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            this.pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), newValue);
         });
 
-        this.borderProperty().bind(Bindings
-                .when(textArea.focusedProperty())
-                .then(new Border(new BorderStroke(Color.valueOf("0e283f"), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(2))))
-                .otherwise(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(2)))));
-
-        // When the text area is focused or empty, the label should float above the text area
+        // When the text area is focused or empty, the label should become larger
         isFloatingProperty.bind(Bindings.createBooleanBinding(() -> textArea.isFocused()
-                || !textArea.getText().isEmpty(),
+                        || !textArea.getText().isEmpty(),
                 textArea.focusedProperty(),
                 textArea.textProperty()));
 
         floatingLabel.fontProperty().bind(Bindings
                 .when(isFloatingProperty)
-                .then(Font.font(14))
-                .otherwise(Font.font(16)));
+                .then(Font.font(fontSize - 2))
+                .otherwise(Font.font(fontSize)));
 
         isFloatingProperty.addListener((observable, oldValue, newValue) -> {
-            updateFloatingLabel();
+            resizeChildren();
         });
+
+        textArea.maxWidthProperty().bind(this.widthProperty().subtract(5));
     }
 
-    private void updateFloatingLabel() {
-        if (isFloatingProperty.get()) {
-            StackPane.setMargin(textArea, new Insets(floatingLabel.getHeight() + 4, 0, 0, 0));
-        } else {
-            StackPane.setMargin(textArea, Insets.EMPTY);
-        }
+    public void defaultContextMenu() {
+        MFXContextMenuItem copyItem = MFXContextMenuItem.Builder.build()
+                .setIcon(new MFXFontIcon("fas-copy", 14))
+                .setText(I18N.getOrDefault("textField.contextMenu.copy"))
+                .setAccelerator("Ctrl + C")
+                .setOnAction(event -> textArea.copy())
+                .get();
+
+        MFXContextMenuItem cutItem = MFXContextMenuItem.Builder.build()
+                .setIcon(new MFXFontIcon("fas-scissors", 14))
+                .setText(I18N.getOrDefault("textField.contextMenu.cut"))
+                .setAccelerator("Ctrl + X")
+                .setOnAction(event -> textArea.cut())
+                .get();
+
+        MFXContextMenuItem pasteItem = MFXContextMenuItem.Builder.build()
+                .setIcon(new MFXFontIcon("fas-paste", 14))
+                .setText(I18N.getOrDefault("textField.contextMenu.paste"))
+                .setAccelerator("Ctrl + V")
+                .setOnAction(event -> textArea.paste())
+                .get();
+
+        MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build()
+                .setIcon(new MFXFontIcon("fas-delete-left", 16))
+                .setText(I18N.getOrDefault("textField.contextMenu.delete"))
+                .setAccelerator("Ctrl + D")
+                .setOnAction(event -> textArea.deleteText(textArea.getSelection()))
+                .get();
+
+        MFXContextMenuItem selectAllItem = MFXContextMenuItem.Builder.build()
+                .setIcon(new MFXFontIcon("fas-check-double", 16))
+                .setText(I18N.getOrDefault("textField.contextMenu.selectAll"))
+                .setAccelerator("Ctrl + A")
+                .setOnAction(event -> textArea.selectAll())
+                .get();
+
+        MFXContextMenuItem redoItem = MFXContextMenuItem.Builder.build()
+                .setIcon(new MFXFontIcon("fas-arrow-rotate-right", 12))
+                .setText(I18N.getOrDefault("textField.contextMenu.redo"))
+                .setAccelerator("Ctrl + Y")
+                .setOnAction(event -> textArea.redo())
+                .get();
+        redoItem.disableProperty().bind(textArea.redoableProperty().not());
+
+        MFXContextMenuItem undoItem = MFXContextMenuItem.Builder.build()
+                .setIcon(new MFXFontIcon("fas-arrow-rotate-left", 12))
+                .setText(I18N.getOrDefault("textField.contextMenu.undo"))
+                .setAccelerator("Ctrl + Z")
+                .setOnAction(event -> textArea.undo())
+                .get();
+        undoItem.disableProperty().bind(textArea.undoableProperty().not());
+
+        contextMenu = MFXContextMenu.Builder.build(textArea)
+                .addItems(copyItem, cutItem, pasteItem, deleteItem, selectAllItem)
+                .addLineSeparator()
+                .addItems(redoItem, undoItem)
+                .setPopupStyleableParent(textArea)
+                .installAndGet();
+
+        textArea.setOnContextMenuRequested(event -> {
+            contextMenu.show(textArea, event.getScreenX(), event.getScreenY());
+        });
+
+        setUpShortcuts();
     }
 
-    private void setUpStackPane() {
+    private void setUpShortcuts() {
+        textArea.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.ESCAPE) {
+                contextMenu.hide();
+            } else if (event.isControlDown()) {
+                switch (event.getCode()) {
+                    case C -> textArea.copy();
+                    case X -> textArea.cut();
+                    case V -> textArea.paste();
+                    case D -> textArea.deleteText(textArea.getSelection());
+                    case A -> textArea.selectAll();
+                    case Y -> textArea.redo();
+                    case Z -> textArea.undo();
+                }
+            }
+        });
 
+        textArea.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                contextMenu.hide();
+            }
+        });
     }
 
     // region Getters and Setters
@@ -103,5 +207,30 @@ public class TextAreaWithFloatingText extends StackPane {
     public StringProperty floatingTextProperty() {
         return floatingTextProperty;
     }
+
+    public String getText() {
+        return textArea.getText();
+    }
+
+    public void setText(String text) {
+        textArea.setText(text);
+    }
+
+    public TextArea getTextArea() {
+        return textArea;
+    }
+
+    public void setWrapText(boolean wrapText) {
+        textArea.setWrapText(wrapText);
+    }
+
+    public StringProperty textProperty() {
+        return textArea.textProperty();
+    }
+
+    public void setEditable(boolean editable) {
+        textArea.setEditable(editable);
+    }
+
     // endregion
 }

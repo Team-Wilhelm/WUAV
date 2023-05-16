@@ -2,14 +2,17 @@ import be.Document;
 import bll.PdfGenerator;
 import gui.SceneManager;
 import gui.model.DocumentModel;
+import gui.nodes.TextAreaWithFloatingText;
 import gui.util.ImageCropper;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
 import io.github.palexdev.materialfx.css.themes.Themes;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.aspectj.bridge.MessageHandler;
 import utils.ThreadPool;
@@ -24,10 +27,15 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         long start = System.currentTimeMillis();
         Parent root;
-        if (true)
+        if (!true)
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
         else {
             //TODO change back
+            GridPane gridPane = new GridPane();
+            gridPane.setPadding(new Insets(10, 10, 10, 10));
+            gridPane.add(new TextAreaWithFloatingText("Floating Text"), 0, 0);
+            gridPane.add(new TextAreaWithFloatingText("Floating Text"), 0, 1);
+            root = gridPane;
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.ADD_DOCUMENT_SCENE)));
             //primaryStage.setMaximized(true);
         }
