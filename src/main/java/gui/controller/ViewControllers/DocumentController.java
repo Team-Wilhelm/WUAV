@@ -142,6 +142,7 @@ public class DocumentController extends ViewController<Document> implements Init
     private void addDocumentAction() throws IOException {
         AddDocumentController controller = (AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
         controller.setDocumentController(this);
+        controller.setVisibilityForUserRole();
     }
 
     private Window getWindow() {
@@ -202,7 +203,7 @@ public class DocumentController extends ViewController<Document> implements Init
                 try {
                     AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
                     controller.setDocumentController(this);
-                    controller.setIsEditing(tblDocument.getSelectionModel().getSelectedValue());
+                    controller.setIsEditing(tblDocument.getSelectionModel().getSelectedValue());;
                     controller.setVisibilityForUserRole();
                 } catch (Exception e) {
                     e.printStackTrace();

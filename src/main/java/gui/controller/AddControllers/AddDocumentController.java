@@ -108,8 +108,8 @@ public class AddDocumentController extends AddController<Document> implements In
         executorService = ThreadPool.getInstance();
         alertManager = AlertManager.getInstance();
         pdfGenerator = new PdfGenerator();
-
         technicians = new ArrayList<>();
+
         temporaryId = UUID.randomUUID();
         pictures = FXCollections.observableArrayList();
         allTechnicians = FXCollections.observableArrayList();
@@ -130,6 +130,7 @@ public class AddDocumentController extends AddController<Document> implements In
         setTxtCustomerNameAutoComplete();
         assignListenersToTextFields();
         setUpComboBox();
+
         dateLastContract.setValue(LocalDate.now());
 
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
@@ -293,7 +294,7 @@ public class AddDocumentController extends AddController<Document> implements In
      * Assigns the user to the document in the database.
      */
     private final ChangeListener<User> technicianListenerIsEditing = (observable, oldValue, newValue) -> {
-        if (newValue != null && !newValue.equals(UserModel.getLoggedInUser())) {
+        if (newValue != null) {
             assignUserToDocument(newValue);
             comboTechnicians.getSelectionModel().clearSelection();
             populateComboBox();
@@ -306,7 +307,7 @@ public class AddDocumentController extends AddController<Document> implements In
      */
     private final ChangeListener<User> technicianListenerNotEditing = (observable, oldValue, newValue) -> {
         if (newValue != null) {
-            if (!technicians.contains(newValue) && !newValue.equals(UserModel.getLoggedInUser())) {
+            if (!technicians.contains(newValue)) {
                 newValue.getAssignedDocuments().put(temporaryId, documentToEdit);
                 technicians.add(newValue);
             }
@@ -715,9 +716,13 @@ public class AddDocumentController extends AddController<Document> implements In
 
     public void setVisibilityForUserRole() {
         UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
+        if (!isEditing.get() && loggedInUserRole == UserRole.TECHNICIAN){
+            technicians.add(UserModel.getLoggedInUser());
+        }
+
         if(loggedInUserRole == UserRole.ADMINISTRATOR
                 || loggedInUserRole == UserRole.PROJECT_MANAGER
-                || documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())){
+                || technicians.contains(UserModel.getLoggedInUser())){
             hasAccess = true;
         }
         gridPaneJob.getChildren().stream().filter(node -> node instanceof MFXTextField).forEach(node -> {

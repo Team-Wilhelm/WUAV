@@ -18,11 +18,9 @@ import java.util.ResourceBundle;
 public class MenuController implements Initializable {
     @FXML
     private GridPane gridPane;
-    private Node documentView, employeeView, currentScene;
+    private Node documentView, employeeView, canvasView, currentScene;
     private DocumentController documentController;
     private UserController userController;
-    private Node documentView, employeeView, canvasView, currentScene;
-    private ViewController<?> documentController, userController;
     private User user;
 
     @Override
@@ -33,6 +31,7 @@ public class MenuController implements Initializable {
         try {
             documentView = documentLoader.load();
             employeeView = employeeLoader.load();
+            canvasView = canvasLoader.load();
             documentController = documentLoader.getController();
             userController = employeeLoader.getController();
 
