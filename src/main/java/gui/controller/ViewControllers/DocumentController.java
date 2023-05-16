@@ -190,7 +190,6 @@ public class DocumentController extends ViewController<Document> implements Init
             return row;
         });
 
-
         tblDocument.getTableColumns().addAll(jobTitle, dateOfCreation, customerName, customerEmail, myDocument);
         tblDocument.autosizeColumnsOnInitialization();
         tblDocument.setFooterVisible(false);
@@ -221,6 +220,11 @@ public class DocumentController extends ViewController<Document> implements Init
 
     public void setVisibilityForUserRole() {
         UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
+        if(!(loggedInUserRole == UserRole.TECHNICIAN)){
+            tblDocument.getTableColumns().remove(tblDocument.getTableColumns().size() - 1);
+        }
+
+
         if(loggedInUserRole == UserRole.ADMINISTRATOR || loggedInUserRole == UserRole.PROJECT_MANAGER || loggedInUserRole == UserRole.TECHNICIAN){
             hasAccess = true;
         }
