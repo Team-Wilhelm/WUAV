@@ -35,18 +35,19 @@ public class SelectionTool implements EventResponsible {
 
     @Override
     public void handle(MouseEvent e) {
-        Point2D currentPoint = new Point2D(e.getX(), e.getY());
+        Point2D currentPoint = new Point2D(roundToNearestMultiple(e.getX(), 10), roundToNearestMultiple(e.getY(), 10));
 
         if (e.getEventType() == MouseEvent.MOUSE_PRESSED) {
             pressedPoint = currentPoint;
             selectedShape = null;
-            for (MyShape obj : canvas.getShapes())
+            for (MyShape obj : canvas.getShapes()) {
                 if (obj.contains(currentPoint)) {
                     selectedShape = obj;
                     obj.setSelected(true);
-                } else
+                } else {
                     obj.setSelected(false);
-
+                }
+            }
         } else if (e.getEventType() == MouseEvent.MOUSE_DRAGGED) {
             if (selectedShape != null) {
                 Point2D transform = new Point2D(currentPoint.getX() - pressedPoint.getX(),
@@ -60,6 +61,9 @@ public class SelectionTool implements EventResponsible {
         }
 
         canvas.update();
+    }
+    private double roundToNearestMultiple(double value, double multiple) {
+        return Math.round(value / multiple) * multiple;
     }
 
     @Override

@@ -27,19 +27,28 @@ public class Square extends MyShape {
         if (points.get(0) == null || points.get(1) == null)
             return;
 
-        gc.setFill(Color.TRANSPARENT);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(5);
+        gc.setFill(color);
         Rectangle bound = getBound();
 
+        if (selected) {
+            double[] dashes = {5, 5}; // Adjust the dash pattern as desired
+            gc.setLineDashes(dashes);
+            gc.setStroke(Color.BLACK);
+            gc.strokeRect(
+                    bound.getX() - borderSpacing,
+                    bound.getY() - borderSpacing,
+                    bound.getWidth() + 2 * borderSpacing,
+                    bound.getHeight() + 2 * borderSpacing
+            );
+            gc.setLineDashes(null); // Reset the line dashes
+        }
+
         gc.fillRect(bound.getX(), bound.getY(), bound.getWidth(), bound.getHeight());
-        var image = new Image("file:src/main/resources/icons/bi_projector-fill.png");
-        gc.drawImage(image, bound.getX(), bound.getY(), bound.getWidth(), bound.getHeight());
     }
 
     @Override
     public void handle(MouseEvent e) {
-        Point2D currentPoint = new Point2D(e.getX(), e.getY());
+        Point2D currentPoint = new Point2D(roundToNearestMultiple(e.getX(), 10), roundToNearestMultiple(e.getY(), 10));
         if (e.getEventType() == MouseEvent.MOUSE_PRESSED)
             points.set(0, currentPoint);
         else if (e.getEventType() == MouseEvent.MOUSE_DRAGGED)
@@ -64,29 +73,25 @@ public class Square extends MyShape {
         final double width = Math.abs(startPoint.getX() - endPoint.getX());
         final double height = Math.abs(startPoint.getY() - endPoint.getY());
         final double side = Math.min(width, height);
+        final double multiple = 10.0; // the multiple of 10
 
+        // calculate the size of the shape that is a multiple of 10
+        double newSize = Math.floor(side / multiple) * multiple;
+
+        // if the size is less than 10, set it to 10
+        newSize = Math.max(newSize, 10);
+
+        // calculate the new endpoint based on the start point and the new size
         if (startPoint.getX() < endPoint.getX()) {
-            // start \
-            //        \
-            //         \ end
             if (startPoint.getY() < endPoint.getY())
-                return startPoint.add(side, side);
-            //         / end
-            //        /
-            // start /
+                return startPoint.add(newSize, newSize);
             else
-                return startPoint.add(side, -side);
+                return startPoint.add(newSize, -newSize);
         } else {
-            //       / start
-            //      /
-            // end /
             if (startPoint.getY() < endPoint.getY())
-                return startPoint.add(-side, side);
-            // end \
-            //      \
-            //       \ start
+                return startPoint.add(-newSize, newSize);
             else
-                return startPoint.add(-side, -side);
+                return startPoint.add(-newSize, -newSize);
         }
     }
 }

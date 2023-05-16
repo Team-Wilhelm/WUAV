@@ -4,6 +4,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 
 import java.util.Arrays;
 
@@ -26,12 +27,26 @@ public class Rectangle extends MyShape {
 
         gc.setFill(color);
         javafx.scene.shape.Rectangle bound = getBound();
+
+        if (selected) {
+            double[] dashes = {5, 5}; // Adjust the dash pattern as desired
+            gc.setLineDashes(dashes);
+            gc.setStroke(Color.BLACK);
+            gc.strokeRect(
+                    bound.getX() - borderSpacing,
+                    bound.getY() - borderSpacing,
+                    bound.getWidth() + 2 * borderSpacing,
+                    bound.getHeight() + 2 * borderSpacing
+            );
+            gc.setLineDashes(null); // Reset the line dashes
+        }
+
         gc.fillRect(bound.getX(), bound.getY(), bound.getWidth(), bound.getHeight());
     }
 
     @Override
     public void handle(MouseEvent e) {
-        Point2D currentPoint = new Point2D(e.getX(), e.getY());
+        Point2D currentPoint = new Point2D(roundToNearestMultiple(e.getX(), 10), roundToNearestMultiple(e.getY(), 10));
         if (e.getEventType() == MouseEvent.MOUSE_PRESSED)
             points.set(0, currentPoint);
         else if (e.getEventType() == MouseEvent.MOUSE_DRAGGED)

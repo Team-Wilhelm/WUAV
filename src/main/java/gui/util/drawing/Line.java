@@ -5,29 +5,41 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Paint;
 
 import java.util.ArrayList;
 
 public class Line extends MyShape {
     private boolean isVertical = false;
     private boolean isHorizontal = false;
+    private Paint color;
 
     /**
      * Constructs a line object.
      */
-    public Line() {
+    public Line(Paint color) {
+        this.color = color;
         points = new ArrayList<>();
     }
 
     @Override
     public void draw(GraphicsContext gc) {
-        if (points.size() < 2)
+        if(points.isEmpty())
             return;
-        gc.setStroke(color);
-        gc.setLineWidth(5);
 
         double startX = points.get(0).add(transform).getX();
         double startY = points.get(0).add(transform).getY();
+
+        if (points.size() < 2)
+        {
+            gc.setStroke(color);
+            gc.setLineWidth(5);
+            gc.strokeLine(startX, startY, startX, startY);
+            return;
+        }
+        gc.setStroke(color);
+        gc.setLineWidth(5);
+
         double endX = points.get(1).add(transform).getX();
         double endY = points.get(1).add(transform).getY();
 

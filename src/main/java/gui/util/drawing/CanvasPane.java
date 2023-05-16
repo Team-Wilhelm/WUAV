@@ -92,8 +92,9 @@ public class CanvasPane extends Pane {
      */
     private void render() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        for (MyShape myShape : shapes)
+        for (MyShape myShape : shapes) {
             myShape.draw(gc);
+        }
     }
 
     /**
@@ -102,6 +103,13 @@ public class CanvasPane extends Pane {
     public void update() {
         clear();
         render();
+    }
+
+    public void deselectAll() {
+        for (MyShape myShape : shapes) {
+            myShape.setSelected(false);
+        }
+        update();
     }
 
     private void handle(MouseEvent e) {
