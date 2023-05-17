@@ -7,6 +7,7 @@ import javafx.stage.Window;
 import java.util.Optional;
 
 public class DialogueManager {
+    //TODO manage
     private Alert alert;
     private static DialogueManager instance = null;
 

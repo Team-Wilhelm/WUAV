@@ -3,6 +3,10 @@ package gui.controller.AddControllers;
 import be.User;
 import gui.nodes.PasswordDialogue;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import utils.enums.EditingOptions;
 import utils.enums.UserRole;
 import gui.controller.ViewControllers.UserController;
@@ -306,6 +310,32 @@ public class AddUserController extends AddController<User> implements Initializa
             txtPhoneNumber.getStyleClass().removeIf(s -> s.equals("not-editable"));
             comboPosition.getStyleClass().removeIf(s -> s.equals("not-editable"));
         }
+    }
+
+    public void setShortcutsAndAccelerators() {
+        Scene scene = txtName.getScene();
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN), () -> {
+            if (!btnSave.isDisabled()) {
+                btnSaveAction(null);
+            }
+        });
+
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN), () -> {
+            if (!comboOptions.isDisabled()) {
+                deleteUserAction(null);
+            }
+        });
+
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                if (isEditing) {
+                    setIsEditing(userToUpdate);
+                    comboOptions.getSelectionModel().clearSelection();
+                } else {
+                    closeWindow(event);
+                }
+            }
+        });
     }
     //endregion
 }

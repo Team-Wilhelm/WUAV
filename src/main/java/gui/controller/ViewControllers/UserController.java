@@ -140,6 +140,7 @@ public class UserController extends ViewController<User> implements Initializabl
                 controller.setUserController(this);
                 controller.setIsEditing(lastFocusedCard.getUser());
                 controller.setVisibilityForUserRole();
+                controller.setShortcutsAndAccelerators();
             } catch (Exception e) {
                e.printStackTrace();
             }
@@ -158,6 +159,7 @@ public class UserController extends ViewController<User> implements Initializabl
             FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
             AddUserController controller = loader.getController();
             controller.setUserController(this);
+            controller.setShortcutsAndAccelerators();
     }
 
     public void setVisibilityForUserRole() {

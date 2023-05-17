@@ -6,6 +6,7 @@ import gui.tasks.TaskState;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.stage.Window;
@@ -114,8 +115,8 @@ public abstract class AddController<T> {
         });
     }
 
-    protected void closeWindow(ActionEvent actionEvent) {
-        ((Node) actionEvent.getSource()).getScene().getWindow().hide();
+    protected void closeWindow(Event event) {
+        ((Node) event.getSource()).getScene().getWindow().hide();
     }
 
     protected boolean isInputEmpty(MFXTextField textField) {
