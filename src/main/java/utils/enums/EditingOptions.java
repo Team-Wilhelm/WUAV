@@ -2,6 +2,7 @@ package utils.enums;
 
 public enum EditingOptions {
     EDIT("Edit"),
+    CHANGE_PASSWORD("Change Password"),
     DELETE("Delete");
 
     private final String name;

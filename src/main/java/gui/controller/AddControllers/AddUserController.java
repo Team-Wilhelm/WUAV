@@ -35,6 +35,7 @@ import java.util.*;
 
 public class AddUserController extends AddController<User> implements Initializable {
     //TODO add dialogue for changing password
+    //TODO ESC should revert editing mode
     @FXML
     private GridPane gridPane;
     @FXML
@@ -233,8 +234,13 @@ public class AddUserController extends AddController<User> implements Initializa
                 editUserAction(null);
             } else if (newValue == EditingOptions.DELETE) {
                 deleteUserAction(null);
+            } else if (newValue == EditingOptions.CHANGE_PASSWORD) {
+                changePasswordAction();
             }
         });
+    }
+
+    private void changePasswordAction() {
     }
 
     public void setProfilePicture(Image image, String profilePicturePath) throws Exception {
@@ -267,6 +273,7 @@ public class AddUserController extends AddController<User> implements Initializa
             // Make the text fields look like labels if they're not editable
             txtName.getStyleClass().add("not-editable");
             txtName.setFloatingText("");
+            //TODO Make the txtName resize to the size of the text, so it can be centered
             txtUsername.getStyleClass().add("not-editable");
             txtPhoneNumber.getStyleClass().add("not-editable");
             comboPosition.getStyleClass().add("not-editable");
