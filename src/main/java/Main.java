@@ -2,6 +2,8 @@ import be.Document;
 import bll.PdfGenerator;
 import gui.SceneManager;
 import gui.model.DocumentModel;
+import gui.model.UserModel;
+import gui.nodes.TextAreaWithFloatingText;
 import gui.util.ImageCropper;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
 import io.github.palexdev.materialfx.css.themes.Themes;
@@ -28,8 +30,9 @@ public class Main extends Application {
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
         else {
             //TODO change back
-            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.ADD_DOCUMENT_SCENE)));
-            //primaryStage.setMaximized(true);
+            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.MENU_SCENE)));
+            primaryStage.setMaximized(true);
+            UserModel.getInstance().setLoggedInUser(UserModel.getInstance().getUserByUsername("admin"));
         }
 
         primaryStage.setTitle("WUAV Documentation Management System");

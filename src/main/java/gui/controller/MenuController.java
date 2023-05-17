@@ -18,11 +18,9 @@ import java.util.ResourceBundle;
 public class MenuController implements Initializable {
     @FXML
     private GridPane gridPane;
-    private Node documentView, employeeView, currentScene;
+    private Node documentView, employeeView, canvasView, currentScene;
     private DocumentController documentController;
     private UserController userController;
-    private Node documentView, employeeView, canvasView, currentScene;
-    private ViewController<?> documentController, userController;
     private User user;
 
     @Override
@@ -35,7 +33,7 @@ public class MenuController implements Initializable {
             employeeView = employeeLoader.load();
             documentController = documentLoader.getController();
             userController = employeeLoader.getController();
-
+            canvasView = canvasLoader.load();
             currentScene = documentView;
             gridPane.add(currentScene, 2, 0, 1,gridPane.getRowCount());
         } catch (Exception e) {
@@ -69,6 +67,4 @@ public class MenuController implements Initializable {
         documentController.setVisibilityForUserRole();
         userController.setVisibilityForUserRole();
     }
-
-
 }

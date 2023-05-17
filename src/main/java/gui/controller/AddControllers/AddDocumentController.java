@@ -31,7 +31,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.FlowPane;
@@ -70,13 +69,13 @@ public class AddDocumentController extends AddController<Document> implements In
     @FXML
     private MFXTextField txtCity, txtCountry, txtEmail, txtHouseNumber, txtJobTitle, txtPhoneNumber, txtPostcode, txtStreetName;
     @FXML
-    private TextArea txtJobDescription, txtNotes;
+    private MFXTextFieldWithAutofill txtName;
     @FXML
     private MFXToggleButton toggleCustomerType;
     @FXML
     private MFXDatePicker dateLastContract;
-    private MFXTextFieldWithAutofill txtName;
-    private MFXContextMenu contextMenu;
+    @FXML
+    private TextAreaWithFloatingText txtJobDescription, txtNotes;
     private DocumentPropertiesList propertiesList;
 
     private DocumentModel documentModel;
@@ -108,8 +107,8 @@ public class AddDocumentController extends AddController<Document> implements In
         executorService = ThreadPool.getInstance();
         alertManager = AlertManager.getInstance();
         pdfGenerator = new PdfGenerator();
-
         technicians = new ArrayList<>();
+
         temporaryId = UUID.randomUUID();
         pictures = FXCollections.observableArrayList();
         allTechnicians = FXCollections.observableArrayList();
@@ -130,19 +129,14 @@ public class AddDocumentController extends AddController<Document> implements In
         setTxtCustomerNameAutoComplete();
         assignListenersToTextFields();
         setUpComboBox();
+
         dateLastContract.setValue(LocalDate.now());
 
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
         btnSave.disableProperty().bind(isInputChanged.not());
         btnDelete.disableProperty().bind(isEditing.not());
 
-        txtJobDescription.setWrapText(true);
-        txtNotes.setWrapText(true);
-
         addTooltips();
-
-        gridPaneJob.getChildren().remove(txtJobDescription);
-        gridPaneJob.add(new TextAreaWithFloatingText("Job description"), 0, 1, 4, 2);
     }
 
     @FXML
@@ -192,6 +186,7 @@ public class AddDocumentController extends AddController<Document> implements In
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
+        technicians.forEach(technician -> technician.addDocument(currentDocument));
 
         if (isEditing.get()) {
             currentDocument.setDocumentID(documentToEdit.getDocumentID());
@@ -201,6 +196,8 @@ public class AddDocumentController extends AddController<Document> implements In
         setUpSaveTask(task, documentController, txtCity.getScene().getWindow(), this);
         executorService.execute(task);
 
+        System.out.println(Arrays.toString(currentDocument.getTechnicians().toArray()));
+        System.out.println(Arrays.toString(UserModel.getLoggedInUser().getAssignedDocuments().values().toArray()));
         pdfTab.setDisable(false);
     }
 
@@ -249,7 +246,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private final ChangeListener<String> jobInputListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            boolean isNotFilled = isInputEmpty(txtJobTitle) || isInputEmpty(txtJobDescription);
+            boolean isNotFilled = isInputEmpty(txtJobTitle) || isInputEmpty(txtJobDescription.getTextArea());
             btnNextJobTab.setDisable(isNotFilled);
             customerInformationTab.setDisable(isNotFilled);
         }
@@ -293,7 +290,7 @@ public class AddDocumentController extends AddController<Document> implements In
      * Assigns the user to the document in the database.
      */
     private final ChangeListener<User> technicianListenerIsEditing = (observable, oldValue, newValue) -> {
-        if (newValue != null && !newValue.equals(UserModel.getLoggedInUser())) {
+        if (newValue != null) {
             assignUserToDocument(newValue);
             comboTechnicians.getSelectionModel().clearSelection();
             populateComboBox();
@@ -306,11 +303,10 @@ public class AddDocumentController extends AddController<Document> implements In
      */
     private final ChangeListener<User> technicianListenerNotEditing = (observable, oldValue, newValue) -> {
         if (newValue != null) {
-            if (!technicians.contains(newValue) && !newValue.equals(UserModel.getLoggedInUser())) {
+            if (!technicians.contains(newValue)) {
                 newValue.getAssignedDocuments().put(temporaryId, documentToEdit);
                 technicians.add(newValue);
-            }
-            else if (!newValue.equals(UserModel.getLoggedInUser())) {
+            } else if (!newValue.equals(UserModel.getLoggedInUser())) {
                 technicians.remove(newValue);
                 newValue.getAssignedDocuments().remove(temporaryId);
             }
@@ -452,6 +448,7 @@ public class AddDocumentController extends AddController<Document> implements In
                         File file = new File(downloadPath);
                         ImageIO.write(SwingFXUtils.fromFXImage(imageToOpen, null), "png", file);
                         Desktop.getDesktop().open(file);
+                        file.deleteOnExit(); // Delete the file after closing the image viewer
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -464,7 +461,7 @@ public class AddDocumentController extends AddController<Document> implements In
                     imagePreviews.remove(imagePreview);
                     pictures.remove(image);
                 } if (e.isControlDown() && e.getCode().equals(KeyCode.E)) {
-                    imagePreview.openDescriptionDialogue();
+                    imagePreview.openDescriptionDialogue(hasAccess);
                 }
             });
 
@@ -678,14 +675,8 @@ public class AddDocumentController extends AddController<Document> implements In
     }
 
     private void setTxtCustomerNameAutoComplete() {
-        gridPaneCustomer.getChildren().remove(gridPaneCustomer.lookup("#txtName"));
-        txtName = new MFXTextFieldWithAutofill();
-        txtName.setId("txtName");
-        txtName.setFloatingText("Name");
-        txtName.setMaxWidth(Double.MAX_VALUE);
         txtName.textProperty().addListener(customerInputListener);
         txtName.textProperty().addListener(customerListener);
-        gridPaneCustomer.add(txtName, 0, 0);
 
         txtName.setSelectionCallback(selectedSuggestion -> {
             if (txtName.getText() != null) {
@@ -715,9 +706,13 @@ public class AddDocumentController extends AddController<Document> implements In
 
     public void setVisibilityForUserRole() {
         UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
+        if (!isEditing.get() && loggedInUserRole == UserRole.TECHNICIAN){
+            technicians.add(UserModel.getLoggedInUser());
+        }
+
         if(loggedInUserRole == UserRole.ADMINISTRATOR
                 || loggedInUserRole == UserRole.PROJECT_MANAGER
-                || documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())){
+                || technicians.contains(UserModel.getLoggedInUser())){
             hasAccess = true;
         }
         gridPaneJob.getChildren().stream().filter(node -> node instanceof MFXTextField).forEach(node -> {
@@ -731,7 +726,9 @@ public class AddDocumentController extends AddController<Document> implements In
         btnDelete.setVisible(hasAccess);
         btnUploadPictures.setVisible(hasAccess);
         btnSave.setVisible(hasAccess);
-        //TODO restrict context menu to hasAccess
+
+        if (!hasAccess)
+            imagePreviews.forEach(ImagePreview::makeContextMenuNotEditable);
     }
     // endregion
 }
