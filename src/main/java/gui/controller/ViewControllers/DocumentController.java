@@ -20,6 +20,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import gui.util.AlertManager;
@@ -81,15 +83,6 @@ public class DocumentController extends ViewController<Document> implements Init
         });
 
              */
-            btnAddDocument.getScene().setOnKeyPressed(event -> {
-                if (event.isControlDown() && event.getCode().equals(KeyCode.N)) {
-                    try {
-                        addDocumentAction();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
         });
     }
 
@@ -136,8 +129,13 @@ public class DocumentController extends ViewController<Document> implements Init
     }
 
     @FXML
-    private void addDocumentAction() throws IOException {
-        AddDocumentController controller = (AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
+    private void addDocumentAction() {
+        AddDocumentController controller;
+        try {
+            controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         controller.setDocumentController(this);
         controller.setVisibilityForUserRole();
     }
@@ -223,5 +221,9 @@ public class DocumentController extends ViewController<Document> implements Init
         }
         btnAddDocument.setVisible(hasAccess);
         //TODO make gridpane take all available space
+    }
+
+    public void addShortcuts() {
+        btnAddDocument.getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::addDocumentAction);
     }
 }

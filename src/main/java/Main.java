@@ -19,7 +19,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         long start = System.currentTimeMillis();
         Parent root;
-        if (!true)
+        if (true)
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
         else {
             //TODO change back
@@ -35,6 +35,12 @@ public class Main extends Application {
         MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
         primaryStage.centerOnScreen();
         primaryStage.show();
+
+        primaryStage.setOnCloseRequest(e -> {
+            e.consume();
+            primaryStage.close();
+            System.exit(0);
+        });
         System.out.println("Time to load: " + (System.currentTimeMillis() - start) + "ms");
     }
 
