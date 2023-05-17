@@ -108,7 +108,9 @@ public class AddUserController extends AddController<User> implements Initializa
 
             // Save the user
             assignInputToVariables();
-            byte[][] passwordHash = hashPasswordHelper.hashPassword(password);
+
+            // If the user is editing and the password has changed, it's already been hashed and set in the User object
+            byte[][] passwordHash = isEditing ? new byte[][] {userToUpdate.getPassword(), userToUpdate.getSalt()} : hashPasswordHelper.hashPassword(password);
             User user = new User(name, username, passwordHash, phoneNumber, userRole, profilePicturePath);
             SaveTask<User> saveTask = new SaveTask<>(user, isEditing, userModel);
             if (isEditing) {
@@ -297,7 +299,7 @@ public class AddUserController extends AddController<User> implements Initializa
     private void showPasswordDialogue() {
         PasswordDialogue passwordDialogue = new PasswordDialogue(txtName.getScene().getWindow(), gridPane, userToUpdate);
         passwordDialogue.showDialog();
-        passwordDialogue.setOnCloseRequest(event -> {
+        passwordDialogue.setOnHidden(event -> {
             if (passwordDialogue.isPasswordChanged()) {
                 userToUpdate.setPassword(passwordDialogue.getNewPassword());
                 userToUpdate.setSalt(passwordDialogue.getNewSalt());
