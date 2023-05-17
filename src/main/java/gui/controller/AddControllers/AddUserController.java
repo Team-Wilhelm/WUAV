@@ -52,7 +52,7 @@ public class AddUserController extends AddController<User> implements Initializa
     private User userToUpdate;
     private UserController userController;
     private boolean isEditing;
-    private boolean isUpdating;
+    private BooleanProperty isUpdating;
     private String name, username, password, phoneNumber, profilePicturePath;
     private Image profilePicture;
     private UserRole userRole;
@@ -64,12 +64,16 @@ public class AddUserController extends AddController<User> implements Initializa
         alertManager = AlertManager.getInstance();
         hashPasswordHelper = new HashPasswordHelper();
         executorService = ThreadPool.getInstance();
+
+        isUpdating = new SimpleBooleanProperty(true);
+        isUpdating.addListener((observable, oldValue, newValue) -> {
+            changeTextFieldStyle(isUpdating.get());
+        });
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         isEditing = false;
-        isUpdating = true;
         profilePicturePath = "/img/userIcon.png";
 
         btnSave.setDisable(true);
@@ -89,17 +93,19 @@ public class AddUserController extends AddController<User> implements Initializa
             }
             return comboPosition.getSelectionModel().getSelectedItem().toString();
         }, comboPosition.getSelectionModel().selectedItemProperty()));
+
+        btnSave.requestFocus();
     }
 
     @FXML
     private void btnSaveAction(ActionEvent actionEvent) {
         if (checkInput()) {
-            if (!isUpdating) {
+            if (!isUpdating.get()) {
                 closeWindow(actionEvent);
             }
 
             // If the user is updating, the save button is disabled after the save is complete
-            isUpdating = false;
+            isUpdating.set(false);
             btnSave.setDisable(true);
             disableFields(true);
 
@@ -119,7 +125,7 @@ public class AddUserController extends AddController<User> implements Initializa
 
     @FXML
     private void editUserAction(ActionEvent actionEvent) {
-        isUpdating = true;
+        isUpdating.set(true);
         disableFields(false);
         btnSave.setDisable(false);
     }
@@ -137,7 +143,7 @@ public class AddUserController extends AddController<User> implements Initializa
 
     private void profilePictureDoubleClick() {
         imgProfilePicture.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2 && isUpdating) {
+            if (event.getClickCount() == 2 && isUpdating.get()) {
                 ImageCropper imageCropper = new ImageCropper(this);
                 imageCropper.chooseImage(userToUpdate);
             }
@@ -194,7 +200,7 @@ public class AddUserController extends AddController<User> implements Initializa
     public void setIsEditing(User user) {
         disableFields(true);
         isEditing = true;
-        isUpdating = false;
+        isUpdating.set(false);
         btnEdit.setDisable(false);
         btnDelete.setDisable(false);
 
@@ -257,6 +263,21 @@ public class AddUserController extends AddController<User> implements Initializa
         }
         btnEdit.setVisible(hasAccess);
         btnSave.setVisible(hasAccess);
+    }
+
+    private void changeTextFieldStyle(boolean isUpdating) {
+        if (!isUpdating) {
+            txtName.getStyleClass().add("not-editable");
+            txtUsername.getStyleClass().add("not-editable");
+            txtPassword.getStyleClass().add("not-editable");
+            txtPhoneNumber.getStyleClass().add("not-editable");
+            }
+        else {
+            txtName.getStyleClass().removeIf(s -> s.equals("not-editable"));
+            txtUsername.getStyleClass().removeIf(s -> s.equals("not-editable"));
+            txtPassword.getStyleClass().removeIf(s -> s.equals("not-editable"));
+            txtPhoneNumber.getStyleClass().removeIf(s -> s.equals("not-editable"));
+        }
     }
     //endregion
 }

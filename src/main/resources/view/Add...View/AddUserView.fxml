@@ -5,21 +5,19 @@
 <?import io.github.palexdev.materialfx.controls.MFXComboBox?>
 <?import io.github.palexdev.materialfx.controls.MFXPasswordField?>
 <?import io.github.palexdev.materialfx.controls.MFXTextField?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 
 <GridPane hgap="15.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="900.0" styleClass="background" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.AddControllers.AddUserController">
   <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
-      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
-    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
-      <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
-      <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" prefWidth="100.0" />
+    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
+      <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
   </columnConstraints>
   <rowConstraints>
     <RowConstraints minHeight="10.0" percentHeight="25.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -31,6 +29,16 @@
       <RowConstraints minHeight="10.0" percentHeight="15.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
+      <StackPane fx:id="imgBackground" prefHeight="150.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowSpan="2" />
+      <Label fx:id="lblPosition" text="Position" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+      <MFXTextField fx:id="txtName" floatingText="Name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+      <MFXTextField fx:id="txtUsername" floatingText="Username" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+      <MFXTextField fx:id="txtPhoneNumber" floatingText="Phone number" maxWidth="1.7976931348623157E308" textLimit="30" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+      <MFXPasswordField fx:id="txtPassword" floatingText="Password" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+      <MFXComboBox fx:id="comboPosition" floatingText="Position" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+      <MFXButton fx:id="btnSave" maxWidth="1.7976931348623157E308" onAction="#btnSaveAction" text="Save" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+      <MFXButton fx:id="btnEdit" maxWidth="1.7976931348623157E308" onAction="#editUserAction" text="Edit" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+      <MFXButton fx:id="btnDelete" maxWidth="1.7976931348623157E308" onAction="#deleteUserAction" text="Delete" GridPane.rowIndex="6" />
        <ImageViewPane fx:id="profilePicturePane" GridPane.rowIndex="1" GridPane.rowSpan="2">
            <imageView>
                <ImageView fx:id="imgProfilePicture" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.rowIndex="2">
@@ -38,17 +46,5 @@
                </ImageView>
            </imageView>
        </ImageViewPane>
-      <Label fx:id="lblPosition" text="Position" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-      <MFXTextField fx:id="txtName" floatingText="Name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-      <MFXTextField fx:id="txtUsername" floatingText="Username" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-      <MFXTextField fx:id="txtPhoneNumber" floatingText="Phone number" maxWidth="1.7976931348623157E308" textLimit="30" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-      <MFXPasswordField fx:id="txtPassword" floatingText="Password" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-      <MFXComboBox fx:id="comboPosition" floatingText="Position" GridPane.columnIndex="3" GridPane.rowIndex="5" />
-      <MFXButton fx:id="btnSave" maxWidth="1.7976931348623157E308" onAction="#btnSaveAction" text="Save" GridPane.columnIndex="4" GridPane.rowIndex="6" />
-      <MFXButton fx:id="btnEdit" maxWidth="1.7976931348623157E308" onAction="#editUserAction" text="Edit" GridPane.columnIndex="3" GridPane.rowIndex="6" />
-      <MFXButton fx:id="btnDelete" maxWidth="1.7976931348623157E308" onAction="#deleteUserAction" text="Delete" GridPane.rowIndex="6" />
    </children>
-   <padding>
-      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-   </padding>
 </GridPane>

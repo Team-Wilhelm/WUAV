@@ -1,10 +1,9 @@
 package gui.controller;
 
 import be.User;
-import gui.SceneManager;
+import gui.util.SceneManager;
 import gui.controller.ViewControllers.DocumentController;
 import gui.controller.ViewControllers.UserController;
-import gui.controller.ViewControllers.ViewController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

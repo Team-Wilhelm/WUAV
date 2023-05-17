@@ -1,7 +1,7 @@
 package gui.controller;
 
 import be.User;
-import gui.SceneManager;
+import gui.util.SceneManager;
 import gui.model.UserModel;
 import gui.util.AlertManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
