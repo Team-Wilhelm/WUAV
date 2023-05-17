@@ -2,9 +2,7 @@ package bll;
 
 import be.Address;
 import be.Document;
-import be.ImageWrapper;
-import be.User;
-import be.enums.DocumentPropertyType;
+import utils.enums.DocumentPropertyType;
 import com.itextpdf.io.font.FontConstants;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;

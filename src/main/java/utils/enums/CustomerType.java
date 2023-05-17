@@ -1,4 +1,4 @@
-package be.enums;
+package utils.enums;
 
 public enum CustomerType {
     BUSINESS,

@@ -1,6 +1,6 @@
 package utils.permissions;
 
-import be.enums.UserRole;
+import utils.enums.UserRole;
 import java.lang.annotation.*;
 
 

@@ -1,4 +1,4 @@
-package be.enums;
+package utils.enums;
 
 public enum DocumentPropertyType {
     DATE_OF_CREATION("Date of creation: "),

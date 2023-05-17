@@ -1,8 +1,8 @@
 package gui.controller.AddControllers;
 
-import be.Document;
 import be.User;
-import be.enums.UserRole;
+import utils.enums.EditingOptions;
+import utils.enums.UserRole;
 import gui.controller.ViewControllers.UserController;
 import gui.model.UserModel;
 import gui.tasks.DeleteTask;
@@ -12,7 +12,7 @@ import gui.util.AlertManager;
 import gui.util.CropImageToCircle;
 import gui.util.ImageCropper;
 import io.github.palexdev.materialfx.controls.*;
-import javafx.beans.binding.Bindings;
+import io.github.palexdev.materialfx.enums.FloatMode;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -21,9 +21,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.HPos;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -35,9 +33,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.*;
 
-import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
-
 public class AddUserController extends AddController<User> implements Initializable {
+    //TODO add dialogue for changing password
     @FXML
     private GridPane gridPane;
     @FXML
@@ -45,11 +42,11 @@ public class AddUserController extends AddController<User> implements Initializa
     @FXML
     private MFXTextField txtName, txtUsername, txtPhoneNumber;
     @FXML
-    private MFXPasswordField txtPassword;
-    @FXML
     private MFXComboBox<UserRole> comboPosition;
     @FXML
-    private MFXButton btnSave, btnDelete, btnEdit;
+    private MFXComboBox<EditingOptions> comboOptions;
+    @FXML
+    private MFXButton btnSave;
 
     private final UserModel userModel;
     private final AlertManager alertManager;
@@ -82,17 +79,14 @@ public class AddUserController extends AddController<User> implements Initializa
         profilePicturePath = "/img/userIcon.png";
 
         btnSave.setDisable(true);
-        btnDelete.setDisable(true);
-        btnEdit.setDisable(true);
+        comboOptions.setDisable(true);
 
         profilePictureDoubleClick();
-        populateCombobox();
+        setUpComboBoxes();
 
         assignListenersToTextFields();
-        comboPosition.getSelectionModel().selectedItemProperty().addListener(positionListener);
 
         btnSave.requestFocus();
-        txtPassword.visibleProperty().bind(isUpdating);
     }
 
     @FXML
@@ -106,6 +100,7 @@ public class AddUserController extends AddController<User> implements Initializa
             isUpdating.set(false);
             btnSave.setDisable(true);
             disableFields(true);
+            comboOptions.clearSelection();
 
             // Save the user
             assignInputToVariables();
@@ -155,7 +150,7 @@ public class AddUserController extends AddController<User> implements Initializa
     private final ChangeListener<String> inputListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (isInputEmpty(txtName) || isInputEmpty(txtUsername) || (isInputEmpty(txtPassword) && !isEditing)
+            if (isInputEmpty(txtName) || isInputEmpty(txtUsername)
                     || comboPosition.getValue() == null) {
                 btnSave.setDisable(true);
             } else {
@@ -167,7 +162,7 @@ public class AddUserController extends AddController<User> implements Initializa
     private final ChangeListener<UserRole> positionListener = new ChangeListener<UserRole>() {
         @Override
         public void changed(ObservableValue<? extends UserRole> observable, UserRole oldValue, UserRole newValue) {
-            if (isInputEmpty(txtName) || isInputEmpty(txtUsername) || (isInputEmpty(txtPassword) && !isEditing)
+            if (isInputEmpty(txtName) || isInputEmpty(txtUsername)
                     || comboPosition.getValue() == null) {
                 btnSave.setDisable(true);
             } else {
@@ -182,7 +177,6 @@ public class AddUserController extends AddController<User> implements Initializa
     protected void assignInputToVariables() {
         name = txtName.getText().trim();
         username = txtUsername.getText().trim();
-        password = txtPassword.getText();
         phoneNumber = txtPhoneNumber.getText().trim();
         userRole = comboPosition.getSelectionModel().getSelectedItem();
     }
@@ -191,7 +185,6 @@ public class AddUserController extends AddController<User> implements Initializa
     protected void assignListenersToTextFields() {
         txtName.textProperty().addListener(inputListener);
         txtUsername.textProperty().addListener(inputListener);
-        txtPassword.textProperty().addListener(inputListener);
         txtPhoneNumber.textProperty().addListener(inputListener);
     }
 
@@ -199,13 +192,11 @@ public class AddUserController extends AddController<User> implements Initializa
         disableFields(true);
         isEditing = true;
         isUpdating.set(false);
-        btnEdit.setDisable(false);
-        btnDelete.setDisable(false);
+        comboOptions.setDisable(false);
 
         userToUpdate = user;
         txtName.setText(user.getFullName());
         txtUsername.setText(user.getUsername());
-        txtPassword.setPromptText("Leave empty to keep current password");
         txtPhoneNumber.setText(user.getPhoneNumber().isEmpty() ? "No phone number available" : user.getPhoneNumber());
         comboPosition.getSelectionModel().selectItem(user.getUserRole());
         imgProfilePicture.setImage(CropImageToCircle.getRoundedImage(user.getProfilePicture()));
@@ -224,7 +215,6 @@ public class AddUserController extends AddController<User> implements Initializa
     private void disableFields(boolean disable) {
         txtName.setEditable(!disable);
         txtUsername.setEditable(!disable);
-        txtPassword.setEditable(!disable);
         txtPhoneNumber.setEditable(!disable);
         comboPosition.setEditable(!disable);
     }
@@ -233,8 +223,18 @@ public class AddUserController extends AddController<User> implements Initializa
         this.userController = userController;
     }
 
-    private void populateCombobox() {
+    private void setUpComboBoxes() {
         comboPosition.getItems().setAll(Arrays.stream(UserRole.values()).toList().subList(0, 4));
+        comboPosition.getSelectionModel().selectedItemProperty().addListener(positionListener);
+
+        comboOptions.getItems().setAll(EditingOptions.values());
+        comboOptions.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == EditingOptions.EDIT) {
+                editUserAction(null);
+            } else if (newValue == EditingOptions.DELETE) {
+                deleteUserAction(null);
+            }
+        });
     }
 
     public void setProfilePicture(Image image, String profilePicturePath) throws Exception {
@@ -252,15 +252,13 @@ public class AddUserController extends AddController<User> implements Initializa
 
     public void setVisibilityForUserRole() {
         UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
-        if(loggedInUserRole == UserRole.ADMINISTRATOR){
-            hasAccess = true;
-        }
-        btnDelete.setVisible(hasAccess);
-
         if(loggedInUserRole == UserRole.ADMINISTRATOR || userToUpdate.equals(UserModel.getLoggedInUser())){
             hasAccess = true;
+            if (loggedInUserRole != UserRole.ADMINISTRATOR) {
+                comboOptions.getItems().remove(EditingOptions.DELETE);
+            }
         }
-        btnEdit.setVisible(hasAccess);
+        comboOptions.setVisible(hasAccess);
         btnSave.setVisible(hasAccess);
     }
 
@@ -268,16 +266,16 @@ public class AddUserController extends AddController<User> implements Initializa
         if (!isUpdating) {
             // Make the text fields look like labels if they're not editable
             txtName.getStyleClass().add("not-editable");
+            txtName.setFloatingText("");
             txtUsername.getStyleClass().add("not-editable");
-            txtPassword.getStyleClass().add("not-editable");
             txtPhoneNumber.getStyleClass().add("not-editable");
             comboPosition.getStyleClass().add("not-editable");
             }
         else {
             // Revert the text fields to their original style
             txtName.getStyleClass().removeIf(s -> s.equals("not-editable"));
+            txtName.setFloatingText("Name");
             txtUsername.getStyleClass().removeIf(s -> s.equals("not-editable"));
-            txtPassword.getStyleClass().removeIf(s -> s.equals("not-editable"));
             txtPhoneNumber.getStyleClass().removeIf(s -> s.equals("not-editable"));
             comboPosition.getStyleClass().removeIf(s -> s.equals("not-editable"));
         }

@@ -2,28 +2,21 @@ package gui.nodes;
 
 import be.Document;
 import be.ImageWrapper;
-import be.enums.DocumentPropertyType;
+import utils.enums.DocumentPropertyType;
 import io.github.palexdev.materialfx.controls.MFXCheckbox;
 import io.github.palexdev.materialfx.controls.MFXToggleButton;
-import javafx.event.ActionEvent;
-import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
-import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class DocumentPropertiesList extends GridPane {
     private Document document;

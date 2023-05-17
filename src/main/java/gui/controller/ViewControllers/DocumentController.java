@@ -1,7 +1,7 @@
 package gui.controller.ViewControllers;
 
 import be.Document;
-import be.enums.UserRole;
+import utils.enums.UserRole;
 import gui.model.UserModel;
 import gui.nodes.DocumentCard;
 import gui.util.SceneManager;

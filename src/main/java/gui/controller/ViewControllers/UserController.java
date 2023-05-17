@@ -1,7 +1,7 @@
 package gui.controller.ViewControllers;
 
 import be.User;
-import be.enums.UserRole;
+import utils.enums.UserRole;
 import gui.nodes.UserCard;
 import gui.util.SceneManager;
 import gui.controller.AddControllers.AddUserController;
@@ -54,6 +54,7 @@ public class UserController extends ViewController<User> implements Initializabl
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //TODO disable edit button while saving
         setProgressVisibility(false);
 
         Bindings.bindContent(flowPane.getChildren(), userCards);

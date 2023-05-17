@@ -1,6 +1,6 @@
 package be;
 
-import be.enums.CustomerType;
+import utils.enums.CustomerType;
 
 import java.sql.Date;
 import java.util.Objects;
