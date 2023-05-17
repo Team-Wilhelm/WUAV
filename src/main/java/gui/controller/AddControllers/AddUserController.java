@@ -313,7 +313,10 @@ public class AddUserController extends AddController<User> implements Initializa
     }
 
     public void setShortcutsAndAccelerators() {
-        Scene scene = txtName.getScene();
+        setShortcutsAndAccelerators(txtName.getScene());
+    }
+
+    public void setShortcutsAndAccelerators(Scene scene) {
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN), () -> {
             if (!btnSave.isDisabled()) {
                 btnSaveAction(null);

@@ -61,7 +61,7 @@
 
         <Region prefHeight="200.0" VBox.vgrow="ALWAYS" />
         <HBox>
-            <MFXButton fx:id="btnMyProfile" alignment="CENTER_LEFT" styleClass="menu-button"
+            <MFXButton fx:id="btnMyProfile" onAction="#btnMyProfileAction" alignment="CENTER_LEFT" styleClass="menu-button"
                        prefWidth="200.0" text="My profile" HBox.hgrow="ALWAYS" graphicTextGap="20">
                 <graphic>
                     <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
