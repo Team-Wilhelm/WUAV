@@ -55,6 +55,7 @@ public class PasswordDialogue extends MFXStageDialog {
     }
 
     public PasswordDialogue(Window owner, Pane ownerNode, User userToUpdate) {
+        //TODO add functionality to top three buttons
         super();
         this.owner = owner;
         this.ownerNode = ownerNode;
@@ -65,20 +66,23 @@ public class PasswordDialogue extends MFXStageDialog {
         setUpGridPane();
         dialogContent = MFXGenericDialogBuilder.build()
                 .setContent(passwordGridPane)
+                .setOnMinimize(event -> this.setIconified(true))
+                .setOnClose(event -> this.close())
+                .setOnAlwaysOnTop(event -> this.setAlwaysOnTop(true))
                 .get();
         setUpDialogueWindow();
         addButtons();
     }
 
     private void setUpDialogueWindow() {
-        super.setContent(dialogContent);
-        super.initOwner(owner);
-        super.initModality(Modality.APPLICATION_MODAL);
-        super.setDraggable(true);
-        super.setTitle("Change password");
-        super.setOwnerNode(ownerNode);
-        super.setScrimPriority(ScrimPriority.WINDOW);
-        super.setScrimOwner(true);
+        setContent(dialogContent);
+        initOwner(owner);
+        initModality(Modality.APPLICATION_MODAL);
+        setDraggable(true);
+        setTitle("Change password");
+        setOwnerNode(ownerNode);
+        setScrimPriority(ScrimPriority.WINDOW);
+        setScrimOwner(true);
     }
 
     private void addButtons() {
@@ -101,6 +105,7 @@ public class PasswordDialogue extends MFXStageDialog {
         passwordGridPane = new GridPane();
         passwordGridPane.setHgap(10);
         passwordGridPane.setVgap(10);
+        passwordGridPane.setMaxWidth(Double.MAX_VALUE);
 
         // If the user is not an admin, add the current password field, otherwise start at the new password field
         int startIndex = userToUpdate == UserModel.getLoggedInUser() ? 0 : 1;
@@ -120,7 +125,6 @@ public class PasswordDialogue extends MFXStageDialog {
     private final ChangeListener<String> passwordListener = (observable, oldValue, newValue) -> {
         if (passwordFields.get(PasswordType.NEW).getText().isEmpty() || passwordFields.get(PasswordType.CONFIRM).getText().isEmpty()) {
             btnConfirm.setDisable(true);
-            System.out.println("Password fields are empty");
             return;
         }
 

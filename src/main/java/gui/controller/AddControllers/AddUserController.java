@@ -35,7 +35,6 @@ import java.net.URL;
 import java.util.*;
 
 public class AddUserController extends AddController<User> implements Initializable {
-    //TODO add dialogue for changing password
     //TODO ESC should revert editing mode
     @FXML
     private GridPane gridPane;
@@ -72,8 +71,9 @@ public class AddUserController extends AddController<User> implements Initializa
         executorService = ThreadPool.getInstance();
 
         isUpdating = new SimpleBooleanProperty(true);
+
         isUpdating.addListener((observable, oldValue, newValue) -> {
-            changeTextFieldStyle(isUpdating.get());
+            changeTextFieldStyle();
         });
     }
 
@@ -101,10 +101,10 @@ public class AddUserController extends AddController<User> implements Initializa
             }
 
             // If the user is updating, the save button is disabled after the save is complete
+            comboOptions.getSelectionModel().clearSelection();
             isUpdating.set(false);
             btnSave.setDisable(true);
             disableFields(true);
-            comboOptions.clearSelection();
 
             // Save the user
             assignInputToVariables();
@@ -144,6 +144,20 @@ public class AddUserController extends AddController<User> implements Initializa
             if (event.getClickCount() == 2 && isUpdating.get()) {
                 ImageCropper imageCropper = new ImageCropper(this);
                 imageCropper.chooseImage(userToUpdate);
+            }
+        });
+    }
+
+    private void showPasswordDialogue() {
+        comboOptions.getSelectionModel().clearSelection();
+        PasswordDialogue passwordDialogue = new PasswordDialogue(txtName.getScene().getWindow(), gridPane, userToUpdate);
+        passwordDialogue.showDialog();
+        passwordDialogue.setOnHidden(event -> {
+            if (passwordDialogue.isPasswordChanged()) {
+                isUpdating.set(true);
+                userToUpdate.setPassword(passwordDialogue.getNewPassword());
+                userToUpdate.setSalt(passwordDialogue.getNewSalt());
+                btnSaveAction(null);
             }
         });
     }
@@ -245,10 +259,6 @@ public class AddUserController extends AddController<User> implements Initializa
         });
     }
 
-    private void changePasswordAction() {
-        showPasswordDialogue();
-    }
-
     public void setProfilePicture(Image image, String profilePicturePath) throws Exception {
         profilePicture = image;
         imgProfilePicture.setImage(CropImageToCircle.getRoundedImage(profilePicture));
@@ -272,15 +282,17 @@ public class AddUserController extends AddController<User> implements Initializa
         }
         comboOptions.setVisible(hasAccess);
         btnSave.setVisible(hasAccess);
+
+        if (!hasAccess)
+            gridPane.getRowConstraints().get(gridPane.getRowCount() -1).setPercentHeight(0); // TODO If the user cannot edit, remove dead space
     }
 
-    private void changeTextFieldStyle(boolean isUpdating) {
-        if (!isUpdating) {
+    private void changeTextFieldStyle() {
+        if (!isUpdating.get()) {
             // Make the text fields look like labels if they're not editable
             txtName.getStyleClass().add("not-editable");
             txtName.setFloatingText("");
             txtName.setAlignment(Pos.CENTER);
-            //TODO Make the txtName resize to the size of the text, so it can be centered
             txtUsername.getStyleClass().add("not-editable");
             txtPhoneNumber.getStyleClass().add("not-editable");
             comboPosition.getStyleClass().add("not-editable");
@@ -294,18 +306,6 @@ public class AddUserController extends AddController<User> implements Initializa
             txtPhoneNumber.getStyleClass().removeIf(s -> s.equals("not-editable"));
             comboPosition.getStyleClass().removeIf(s -> s.equals("not-editable"));
         }
-    }
-
-    private void showPasswordDialogue() {
-        PasswordDialogue passwordDialogue = new PasswordDialogue(txtName.getScene().getWindow(), gridPane, userToUpdate);
-        passwordDialogue.showDialog();
-        passwordDialogue.setOnHidden(event -> {
-            if (passwordDialogue.isPasswordChanged()) {
-                userToUpdate.setPassword(passwordDialogue.getNewPassword());
-                userToUpdate.setSalt(passwordDialogue.getNewSalt());
-                btnSaveAction(null);
-            }
-        });
     }
     //endregion
 }
