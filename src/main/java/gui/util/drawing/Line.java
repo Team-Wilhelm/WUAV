@@ -2,85 +2,94 @@ package gui.util.drawing;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Paint;
+import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 
+/**
+ * A rectangle object.
+ */
 public class Line extends MyShape {
-    private boolean isVertical = false;
-    private boolean isHorizontal = false;
-    private Paint color;
 
+    private Color color;
+    private boolean isVertical;
+    private boolean isHorizontal;
     /**
-     * Constructs a line object.
+     * Constructs a rectangle object.
      */
-    public Line(Paint color) {
+    public Line(Color color) {
         this.color = color;
-        points = new ArrayList<>();
+        points = Arrays.asList(null, null);
     }
 
     @Override
     public void draw(GraphicsContext gc) {
-        if(points.isEmpty())
+        if (points.get(0) == null || points.get(1) == null)
             return;
 
-        double startX = points.get(0).add(transform).getX();
-        double startY = points.get(0).add(transform).getY();
-
-        if (points.size() < 2)
-        {
-            gc.setStroke(color);
-            gc.setLineWidth(5);
-            gc.strokeLine(startX, startY, startX, startY);
-            return;
-        }
-        gc.setStroke(color);
-        gc.setLineWidth(5);
-
-        double endX = points.get(1).add(transform).getX();
-        double endY = points.get(1).add(transform).getY();
-
-        if (isVertical) {
-            startX = endX = Math.round((startX + endX) / 2);
-        } else if (isHorizontal) {
-            startY = endY = Math.round((startY + endY) / 2);
-        } else {
-            return;
+        gc.setFill(color);
+        javafx.scene.shape.Rectangle bound = getBound();
+        var size = 5;
+        if(selected != true) {
+            if (isVertical)
+                bound = new javafx.scene.shape.Rectangle(points.get(0).getX(), bound.getY(), size, bound.getHeight());
+            else if (isHorizontal)
+                bound = new javafx.scene.shape.Rectangle(bound.getX(), points.get(0).getY(), bound.getWidth(), size);
+        }else {
+            if (isVertical)
+                bound = new javafx.scene.shape.Rectangle(bound.getX(), bound.getY(), size, bound.getHeight());
+            else if (isHorizontal)
+                bound = new javafx.scene.shape.Rectangle(bound.getX(), bound.getY(), bound.getWidth(), size);
         }
 
-        gc.strokeLine(startX, startY, endX, endY);
+        if (selected) {
+            double[] dashes = {5, 5}; // Adjust the dash pattern as desired
+            gc.setLineDashes(dashes);
+            gc.setStroke(Color.BLACK);
+            gc.strokeRect(
+                    bound.getX() - borderSpacing,
+                    bound.getY() - borderSpacing,
+                    bound.getWidth() + 2 * borderSpacing,
+                    bound.getHeight() + 2 * borderSpacing
+            );
+            gc.setLineDashes(null); // Reset the line dashes
+        }
+        if(isVertical)
+            gc.fillRect(bound.getX(), bound.getY(), size, bound.getHeight());
+        else if(isHorizontal)
+            gc.fillRect(bound.getX(), bound.getY(), bound.getWidth(), size);
     }
 
     @Override
     public void handle(MouseEvent e) {
-        Point2D currentPoint = new Point2D(e.getX(), e.getY());
-        if (e.getEventType() == MouseEvent.MOUSE_CLICKED) {
-            if (points.isEmpty()) {
-                points.add(currentPoint);
-            } else {
-                Point2D startPoint = points.get(0).add(transform);
-                Point2D endPoint = currentPoint.add(transform);
-                double deltaX = Math.abs(endPoint.getX() - startPoint.getX());
-                double deltaY = Math.abs(endPoint.getY() - startPoint.getY());
+        Point2D currentPoint = new Point2D(roundToNearestMultiple(e.getX(), 10), roundToNearestMultiple(e.getY(), 10));
 
-                if (deltaX >= deltaY) {
-                    points.add(new Point2D(currentPoint.getX(), startPoint.getY()));
-                    isHorizontal = true;
-                } else {
-                    points.add(new Point2D(startPoint.getX(), currentPoint.getY()));
-                    isVertical = true;
-                }
-                didFinishDrawingCallback.run();
+        try {
+            double width = Math.abs(points.get(1).getX() - points.get(0).getX());
+            double height = Math.abs(points.get(1).getY() - points.get(0).getY());
+
+            if (width >= height) {
+                isHorizontal = true;
+                isVertical = false;
+            } else {
+                isVertical = true;
+                isHorizontal = false;
             }
         }
+        catch (Exception ex) { }
+
+        if (e.getEventType() == MouseEvent.MOUSE_PRESSED)
+            points.set(0, currentPoint);
+        else if (e.getEventType() == MouseEvent.MOUSE_DRAGGED)
+            points.set(1, currentPoint);
+        else if (e.getEventType() == MouseEvent.MOUSE_RELEASED)
+            didFinishDrawingCallback.run();
     }
 
     @Override
     public void handle(KeyEvent e) {
-        if (e.getCode() == KeyCode.ENTER)
-            didFinishDrawingCallback.run();
+
     }
 }
