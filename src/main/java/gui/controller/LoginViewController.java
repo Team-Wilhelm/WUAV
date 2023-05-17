@@ -16,6 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import utils.HashPasswordHelper;
 
@@ -69,9 +70,11 @@ public class LoginViewController implements Initializable {
         Scene scene = new Scene(root);
         MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
 
-        menuController.setVisibilityForUserRole();
-
         stage.setScene(scene);
+        stage.setWidth(Screen.getPrimary().getBounds().getWidth() - 200);
+        stage.setHeight(Screen.getPrimary().getBounds().getHeight() - 200);
+
+        menuController.userLogInAction(scene); // Needs to be called after the scene is set
         stage.centerOnScreen();
         stage.setMaximized(true);
     }
