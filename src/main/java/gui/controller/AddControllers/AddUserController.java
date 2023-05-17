@@ -9,6 +9,7 @@ import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
 import gui.util.AlertManager;
+import gui.util.CropImageToCircle;
 import gui.util.ImageCropper;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.beans.binding.Bindings;
@@ -20,10 +21,12 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.HPos;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import utils.BlobService;
 import utils.HashPasswordHelper;
 import utils.ThreadPool;
@@ -32,11 +35,13 @@ import java.io.File;
 import java.net.URL;
 import java.util.*;
 
+import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
+
 public class AddUserController extends AddController<User> implements Initializable {
     @FXML
-    private ImageView imgProfilePicture;
+    private GridPane gridPane;
     @FXML
-    private Label lblPosition;
+    private ImageView imgProfilePicture;
     @FXML
     private MFXTextField txtName, txtUsername, txtPhoneNumber;
     @FXML
@@ -86,15 +91,8 @@ public class AddUserController extends AddController<User> implements Initializa
         assignListenersToTextFields();
         comboPosition.getSelectionModel().selectedItemProperty().addListener(positionListener);
 
-        // Bind the text of the label displaying an employee's role to the selected item of the combo box
-        lblPosition.textProperty().bind(Bindings.createStringBinding(() -> {
-            if (comboPosition.getSelectionModel().getSelectedItem() == null) {
-                return "";
-            }
-            return comboPosition.getSelectionModel().getSelectedItem().toString();
-        }, comboPosition.getSelectionModel().selectedItemProperty()));
-
         btnSave.requestFocus();
+        txtPassword.visibleProperty().bind(isUpdating);
     }
 
     @FXML
@@ -208,8 +206,9 @@ public class AddUserController extends AddController<User> implements Initializa
         txtName.setText(user.getFullName());
         txtUsername.setText(user.getUsername());
         txtPassword.setPromptText("Leave empty to keep current password");
+        txtPhoneNumber.setText(user.getPhoneNumber().isEmpty() ? "No phone number available" : user.getPhoneNumber());
         comboPosition.getSelectionModel().selectItem(user.getUserRole());
-        imgProfilePicture.setImage(user.getProfilePicture());
+        imgProfilePicture.setImage(CropImageToCircle.getRoundedImage(user.getProfilePicture()));
         profilePicturePath = user.getProfilePicturePath();
     }
 
@@ -227,7 +226,7 @@ public class AddUserController extends AddController<User> implements Initializa
         txtUsername.setEditable(!disable);
         txtPassword.setEditable(!disable);
         txtPhoneNumber.setEditable(!disable);
-        comboPosition.setDisable(disable);
+        comboPosition.setEditable(!disable);
     }
 
     public void setUserController(UserController userController) {
@@ -240,7 +239,7 @@ public class AddUserController extends AddController<User> implements Initializa
 
     public void setProfilePicture(Image image, String profilePicturePath) throws Exception {
         profilePicture = image;
-        imgProfilePicture.setImage(profilePicture);
+        imgProfilePicture.setImage(CropImageToCircle.getRoundedImage(profilePicture));
 
         // Save the picture to blob service
         UUID id = isEditing ? userToUpdate.getUserID() : UUID.randomUUID();
@@ -267,16 +266,20 @@ public class AddUserController extends AddController<User> implements Initializa
 
     private void changeTextFieldStyle(boolean isUpdating) {
         if (!isUpdating) {
+            // Make the text fields look like labels if they're not editable
             txtName.getStyleClass().add("not-editable");
             txtUsername.getStyleClass().add("not-editable");
             txtPassword.getStyleClass().add("not-editable");
             txtPhoneNumber.getStyleClass().add("not-editable");
+            comboPosition.getStyleClass().add("not-editable");
             }
         else {
+            // Revert the text fields to their original style
             txtName.getStyleClass().removeIf(s -> s.equals("not-editable"));
             txtUsername.getStyleClass().removeIf(s -> s.equals("not-editable"));
             txtPassword.getStyleClass().removeIf(s -> s.equals("not-editable"));
             txtPhoneNumber.getStyleClass().removeIf(s -> s.equals("not-editable"));
+            comboPosition.getStyleClass().removeIf(s -> s.equals("not-editable"));
         }
     }
     //endregion

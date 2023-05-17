@@ -188,4 +188,8 @@
     -fx-border-style: hidden;
 }
 
+.mfx-combo-box.not-editable .caret .mfx-font-icon {
+    -mfx-color: transparent;
+}
+
 
