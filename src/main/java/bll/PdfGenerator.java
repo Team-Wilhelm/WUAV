@@ -11,10 +11,14 @@ import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.Rectangle;
+import com.itextpdf.kernel.pdf.PageLabelNumberingStyleConstants;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.annot.PdfAnnotation;
+import com.itextpdf.kernel.pdf.annot.PdfTextAnnotation;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.kernel.pdf.xobject.PdfXObject;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.border.Border;
 import com.itextpdf.layout.element.*;
@@ -23,6 +27,7 @@ import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 import gui.nodes.DocumentPropertyCheckboxWrapper;
+import io.github.palexdev.virtualizedfx.table.TableCache;
 
 import java.io.IOException;
 import java.util.List;
@@ -117,27 +122,28 @@ public class PdfGenerator {
                     doc.add(technicianList);
                 }
             }
-
             //Add images
             Table imageTable;
             List<DocumentPropertyCheckboxWrapper> imageCheckboxes = checkBoxes.stream().filter(checkbox -> checkbox.getProperty() == DocumentPropertyType.IMAGE).toList();
             if (!imageCheckboxes.isEmpty()) {
-                for (int i = 0; i < imageCheckboxes.size(); i++) {
+                doc.add(pageBreak);
+                /*for (int i = 0; i < imageCheckboxes.size(); i++) {
                     if (i % 2 != 0) {
                         doc.add(pageBreak);
-                    }
+                    }*/
+                 for (DocumentPropertyCheckboxWrapper image: imageCheckboxes) {
                     imageTable = new Table(1);
 
-                    ImageData imageData = ImageDataFactory.create(imageCheckboxes.get(i).getImage().getUrl());
+                    ImageData imageData = ImageDataFactory.create(/*imageCheckboxes.get(i).getImage().getUrl()*/image.getImage().getUrl());
                     Image documentImage = new Image(imageData);
                     documentImage.setHorizontalAlignment(HorizontalAlignment.CENTER);
+                    //documentImage.setHeight(150);
                     documentImage.setAutoScale(true);
-
-                    documentImage.setHeight(150).setHorizontalAlignment(HorizontalAlignment.CENTER);
                     imageTable.addCell(documentImage);
 
                     Cell footerCell = new Cell();
-                    String description = imageCheckboxes.get(i).getImage().getDescription() == null ? "" : imageCheckboxes.get(i).getImage().getDescription();
+                    //String description = imageCheckboxes.get(i).getImage().getDescription() == null ? "Image: " + i : imageCheckboxes.get(i).getImage().getDescription();
+                    String description = image.getImage().getDescription() == null ? "no description" : image.getImage().getDescription();
                     footerCell.add(description).setTextAlignment(TextAlignment.CENTER);
                     footerCell.setBorder(Border.NO_BORDER);
                     imageTable.addFooterCell(footerCell);
@@ -150,23 +156,21 @@ public class PdfGenerator {
                 }
             }
 
-
             //Create page number header and website footer and add contents
-            Paragraph footerText = new Paragraph("www.wuav.dk");
+            /*Paragraph footerText = new Paragraph("www.wuav.dk");
             footerText.setTextAlignment(TextAlignment.CENTER);
-            Rectangle footer = new Rectangle(0, 0, pdfDoc.getDefaultPageSize().getWidth(), 50);
+            Rectangle footer = new Rectangle(0, 0, 300, 50);
+
             int numberOfPages = doc.getPdfDocument().getNumberOfPages();
-            for (int i = 1; i <= numberOfPages; i++) {
-                PdfPage page = pdfDoc.getPage(i);
+            for (int i = 0; i < numberOfPages; i++) {
+                PdfPage page = pdfDoc.getPage(i+1);
                 PdfCanvas pdfCanvas = new PdfCanvas(page);
                 pdfCanvas.rectangle(footer);
                 Canvas canvas = new Canvas(pdfCanvas, pdfDoc, footer);
                 canvas.add(footerText);
-                if (numberOfPages > 1) {
-                    canvas.add(new Paragraph(i + " of " + numberOfPages).setTextAlignment(TextAlignment.CENTER).setFixedPosition(0, pdfDoc.getDefaultPageSize().getTop() - 50, pdfDoc.getDefaultPageSize().getWidth()));
-                }
+                canvas.add(new Paragraph((i + 1)+ " of " + numberOfPages).setTextAlignment(TextAlignment.CENTER).setFixedPosition(0, pdfDoc.getDefaultPageSize().getTop() - 50, pdfDoc.getDefaultPageSize().getWidth()));
                 canvas.close();
-            }
+            }*/
 
             doc.close();
 
