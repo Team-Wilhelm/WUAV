@@ -1,26 +1,25 @@
 package gui.util;
 
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Window;
 
 import java.util.Optional;
 
-public class AlertManager {
+public class DialogueManager {
     private Alert alert;
-    private static AlertManager instance = null;
+    private static DialogueManager instance = null;
 
-    private AlertManager() {
+    private DialogueManager() {
         alert = new Alert(Alert.AlertType.ERROR);
     }
 
     /**
      * Makes AlertManager a singleton class, in order to reuse the same alert and avoid code repetition
      */
-    public static AlertManager getInstance() {
+    public static DialogueManager getInstance() {
         if (instance == null) {
-            instance = new AlertManager();
+            instance = new DialogueManager();
         }
         return instance;
     }

@@ -62,12 +62,20 @@ public class User extends Observable<User> {
         this.username = username;
     }
 
-    public byte[][] getPassword() {
-        return password;
+    public byte[] getPassword() {
+        return password[0];
     }
 
-    public void setPassword(byte[][] password) {
-        this.password = password;
+    public byte[] getSalt() {
+        return password[1];
+    }
+
+    public void setPassword(byte[] password) {
+        this.password[0] = password;
+    }
+
+    public void setSalt(byte[] salt) {
+        this.password[1] = salt;
     }
 
     public HashMap<UUID, Document> getAssignedDocuments() {

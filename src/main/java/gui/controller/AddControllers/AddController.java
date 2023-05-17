@@ -1,6 +1,5 @@
 package gui.controller.AddControllers;
 
-import be.Document;
 import gui.controller.ViewControllers.ViewController;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
@@ -10,7 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.stage.Window;
-import gui.util.AlertManager;
+import gui.util.DialogueManager;
 
 import java.util.Timer;
 
@@ -18,7 +17,7 @@ public abstract class AddController<T> {
     protected abstract void assignInputToVariables();
     protected abstract void assignListenersToTextFields();
     protected abstract void setIsEditing(T objectToEdit);
-    private final AlertManager alertManager = AlertManager.getInstance();
+    private final DialogueManager dialogueManager = DialogueManager.getInstance();
 
     protected void setUpSaveTask(SaveTask<T> task, ViewController<T> controller, Window owner, AddController<T> addController) {
         setUpTask(task, controller, owner);
@@ -32,13 +31,13 @@ public abstract class AddController<T> {
                         ((AddDocumentController) addController).setUpPdfListView();
                     }
                 } else if (task.getValue() == TaskState.DUPLICATE_DATA) {
-                    alertManager.showError("Username already exists!", "Username already exists!", owner);
+                    dialogueManager.showError("Username already exists!", "Username already exists!", owner);
                 }
                 else if (task.getValue() == TaskState.NO_PERMISSION){
-                    alertManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
+                    dialogueManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
                 }
                 else {
-                    alertManager.showError("Oops...", "Something went wrong!", owner);
+                    dialogueManager.showError("Oops...", "Something went wrong!", owner);
                 }
             });
 
@@ -79,7 +78,7 @@ public abstract class AddController<T> {
                     },
                     3000
             );
-            alertManager.showError("Oops...", "Something went wrong!", owner);
+            dialogueManager.showError("Oops...", "Something went wrong!", owner);
         });
     }
 
@@ -106,11 +105,11 @@ public abstract class AddController<T> {
             }
 
             else if (task.getValue() == TaskState.NO_PERMISSION){
-                alertManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
+                dialogueManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
             }
 
             else {
-                alertManager.showError("Oops...", "Something went wrong!", owner);
+                dialogueManager.showError("Oops...", "Something went wrong!", owner);
             }
         });
     }

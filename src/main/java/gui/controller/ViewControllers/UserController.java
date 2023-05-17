@@ -7,7 +7,7 @@ import gui.util.SceneManager;
 import gui.controller.AddControllers.AddUserController;
 import gui.model.UserModel;
 import gui.tasks.TaskState;
-import gui.util.AlertManager;
+import gui.util.DialogueManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -144,7 +144,7 @@ public class UserController extends ViewController<User> implements Initializabl
                e.printStackTrace();
             }
         } else {
-            AlertManager.getInstance().showWarning("No user selected", "Please select a user to edit", window);
+            DialogueManager.getInstance().showWarning("No user selected", "Please select a user to edit", window);
         }
     }
 

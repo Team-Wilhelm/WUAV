@@ -24,7 +24,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
-import gui.util.AlertManager;
+import gui.util.DialogueManager;
 import javafx.stage.Window;
 import utils.permissions.AccessChecker;
 import java.io.IOException;
@@ -205,7 +205,7 @@ public class DocumentController extends ViewController<Document> implements Init
                 }
             }
             else {
-                AlertManager.getInstance().showError("No document selected", "Please select a document", btnAddDocument.getScene().getWindow());
+                DialogueManager.getInstance().showError("No document selected", "Please select a document", btnAddDocument.getScene().getWindow());
             }
         }
     }

@@ -1,6 +1,8 @@
 package gui.controller.AddControllers;
 
 import be.User;
+import gui.nodes.PasswordDialogue;
+import javafx.geometry.Pos;
 import utils.enums.EditingOptions;
 import utils.enums.UserRole;
 import gui.controller.ViewControllers.UserController;
@@ -8,11 +10,10 @@ import gui.model.UserModel;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
-import gui.util.AlertManager;
+import gui.util.DialogueManager;
 import gui.util.CropImageToCircle;
 import gui.util.ImageCropper;
 import io.github.palexdev.materialfx.controls.*;
-import io.github.palexdev.materialfx.enums.FloatMode;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -43,6 +44,8 @@ public class AddUserController extends AddController<User> implements Initializa
     @FXML
     private MFXTextField txtName, txtUsername, txtPhoneNumber;
     @FXML
+    private MFXPasswordField txtPassword;
+    @FXML
     private MFXComboBox<UserRole> comboPosition;
     @FXML
     private MFXComboBox<EditingOptions> comboOptions;
@@ -50,7 +53,7 @@ public class AddUserController extends AddController<User> implements Initializa
     private MFXButton btnSave;
 
     private final UserModel userModel;
-    private final AlertManager alertManager;
+    private final DialogueManager dialogueManager;
     private HashPasswordHelper hashPasswordHelper;
     private User userToUpdate;
     private UserController userController;
@@ -64,7 +67,7 @@ public class AddUserController extends AddController<User> implements Initializa
 
     public AddUserController() {
         userModel = UserModel.getInstance();
-        alertManager = AlertManager.getInstance();
+        dialogueManager = DialogueManager.getInstance();
         hashPasswordHelper = new HashPasswordHelper();
         executorService = ThreadPool.getInstance();
 
@@ -78,13 +81,13 @@ public class AddUserController extends AddController<User> implements Initializa
     public void initialize(URL location, ResourceBundle resources) {
         isEditing = false;
         profilePicturePath = "/img/userIcon.png";
+        imgProfilePicture.setImage(CropImageToCircle.getRoundedImage(new Image(profilePicturePath)));
 
         btnSave.setDisable(true);
         comboOptions.setDisable(true);
 
         profilePictureDoubleClick();
         setUpComboBoxes();
-
         assignListenersToTextFields();
 
         btnSave.requestFocus();
@@ -113,7 +116,6 @@ public class AddUserController extends AddController<User> implements Initializa
             }
             setUpSaveTask(saveTask, userController, txtName.getScene().getWindow(), this);
             executorService.execute(saveTask);
-            //userToUpdate = user;
         }
     }
 
@@ -126,7 +128,7 @@ public class AddUserController extends AddController<User> implements Initializa
 
     @FXML
     private void deleteUserAction(ActionEvent actionEvent) {
-        Optional<ButtonType> result = alertManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", txtName.getScene().getWindow());
+        Optional<ButtonType> result = dialogueManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", txtName.getScene().getWindow());
         if (result.isPresent() && result.get().equals(ButtonType.OK)) {
             Task<TaskState> deleteTask = new DeleteTask<>(userToUpdate.getUserID(), userModel);
             setUpDeleteTask(deleteTask, userController, txtName.getScene().getWindow());
@@ -194,6 +196,7 @@ public class AddUserController extends AddController<User> implements Initializa
         isEditing = true;
         isUpdating.set(false);
         comboOptions.setDisable(false);
+        txtPassword.setVisible(false);
 
         userToUpdate = user;
         txtName.setText(user.getFullName());
@@ -207,7 +210,7 @@ public class AddUserController extends AddController<User> implements Initializa
     private boolean checkInput() {
         if (userModel.getAll().values().stream().anyMatch(user -> user.getUsername().equals(username))
                 && !Objects.equals(userToUpdate.getUsername(), username)) {
-            alertManager.showError("Username already exists", "Please choose another username", txtName.getScene().getWindow());
+            dialogueManager.showError("Username already exists", "Please choose another username", txtName.getScene().getWindow());
             return false;
         }
         return true;
@@ -235,12 +238,13 @@ public class AddUserController extends AddController<User> implements Initializa
             } else if (newValue == EditingOptions.DELETE) {
                 deleteUserAction(null);
             } else if (newValue == EditingOptions.CHANGE_PASSWORD) {
-                changePasswordAction();
+                showPasswordDialogue();
             }
         });
     }
 
     private void changePasswordAction() {
+        showPasswordDialogue();
     }
 
     public void setProfilePicture(Image image, String profilePicturePath) throws Exception {
@@ -273,6 +277,7 @@ public class AddUserController extends AddController<User> implements Initializa
             // Make the text fields look like labels if they're not editable
             txtName.getStyleClass().add("not-editable");
             txtName.setFloatingText("");
+            txtName.setAlignment(Pos.CENTER);
             //TODO Make the txtName resize to the size of the text, so it can be centered
             txtUsername.getStyleClass().add("not-editable");
             txtPhoneNumber.getStyleClass().add("not-editable");
@@ -282,10 +287,23 @@ public class AddUserController extends AddController<User> implements Initializa
             // Revert the text fields to their original style
             txtName.getStyleClass().removeIf(s -> s.equals("not-editable"));
             txtName.setFloatingText("Name");
+            txtName.setAlignment(Pos.BASELINE_LEFT);
             txtUsername.getStyleClass().removeIf(s -> s.equals("not-editable"));
             txtPhoneNumber.getStyleClass().removeIf(s -> s.equals("not-editable"));
             comboPosition.getStyleClass().removeIf(s -> s.equals("not-editable"));
         }
+    }
+
+    private void showPasswordDialogue() {
+        PasswordDialogue passwordDialogue = new PasswordDialogue(txtName.getScene().getWindow(), gridPane, userToUpdate);
+        passwordDialogue.showDialog();
+        passwordDialogue.setOnCloseRequest(event -> {
+            if (passwordDialogue.isPasswordChanged()) {
+                userToUpdate.setPassword(passwordDialogue.getNewPassword());
+                userToUpdate.setSalt(passwordDialogue.getNewSalt());
+                btnSaveAction(null);
+            }
+        });
     }
     //endregion
 }
