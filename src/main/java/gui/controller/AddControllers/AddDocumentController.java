@@ -6,7 +6,7 @@ import be.interfaces.Observer;
 import gui.nodes.*;
 import be.enums.CustomerType;
 import be.enums.UserRole;
-import bll.PdfGenerator;
+import bll.pdf.PdfGenerator;
 import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;

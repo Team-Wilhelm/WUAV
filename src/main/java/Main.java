@@ -1,10 +1,5 @@
-import be.Document;
-import bll.PdfGenerator;
 import gui.SceneManager;
-import gui.model.DocumentModel;
 import gui.model.UserModel;
-import gui.nodes.TextAreaWithFloatingText;
-import gui.util.ImageCropper;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
 import io.github.palexdev.materialfx.css.themes.Themes;
 import javafx.application.Application;
@@ -13,11 +8,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.aspectj.bridge.MessageHandler;
 import utils.ThreadPool;
 
 import java.util.Objects;
-import java.util.UUID;
 
 
 public class Main extends Application {

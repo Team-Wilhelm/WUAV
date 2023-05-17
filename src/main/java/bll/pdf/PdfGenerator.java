@@ -1,41 +1,26 @@
-package bll;
+package bll.pdf;
 
 import be.Address;
 import be.Document;
-import be.ImageWrapper;
-import be.User;
 import be.enums.DocumentPropertyType;
 import com.itextpdf.io.font.FontConstants;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.geom.Rectangle;
-import com.itextpdf.kernel.pdf.PageLabelNumberingStyleConstants;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfPage;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.annot.PdfAnnotation;
-import com.itextpdf.kernel.pdf.annot.PdfTextAnnotation;
-import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.kernel.pdf.xobject.PdfXObject;
-import com.itextpdf.layout.Canvas;
+import com.itextpdf.kernel.pdf.*;
 import com.itextpdf.layout.border.Border;
 import com.itextpdf.layout.element.*;
-import com.itextpdf.layout.property.AreaBreakType;
-import com.itextpdf.layout.property.HorizontalAlignment;
-import com.itextpdf.layout.property.TextAlignment;
-import com.itextpdf.layout.property.VerticalAlignment;
+import com.itextpdf.layout.property.*;
 import gui.nodes.DocumentPropertyCheckboxWrapper;
-import io.github.palexdev.virtualizedfx.table.TableCache;
-
 import java.io.IOException;
 import java.util.List;
-
 
 public class PdfGenerator {
     private static PdfFont FONT;
     private static final int FONT_SIZE = 12;
+    PdfPageEventHandler pageNumberHandler;
 
     public void generatePdf(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes) {
         try {
@@ -45,6 +30,12 @@ public class PdfGenerator {
             String home = System.getProperty("user.home");
             PdfWriter writer = new PdfWriter(home + "/Downloads/" + document.getDocumentID() + ".pdf");
             PdfDocument pdfDoc = new PdfDocument(writer);
+
+            pageNumberHandler = new PdfPageEventHandler(pdfDoc);
+
+            // Set the event handler on the PdfDocument
+            pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, pageNumberHandler);
+
             com.itextpdf.layout.Document doc = new com.itextpdf.layout.Document(pdfDoc);
             float margin = 75;
             doc.setMargins(margin, margin, margin, margin);
@@ -127,22 +118,16 @@ public class PdfGenerator {
             List<DocumentPropertyCheckboxWrapper> imageCheckboxes = checkBoxes.stream().filter(checkbox -> checkbox.getProperty() == DocumentPropertyType.IMAGE).toList();
             if (!imageCheckboxes.isEmpty()) {
                 doc.add(pageBreak);
-                /*for (int i = 0; i < imageCheckboxes.size(); i++) {
-                    if (i % 2 != 0) {
-                        doc.add(pageBreak);
-                    }*/
                  for (DocumentPropertyCheckboxWrapper image: imageCheckboxes) {
                     imageTable = new Table(1);
 
-                    ImageData imageData = ImageDataFactory.create(/*imageCheckboxes.get(i).getImage().getUrl()*/image.getImage().getUrl());
+                    ImageData imageData = ImageDataFactory.create(image.getImage().getUrl());
                     Image documentImage = new Image(imageData);
                     documentImage.setHorizontalAlignment(HorizontalAlignment.CENTER);
-                    //documentImage.setHeight(150);
                     documentImage.setAutoScale(true);
                     imageTable.addCell(documentImage);
 
                     Cell footerCell = new Cell();
-                    //String description = imageCheckboxes.get(i).getImage().getDescription() == null ? "Image: " + i : imageCheckboxes.get(i).getImage().getDescription();
                     String description = image.getImage().getDescription() == null ? "no description" : image.getImage().getDescription();
                     footerCell.add(description).setTextAlignment(TextAlignment.CENTER);
                     footerCell.setBorder(Border.NO_BORDER);
@@ -155,31 +140,12 @@ public class PdfGenerator {
                     doc.add(imageTable);
                 }
             }
-
-            //Create page number header and website footer and add contents
-            /*Paragraph footerText = new Paragraph("www.wuav.dk");
-            footerText.setTextAlignment(TextAlignment.CENTER);
-            Rectangle footer = new Rectangle(0, 0, 300, 50);
-
-            int numberOfPages = doc.getPdfDocument().getNumberOfPages();
-            for (int i = 0; i < numberOfPages; i++) {
-                PdfPage page = pdfDoc.getPage(i+1);
-                PdfCanvas pdfCanvas = new PdfCanvas(page);
-                pdfCanvas.rectangle(footer);
-                Canvas canvas = new Canvas(pdfCanvas, pdfDoc, footer);
-                canvas.add(footerText);
-                canvas.add(new Paragraph((i + 1)+ " of " + numberOfPages).setTextAlignment(TextAlignment.CENTER).setFixedPosition(0, pdfDoc.getDefaultPageSize().getTop() - 50, pdfDoc.getDefaultPageSize().getWidth()));
-                canvas.close();
-            }*/
-
             doc.close();
-
 
             } catch(IOException e){
                 throw new RuntimeException(e);
             }
         }
-
 
     private String getLogo(){
         return "https://easvprojects.blob.core.windows.net/wuav/9e112cc6-1487-426a-9bdc-2a4fd7b91861/7e7d9e00-507b-47ee-989b-8686859b41aa-wuav.png";
