@@ -1,4 +1,5 @@
 @import "TextAreaWithFloatingText.css";
+@import "DatePickerStyle.css";
 
 * {
     dark-blue-grey: #0e283f;
@@ -167,6 +168,28 @@
 
 .mfx-checkbox {
     -mfx-main: dark-blue-grey;
+}
+
+#imgBackground {
+    -fx-background-image: url("/img/electrical-equipment-wooden-workplace.jpg");
+    -fx-background-size: cover;
+    -fx-background-position-x: center;
+}
+
+.mfx-text-field.not-editable {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-border-style: hidden;
+    -fx-background-color: transparent;
+}
+
+.mfx-text-field.not-editable .floating-text {
+    -fx-background-color: transparent;
+    -fx-border-style: hidden;
+}
+
+.mfx-combo-box.not-editable .caret .mfx-font-icon {
+    -mfx-color: transparent;
 }
 
 

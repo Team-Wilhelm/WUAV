@@ -1,9 +1,9 @@
 package gui.controller;
 
 import be.User;
-import gui.SceneManager;
+import gui.util.SceneManager;
 import gui.model.UserModel;
-import gui.util.AlertManager;
+import gui.util.DialogueManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -52,12 +52,12 @@ public class LoginViewController implements Initializable {
 
     public Boolean loginUser(Event event){
         User user = userModel.getUserByUsername(usernameInput.getText());
-        if(userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText(), user.getPassword()[1]))){
+        if(userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText(), user.getSalt()))){
             userModel.setLoggedInUser(user);
             openMenuView();
             return true;
         }
-        AlertManager.getInstance().showError(
+        DialogueManager.getInstance().showError(
                 "Login failed!",
                 "Check that username and password are correct",
                 btnLogin.getScene().getWindow());

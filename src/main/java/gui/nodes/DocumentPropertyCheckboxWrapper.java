@@ -1,10 +1,9 @@
 package gui.nodes;
 
 import be.ImageWrapper;
-import be.enums.DocumentPropertyType;
+import utils.enums.DocumentPropertyType;
 import io.github.palexdev.materialfx.controls.MFXCheckbox;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 
 public class DocumentPropertyCheckboxWrapper {
     private DocumentPropertyType property;
