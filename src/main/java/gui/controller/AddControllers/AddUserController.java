@@ -37,9 +37,9 @@ import utils.ThreadPool;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class AddUserController extends AddController<User> implements Initializable {
-    //TODO ESC should revert editing mode
     @FXML
     private GridPane gridPane;
     @FXML
@@ -120,7 +120,7 @@ public class AddUserController extends AddController<User> implements Initializa
             if (isEditing) {
                 user.setUserID(userToUpdate.getUserID());
             }
-            setUpSaveTask(saveTask, userController, txtName.getScene().getWindow(), this);
+            setUpSaveTask(saveTask, userController, gridPane, this);
             executorService.execute(saveTask);
         }
     }
@@ -136,14 +136,15 @@ public class AddUserController extends AddController<User> implements Initializa
 
     @FXML
     private void deleteUserAction(ActionEvent actionEvent) {
-        Optional<ButtonType> result = dialogueManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", txtName.getScene().getWindow());
-        if (result.isPresent() && result.get().equals(ButtonType.OK)) {
-            Task<TaskState> deleteTask = new DeleteTask<>(userToUpdate.getUserID(), userModel);
-            setUpDeleteTask(deleteTask, userController, txtName.getScene().getWindow());
-            executorService.execute(deleteTask);
-            closeWindow(actionEvent);
-            userController.refreshItems();
-        }
+        CompletableFuture<ButtonType> result = dialogueManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", gridPane);
+        result.thenAccept(r -> {
+            if (r.equals(ButtonType.OK)) {
+                Task<TaskState> deleteTask = new DeleteTask<>(userToUpdate.getUserID(), userModel);
+                setUpDeleteTask(deleteTask, userController, gridPane);
+                executorService.execute(deleteTask);
+                closeWindow(actionEvent);
+            }
+        });
     }
 
     private void profilePictureDoubleClick() {
@@ -205,6 +206,7 @@ public class AddUserController extends AddController<User> implements Initializa
         username = txtUsername.getText().trim();
         phoneNumber = txtPhoneNumber.getText().trim();
         userRole = comboPosition.getSelectionModel().getSelectedItem();
+        password = txtPassword.getText().trim();
     }
 
     @Override
@@ -212,6 +214,7 @@ public class AddUserController extends AddController<User> implements Initializa
         txtName.textProperty().addListener(inputListener);
         txtUsername.textProperty().addListener(inputListener);
         txtPhoneNumber.textProperty().addListener(inputListener);
+        txtPassword.textProperty().addListener(inputListener);
     }
 
     public void setIsEditing(User user) {
@@ -233,7 +236,7 @@ public class AddUserController extends AddController<User> implements Initializa
     private boolean checkInput() {
         if (userModel.getAll().values().stream().anyMatch(user -> user.getUsername().equals(username))
                 && !Objects.equals(userToUpdate.getUsername(), username)) {
-            dialogueManager.showError("Username already exists", "Please choose another username", txtName.getScene().getWindow());
+            dialogueManager.showError("Username already exists", "Please choose another username", gridPane);
             return false;
         }
         return true;
@@ -319,6 +322,10 @@ public class AddUserController extends AddController<User> implements Initializa
         setShortcutsAndAccelerators(txtName.getScene());
     }
 
+    /**
+     * Sets the shortcuts and accelerators for the scene
+     * @param scene The scene must be not null
+     */
     public void setShortcutsAndAccelerators(Scene scene) {
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN), () -> {
             if (!btnSave.isDisabled()) {

@@ -1,6 +1,7 @@
 package gui.controller.ViewControllers;
 
 import be.Document;
+import javafx.scene.layout.GridPane;
 import utils.enums.UserRole;
 import gui.model.UserModel;
 import gui.nodes.DocumentCard;
@@ -43,6 +44,8 @@ public class DocumentController extends ViewController<Document> implements Init
     private MFXButton btnAddDocument;
     @FXML
     private MFXTextField searchBar;
+    @FXML
+    private GridPane gridPane;
 
     private ObservableList<DocumentCard> documentCards = FXCollections.observableArrayList();
     private ObservableList<Document> documentList = FXCollections.observableArrayList();
@@ -204,7 +207,7 @@ public class DocumentController extends ViewController<Document> implements Init
                 }
             }
             else {
-                DialogueManager.getInstance().showError("No document selected", "Please select a document", btnAddDocument.getScene().getWindow());
+                DialogueManager.getInstance().showError("No document selected", "Please select a document", gridPane);
             }
         }
     }

@@ -88,7 +88,7 @@ public class ImageCropper {
             controller.setProfilePicture(croppedImage, file.getAbsolutePath());
             stage.close();
         } catch (Exception e) {
-            DialogueManager.getInstance().showError("Error", "An error occurred while saving the image.", stage);
+            DialogueManager.getInstance().showError("Error", "An error occurred while saving the image.", gridPane);
         }
     }
 
