@@ -3,6 +3,8 @@ package gui.controller.AddControllers;
 import be.*;
 import be.interfaces.Observable;
 import be.interfaces.Observer;
+import gui.nodes.textControls.MFXTextFieldWithAutofill;
+import gui.nodes.textControls.TextAreaWithFloatingText;
 import utils.enums.CustomerType;
 import utils.enums.UserRole;
 import bll.pdf.PdfGenerator;
@@ -41,8 +43,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-import julia.nodes.MFXTextFieldWithAutofill;
-import julia.nodes.TextAreaWithFloatingText;
 import utils.BlobService;
 import utils.ThreadPool;
 import javax.imageio.ImageIO;
@@ -157,6 +157,7 @@ public class AddDocumentController extends AddController<Document> implements In
         });
 
         addTooltips();
+        System.out.println(Arrays.toString(txtJobDescription.getStylesheets().toArray()));
     }
 
     @FXML

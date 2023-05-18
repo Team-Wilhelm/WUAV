@@ -230,7 +230,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 Document document = createDocumentFromResultSet(rs);
                 documents.put(document.getDocumentID(), document);
             }
-            System.out.println("DocumentDAO.getAll() took " + (System.currentTimeMillis() - startTime) + "ms");
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {

@@ -1,4 +1,4 @@
-package gui.nodes;
+package gui.nodes.textControls;
 
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.geometry.Side;

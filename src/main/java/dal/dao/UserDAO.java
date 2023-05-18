@@ -113,7 +113,6 @@ public class UserDAO extends DAO implements IDAO<User> {
                 User user = getUserFromResultSet(resultSet, documentIDs, true);
                 users.put(user.getUserID(), user);
             }
-            System.out.println("UserDAO.getAll() took " + (System.currentTimeMillis() - startTime) + "ms");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

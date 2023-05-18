@@ -1,8 +1,7 @@
 package gui.controller.AddControllers;
 
 import be.User;
-import gui.nodes.PasswordDialogue;
-import gui.nodes.UserCard;
+import gui.nodes.dialogues.PasswordDialogue;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;

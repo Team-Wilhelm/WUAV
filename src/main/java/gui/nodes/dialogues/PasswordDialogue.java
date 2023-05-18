@@ -1,19 +1,14 @@
-package gui.nodes;
+package gui.nodes.dialogues;
 
 import be.User;
 import gui.model.UserModel;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
-import io.github.palexdev.materialfx.controls.MFXTextField;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
 import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
-import io.github.palexdev.materialfx.dialogs.MFXStageDialogBuilder;
 import io.github.palexdev.materialfx.enums.ScrimPriority;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.scene.Node;
-import javafx.scene.control.ButtonType;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;

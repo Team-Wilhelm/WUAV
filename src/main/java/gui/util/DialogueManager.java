@@ -1,7 +1,7 @@
 package gui.util;
 
-import be.User;
-import gui.nodes.PasswordDialogue;
+import gui.nodes.dialogues.PasswordDialogue;
+import gui.nodes.dialogues.TextInputDialogue;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
@@ -19,7 +19,6 @@ import java.util.concurrent.CompletableFuture;
  * A manager class for all the alerts and dialogues in the application
  */
 public class DialogueManager {
-    //TODO password dialog
     private static DialogueManager instance = null;
 
     // Alerts
@@ -31,6 +30,7 @@ public class DialogueManager {
 
     // Dialogues
     private PasswordDialogue passwordDialogue;
+    private TextInputDialogue textInputDialogue;
 
     private DialogueManager() {
         dialog = MFXGenericDialogBuilder.build()
@@ -55,6 +55,7 @@ public class DialogueManager {
         result = new CompletableFuture<>();
 
         passwordDialogue = new PasswordDialogue();
+        textInputDialogue = new TextInputDialogue();
     }
 
     /**
@@ -88,6 +89,24 @@ public class DialogueManager {
         return result;
     }
 
+    public CompletableFuture<String> showTextInputDialogue(String header, String contentDescription, String contentValue,  Pane parent) {
+        textInputDialogue.clear();
+
+        if (textInputDialogue.getOwnerNode() != parent) {
+            textInputDialogue.setOwnerNode(parent);
+        }
+
+        if (textInputDialogue.getOwner() == null) {
+            textInputDialogue.initModality(Modality.APPLICATION_MODAL);
+            textInputDialogue.initOwner(parent.getScene().getWindow());
+        }
+
+        textInputDialogue.setHeaderText(header);
+        textInputDialogue.setContentDescription(contentDescription);
+        textInputDialogue.setContentText(contentValue);
+        return textInputDialogue.showAndReturnResult();
+    }
+
     public PasswordDialogue getPasswordDialogue(Pane parent) {
         passwordDialogue.clear();
 
@@ -102,6 +121,7 @@ public class DialogueManager {
 
         return passwordDialogue;
     }
+
 
     private void convertDialogTo(Alert.AlertType alertType, String header, String content, Pane parent) {
         String styleClass = null;
