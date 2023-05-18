@@ -75,7 +75,7 @@ public class UserModel implements IModel<User> {
         return userManager.getById(id);
     }
 
-    public User getByIDFFromModel(UUID id) {
+    public User getByIDFromModel(UUID id) {
         return allUsers.get(id);
     }
 

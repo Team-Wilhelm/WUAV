@@ -22,7 +22,7 @@ public class PdfGenerator {
     private static final int FONT_SIZE = 12;
     PdfPageEventHandler pageNumberHandler;
 
-    public void generatePdf(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes) {
+    public void generatePdf(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes, int numberOfPages) {
         try {
             FONT = PdfFontFactory.createFont(FontConstants.HELVETICA);
 
@@ -31,7 +31,7 @@ public class PdfGenerator {
             PdfWriter writer = new PdfWriter(home + "/Downloads/" + document.getDocumentID() + ".pdf");
             PdfDocument pdfDoc = new PdfDocument(writer);
 
-            pageNumberHandler = new PdfPageEventHandler(pdfDoc);
+            pageNumberHandler = new PdfPageEventHandler(pdfDoc, numberOfPages);
 
             // Set the event handler on the PdfDocument
             pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, pageNumberHandler);
@@ -173,5 +173,128 @@ public class PdfGenerator {
         for (IElement iElement : table.getChildren()) {
             ((Cell)iElement).setBorder(Border.NO_BORDER);
         }
+    }
+
+    public int getNumberOfPages(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes) {
+        int numberOfPages = 1;
+        try {
+            FONT = PdfFontFactory.createFont(FontConstants.HELVETICA);
+
+            // Open a new PDF document
+            String home = System.getProperty("user.home");
+            PdfWriter writer = new PdfWriter(home + "/Downloads/" + document.getDocumentID() + ".pdf");
+            PdfDocument pdfDoc = new PdfDocument(writer);
+
+            com.itextpdf.layout.Document doc = new com.itextpdf.layout.Document(pdfDoc);
+            float margin = 75;
+            doc.setMargins(margin, margin, margin, margin);
+
+            //Create formatting elements
+            Paragraph lineBreak = new Paragraph();
+            Paragraph lineBreak3 = new Paragraph("\n" + "\n" + "\n");
+            AreaBreak pageBreak = new AreaBreak(AreaBreakType.NEXT_AREA);
+
+            //Left side header, customer info
+            Paragraph customerParagraph = new Paragraph(getCustomerInfo(document));
+
+            //Right side header, WUAV info
+            Paragraph WUAVheader = new Paragraph(getWUAVinfo());
+            WUAVheader.setTextAlignment(TextAlignment.RIGHT);
+
+            //Create pdf header
+            Table headerTable = new Table(2);
+
+            Cell customerCell = new Cell();
+            customerCell.add(customerParagraph);
+
+            Cell WUAVCell = new Cell();
+            WUAVCell.add(WUAVheader);
+
+            headerTable.addCell(customerCell);
+            headerTable.addCell(WUAVCell);
+            removeBorder(headerTable);
+
+            doc.add(headerTable);
+            doc.add(lineBreak);
+
+            //Add WUAV logo
+            ImageData data = ImageDataFactory.create(getLogo());
+            Image logoImage = new Image(data);
+            logoImage.setHeight(50).setHorizontalAlignment(HorizontalAlignment.RIGHT);
+
+            Table logoTable = new Table(1);
+            logoTable.addCell(logoImage).setPageNumber(1);
+            removeBorder(logoTable);
+
+            doc.add(logoTable);
+
+            doc.add(lineBreak3);
+
+            //Create job contents for document
+            Paragraph date = new Paragraph(String.valueOf(document.getDateOfCreation()));
+            Paragraph jobTitle = new Paragraph(document.getJobTitle());
+            jobTitle.setBold();
+            jobTitle.setFontSize(14);
+            Paragraph jobDescription = new Paragraph(document.getJobDescription());
+
+            String optionalNotes;
+            if (!document.getOptionalNotes().isEmpty()) {
+                optionalNotes = "Additional notes: " + document.getOptionalNotes();
+            } else optionalNotes = "";
+            Paragraph notes = new Paragraph(optionalNotes);
+
+            // Determine which properties to add to the document
+            for (DocumentPropertyCheckboxWrapper checkboxWrapper: checkBoxes) {
+                if (checkboxWrapper.getProperty() == DocumentPropertyType.DATE_OF_CREATION) {
+                    doc.add(date);
+                    doc.add(lineBreak);
+                }
+                if (checkboxWrapper.getProperty() == DocumentPropertyType.JOB_TITLE) {
+                    doc.add(jobTitle);
+                }
+                if (checkboxWrapper.getProperty() == DocumentPropertyType.JOB_DESCRIPTION) {
+                    doc.add(jobDescription);
+                }
+                if (checkboxWrapper.getProperty() == DocumentPropertyType.NOTES) {
+                    doc.add(notes);
+                } if (checkboxWrapper.getProperty() == DocumentPropertyType.TECHNICIANS) {
+                    Paragraph technicianList = new Paragraph(document.getTechnicianNames());
+                    doc.add(technicianList);
+                }
+            }
+            //Add images
+            Table imageTable;
+            List<DocumentPropertyCheckboxWrapper> imageCheckboxes = checkBoxes.stream().filter(checkbox -> checkbox.getProperty() == DocumentPropertyType.IMAGE).toList();
+            if (!imageCheckboxes.isEmpty()) {
+                doc.add(pageBreak);
+                for (DocumentPropertyCheckboxWrapper image: imageCheckboxes) {
+                    imageTable = new Table(1);
+
+                    ImageData imageData = ImageDataFactory.create(image.getImage().getUrl());
+                    Image documentImage = new Image(imageData);
+                    documentImage.setHorizontalAlignment(HorizontalAlignment.CENTER);
+                    documentImage.setAutoScale(true);
+                    imageTable.addCell(documentImage);
+
+                    Cell footerCell = new Cell();
+                    String description = image.getImage().getDescription() == null ? "no description" : image.getImage().getDescription();
+                    footerCell.add(description).setTextAlignment(TextAlignment.CENTER);
+                    footerCell.setBorder(Border.NO_BORDER);
+                    imageTable.addFooterCell(footerCell);
+
+                    imageTable.setHorizontalAlignment(HorizontalAlignment.CENTER).setVerticalAlignment(VerticalAlignment.MIDDLE);
+                    removeBorder(imageTable);
+                    imageTable.setMarginTop(20);
+
+                    doc.add(imageTable);
+                }
+            }
+            numberOfPages = pdfDoc.getNumberOfPages();
+            doc.close();
+
+        } catch(IOException e){
+            throw new RuntimeException(e);
+        }
+        return numberOfPages;
     }
 }
