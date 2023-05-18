@@ -13,15 +13,11 @@ public class DocumentModel implements IModel<Document> {
     private static DocumentModel instance;
     private DocumentManager documentManager;
     private HashMap<UUID, Document> allDocuments;
-    private HashMap<Document, DocumentCard> createdDocumentCards;
 
     private DocumentModel() {
-        long start = System.currentTimeMillis();
         documentManager = (DocumentManager) ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
         allDocuments = new HashMap<>();
-        createdDocumentCards = new HashMap<>();
         setAllDocuments();
-        //createDocumentCards();
     }
 
     public static DocumentModel getInstance() {
@@ -33,21 +29,24 @@ public class DocumentModel implements IModel<Document> {
 
     @Override
     public CompletableFuture<String> add(Document document) {
-        String message = documentManager.add(document);
-        CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
-        return future.thenApplyAsync(documents -> {
-            setAllDocuments();
-            return message;
-        });
+        CompletableFuture<String> future = new CompletableFuture<>();
+        future.complete(documentManager.add(document));
+        if (future.isDone() && future.get().equals("saved")) {
+            allDocuments.put(document.getDocumentID(), document);
+        }
+        future.thenRun(() -> allDocuments.put(document.getDocumentID(), document));
+        return future;
     }
 
     @Override
     public String update(Document document) {
+
         return documentManager.update(document);
     }
 
     @Override
     public String delete(UUID id) {
+        allDocuments.remove(id);
         return documentManager.delete(id);
     }
 
@@ -64,10 +63,6 @@ public class DocumentModel implements IModel<Document> {
     public void setAllDocuments() {
         this.allDocuments.clear();
         this.allDocuments.putAll(documentManager.getAll());
-    }
-
-    public HashMap<Document, DocumentCard> getCreatedDocumentCards() {
-        return createdDocumentCards;
     }
 
     public void assignUserToDocument(User user, Document document, boolean isAssigning){

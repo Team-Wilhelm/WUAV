@@ -3,11 +3,14 @@ package gui.util;
 import javafx.scene.Node;
 import utils.enums.NodeType;
 
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Queue;
 
 public class NodePool {
     private static NodePool instance;
-    private HashMap<NodeType, Node> nodePool;
+    private HashMap<NodeType, Deque<Node>> nodePool;
 
     private NodePool() {
         nodePool = new HashMap<>();
@@ -21,14 +24,10 @@ public class NodePool {
     }
 
     public void addNode(NodeType nodeType, Node node) {
-        nodePool.put(nodeType, node);
+        nodePool.get(nodeType).add(node);
     }
 
     public Node getNode(NodeType nodeType) {
-        return nodePool.get(nodeType);
-    }
-
-    public void removeNode(NodeType nodeType) {
-        nodePool.remove(nodeType);
+        return nodePool.get(nodeType).getFirst();
     }
 }

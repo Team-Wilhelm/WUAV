@@ -2,10 +2,11 @@ package gui.tasks;
 
 import gui.model.IModel;
 import javafx.concurrent.Task;
+import utils.enums.ResultState;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SaveTask<T> extends Task<TaskState> {
+public class SaveTask<T> extends Task<ResultState> {
     private final T objectToSave;
     private final boolean isEditing;
     private final IModel<T> model;
@@ -18,12 +19,12 @@ public class SaveTask<T> extends Task<TaskState> {
     }
 
     @Override
-    protected TaskState call() {
+    protected ResultState call() {
         Thread.currentThread().setName("SaveTask");
 
         if (isCancelled()) {
             updateMessage("Saving was not successful");
-            return TaskState.NOT_SUCCESSFUL;
+            return ResultState.FAILED;
         }
 
         else {
@@ -41,15 +42,15 @@ public class SaveTask<T> extends Task<TaskState> {
 
             if (message.equals("saved") || message.equals("updated")) {
                 updateMessage("Saved successfully");
-                return TaskState.SUCCESSFUL;
+                return ResultState.SUCCESSFUL;
             }
             else if (message.equals("No Permission")){
-                return TaskState.NO_PERMISSION;
+                return ResultState.NO_PERMISSION;
             }
 
             else {
                 updateMessage("Saving was not successful");
-                return TaskState.NOT_SUCCESSFUL;
+                return ResultState.FAILED;
             }
         }
     }
@@ -71,6 +72,6 @@ public class SaveTask<T> extends Task<TaskState> {
     }
 
     public interface Callback {
-        void onTaskCompleted(TaskState taskState);
+        void onTaskCompleted(ResultState resultState);
     }
 }

@@ -6,6 +6,7 @@ import utils.enums.CustomerType;
 import dal.DBConnection;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
+import utils.enums.ResultState;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,7 +23,7 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
     }
 
     @Override
-    public String add(Customer customer) {
+    public ResultState add(Customer customer) {
         String result = "saved";
         String sql = "DECLARE @AddressID INT;"+
                 "INSERT INTO CustomerAddress (StreetName, StreetNumber, Postcode, Town, Country) " +
@@ -62,18 +63,17 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
                 customer.setCustomerID(UUID.fromString(rs.getString("CustomerID")));
                 customer.getCustomerAddress().setAddressID(rs.getInt("AddressID"));
             }
+            return ResultState.SUCCESSFUL;
         } catch (Exception e) {
             e.printStackTrace();
-            result = e.getMessage();
+            return ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        return result;
     }
 
     @Override
-    public String update(Customer customer) {
-        String result = "updated";
+    public ResultState update(Customer customer) {
         String sql = "UPDATE CustomerAddress " +
                 "SET StreetName = ?, StreetNumber = ?, Postcode = ?, Town = ?, Country = ? " +
                 "WHERE AddressID = ?;" +
@@ -102,17 +102,17 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
             ps.setString(12, customer.getCustomerID().toString());
 
             ps.executeUpdate();
+            return ResultState.SUCCESSFUL;
         } catch (SQLException e) {
             e.printStackTrace();
-            result = e.getMessage();
+            return ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        return result;
     }
 
     @Override
-    public String delete(UUID id) {
+    public ResultState delete(UUID id) {
         String sql = "UPDATE Customer SET Deleted = 1 WHERE CustomerID = ?";
         return delete(id, sql);
     }

@@ -2,11 +2,11 @@ package gui.tasks;
 
 import gui.model.IModel;
 import javafx.concurrent.Task;
+import utils.enums.ResultState;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
-public class DeleteTask<T> extends Task<TaskState> {
+public class DeleteTask<T> extends Task<ResultState> {
     private final UUID objectToDelete;
     private final IModel<T> model;
 
@@ -16,10 +16,10 @@ public class DeleteTask<T> extends Task<TaskState> {
     }
 
     @Override
-    protected TaskState call() {
+    protected ResultState call() {
         if (isCancelled()) {
             updateMessage("Deleting cancelled");
-            return TaskState.NOT_SUCCESSFUL;
+            return ResultState.FAILED;
         }
         else {
             updateMessage("Deleting...");
@@ -27,16 +27,16 @@ public class DeleteTask<T> extends Task<TaskState> {
 
             if (message.equals("deleted")) {
                 updateMessage("Deleted successfully");
-                return TaskState.SUCCESSFUL;
+                return ResultState.SUCCESSFUL;
             }
 
             else if(message.equals("No Permission")){
-                return TaskState.NO_PERMISSION;
+                return ResultState.NO_PERMISSION;
             }
 
             else {
                 updateMessage("Deleting was not successful");
-                return TaskState.NOT_SUCCESSFUL;
+                return ResultState.FAILED;
             }
         }
     }
