@@ -3,23 +3,17 @@ package gui.util;
 import be.User;
 import gui.controller.AddControllers.AddUserController;
 import io.github.palexdev.materialfx.controls.MFXButton;
-import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
@@ -30,7 +24,6 @@ import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 import java.io.File;
-import java.io.IOException;
 
 public class ImageCropper {
     //TODO add resizing to the rectangle
@@ -95,7 +88,7 @@ public class ImageCropper {
             controller.setProfilePicture(croppedImage, file.getAbsolutePath());
             stage.close();
         } catch (Exception e) {
-            AlertManager.getInstance().showError("Error", "An error occurred while saving the image.", stage);
+            DialogueManager.getInstance().showError("Error", "An error occurred while saving the image.", stage);
         }
     }
 

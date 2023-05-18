@@ -1,9 +1,9 @@
 package gui.controller;
 
 import be.User;
-import gui.SceneManager;
+import gui.util.SceneManager;
 import gui.model.UserModel;
-import gui.util.AlertManager;
+import gui.util.DialogueManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -16,6 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import utils.HashPasswordHelper;
 
@@ -52,12 +53,12 @@ public class LoginViewController implements Initializable {
 
     public Boolean loginUser(Event event){
         User user = userModel.getUserByUsername(usernameInput.getText());
-        if(userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText(), user.getPassword()[1]))){
+        if(userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText(), user.getSalt()))){
             userModel.setLoggedInUser(user);
             openMenuView();
             return true;
         }
-        AlertManager.getInstance().showError(
+        DialogueManager.getInstance().showError(
                 "Login failed!",
                 "Check that username and password are correct",
                 btnLogin.getScene().getWindow());
@@ -69,9 +70,11 @@ public class LoginViewController implements Initializable {
         Scene scene = new Scene(root);
         MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
 
-        menuController.setVisibilityForUserRole();
-
         stage.setScene(scene);
+        stage.setWidth(Screen.getPrimary().getBounds().getWidth() - 200);
+        stage.setHeight(Screen.getPrimary().getBounds().getHeight() - 200);
+
+        menuController.userLogInAction(scene); // Needs to be called after the scene is set
         stage.centerOnScreen();
         stage.setMaximized(true);
     }

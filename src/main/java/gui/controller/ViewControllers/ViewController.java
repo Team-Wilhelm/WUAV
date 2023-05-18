@@ -36,6 +36,11 @@ public abstract class ViewController<T> {
         stage.centerOnScreen();
         stage.initModality(modalityType);
         stage.show();
+        stage.setOnShown(e -> Platform.runLater(() -> {
+            stage.requestFocus();
+            stage.toFront();
+        })
+        );
         return fxmlLoader;
     }
 }

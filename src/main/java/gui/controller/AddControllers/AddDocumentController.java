@@ -3,10 +3,9 @@ package gui.controller.AddControllers;
 import be.*;
 import be.interfaces.Observable;
 import be.interfaces.Observer;
-import gui.nodes.*;
-import be.enums.CustomerType;
-import be.enums.UserRole;
-import bll.PdfGenerator;
+import utils.enums.CustomerType;
+import utils.enums.UserRole;
+import bll.pdf.PdfGenerator;
 import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
@@ -14,8 +13,9 @@ import gui.model.UserModel;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.tasks.TaskState;
-import gui.util.AlertManager;
+import gui.util.DialogueManager;
 import io.github.palexdev.materialfx.controls.*;
+import gui.nodes.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -41,6 +41,8 @@ import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import julia.nodes.MFXTextFieldWithAutofill;
+import julia.nodes.TextAreaWithFloatingText;
 import utils.BlobService;
 import utils.ThreadPool;
 import javax.imageio.ImageIO;
@@ -90,7 +92,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private DocumentController documentController;
     private final ObservableList<ImageWrapper> pictures;
     private final ObservableList<ImagePreview> imagePreviews = FXCollections.observableArrayList();
-    private AlertManager alertManager;
+    private DialogueManager dialogueManager;
     private ObservableList<User> allTechnicians;
     private final ThreadPool executorService;
     private boolean hasAccess = false;
@@ -110,7 +112,7 @@ public class AddDocumentController extends AddController<Document> implements In
         documentModel = DocumentModel.getInstance();
         customerModel = CustomerModel.getInstance();
         executorService = ThreadPool.getInstance();
-        alertManager = AlertManager.getInstance();
+        dialogueManager = DialogueManager.getInstance();
         pdfGenerator = new PdfGenerator();
         technicians = new ArrayList<>();
 
@@ -221,7 +223,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @FXML
     private void deleteAction(ActionEvent actionEvent) {
-        Optional<ButtonType> result = alertManager.showConfirmation("Delete document", "Are you sure you want to delete this document?", txtName.getScene().getWindow());
+        Optional<ButtonType> result = dialogueManager.showConfirmation("Delete document", "Are you sure you want to delete this document?", txtName.getScene().getWindow());
         if (result.isPresent() && result.get().equals(ButtonType.OK)) {
             Task<TaskState> deleteTask = new DeleteTask<>(documentToEdit.getDocumentID(), documentModel);
             setUpDeleteTask(deleteTask, documentController, txtName.getScene().getWindow());
@@ -347,7 +349,7 @@ public class AddDocumentController extends AddController<Document> implements In
                 }
 
                 if (isInputChanged.get() && newValue.equals(pdfTab)) {
-                    Optional<ButtonType> result = alertManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
+                    Optional<ButtonType> result = dialogueManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
                     if (result.isPresent() && result.get().equals(ButtonType.OK)) {
                         saveAction(null);
                     }
@@ -744,6 +746,7 @@ public class AddDocumentController extends AddController<Document> implements In
         btnDelete.setVisible(hasAccess);
         btnUploadPictures.setVisible(hasAccess);
         btnSave.setVisible(hasAccess);
+        toggleCustomerType.disableProperty().setValue(!hasAccess);
 
         if (!hasAccess)
             imagePreviews.forEach(ImagePreview::makeContextMenuNotEditable);
