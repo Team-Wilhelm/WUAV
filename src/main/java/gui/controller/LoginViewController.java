@@ -16,6 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import utils.HashPasswordHelper;
@@ -33,6 +34,8 @@ public class LoginViewController implements Initializable {
     private MFXTextField usernameInput;
     @FXML
     private MFXPasswordField passwordInput;
+    @FXML
+    private BorderPane borderPane;
     private Parent root;
     private Stage stage;
     private MenuController menuController;
@@ -53,6 +56,13 @@ public class LoginViewController implements Initializable {
 
     public Boolean loginUser(Event event){
         User user = userModel.getUserByUsername(usernameInput.getText());
+        if(user == null){
+            DialogueManager.getInstance().showError(
+                    "Login failed!",
+                    "Check that username and password are correct",
+                    borderPane);
+            return false;
+        }
         if(userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText(), user.getSalt()))){
             userModel.setLoggedInUser(user);
             openMenuView();
@@ -61,7 +71,7 @@ public class LoginViewController implements Initializable {
         DialogueManager.getInstance().showError(
                 "Login failed!",
                 "Check that username and password are correct",
-                btnLogin.getScene().getWindow());
+                borderPane);
         return false;
     }
 

@@ -145,7 +145,7 @@ public class UserController extends ViewController<User> implements Initializabl
                e.printStackTrace();
             }
         } else {
-            DialogueManager.getInstance().showWarning("No user selected", "Please select a user to edit", window);
+            DialogueManager.getInstance().showWarning("No user selected", "Please select a user to edit", flowPane);
         }
     }
 
