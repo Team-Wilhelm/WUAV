@@ -1,6 +1,7 @@
 package dal.dao;
 
 import be.User;
+import utils.enums.ResultState;
 import utils.enums.UserRole;
 import dal.DBConnection;
 import dal.interfaces.DAO;
@@ -21,8 +22,7 @@ public class UserDAO extends DAO implements IDAO<User> {
     }
 
     @Override
-    public String add(User user) {
-        String result = "saved";
+    public ResultState add(User user) {
         String sql = "INSERT INTO SystemUser (FullName, Username, UserPassword, UserRole, PhoneNumber, Salt, ProfilePicture) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -42,17 +42,17 @@ public class UserDAO extends DAO implements IDAO<User> {
             if (rs.next()) {
                 user.setUserID(UUID.fromString(rs.getString("UserID")));
             }
+            return ResultState.SUCCESSFUL;
         } catch (Exception e) {
             e.printStackTrace();
-            result = e.getMessage();
+            return ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        return result;
     }
 
     @Override
-    public String update(User user) {
+    public ResultState update(User user) {
         String result = "updated";
         String sql = "UPDATE SystemUser SET FullName = ?, Username = ?, UserPassword = ?, " +
                 "UserRole = ?, PhoneNumber = ?, Salt = ?, ProfilePicture = ? " +
@@ -64,21 +64,19 @@ public class UserDAO extends DAO implements IDAO<User> {
             fillPreparedStatement(ps, user);
             ps.setString(8, user.getUserID().toString());
             ps.executeUpdate();
+            return ResultState.SUCCESSFUL;
         } catch (Exception e) {
             e.printStackTrace();
-            result = e.getMessage();
+            return ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        return result;
     }
 
     @Override
-    public String delete(UUID id) {
-        String result = "deleted";
+    public ResultState delete(UUID id) {
         String sql = "UPDATE SystemUser SET Deleted = 1 WHERE UserID = ?";
-        delete(id, sql);
-        return result;
+        return delete(id, sql);
     }
 
     @Override

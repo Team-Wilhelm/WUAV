@@ -2,20 +2,19 @@ package gui.controller.AddControllers;
 
 import gui.controller.ViewControllers.ViewController;
 import gui.tasks.SaveTask;
-import gui.tasks.TaskState;
+import utils.enums.ResultState;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
-import javafx.stage.Window;
 import gui.util.DialogueManager;
 
 import java.util.Timer;
 
 public abstract class AddController<T> {
+    //TODO review this class
     protected abstract void assignInputToVariables();
     protected abstract void assignListenersToTextFields();
     protected abstract void setIsEditing(T objectToEdit);
@@ -26,16 +25,19 @@ public abstract class AddController<T> {
 
         task.setOnSucceeded(event -> {
             task.setCallback(taskState -> {
-                if (taskState == TaskState.SUCCESSFUL) {
-                    controller.refreshItems();
+                controller.refreshItems();
+                if (taskState == ResultState.SUCCESSFUL) {
                     addController.setIsEditing(task.getObjectToSave());
+                    if (addController instanceof AddUserController){
+                        ((AddUserController) addController).refreshCard();
+                    }
                     if (addController instanceof AddDocumentController) {
                         ((AddDocumentController) addController).setUpPdfListView();
                     }
-                } else if (task.getValue() == TaskState.DUPLICATE_DATA) {
+                } else if (task.getValue() == ResultState.DUPLICATE_DATA) {
                     dialogueManager.showError("Username already exists!", "Username already exists!", owner);
                 }
-                else if (task.getValue() == TaskState.NO_PERMISSION){
+                else if (task.getValue() == ResultState.NO_PERMISSION){
                     dialogueManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
                 }
                 else {
@@ -43,19 +45,7 @@ public abstract class AddController<T> {
                 }
             });
 
-            // unbind the progress label and spinner from the task and set spinner to 100%
-            controller.unbindProgress();
-
-            // after 3 seconds, the progress bar will be hidden
-            new Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            controller.setProgressVisibility(false);
-                        }
-                    },
-                    3000
-            );
+            hideMessageAfterTimeout(controller);
 
             if (task.getCallback() != null) {
                 task.getCallback().onTaskCompleted(task.getValue());
@@ -63,50 +53,29 @@ public abstract class AddController<T> {
         });
     }
 
-    private void setUpTask(Task<TaskState> task, ViewController<T> controller, Pane owner) {
+    private void setUpTask(Task<ResultState> task, ViewController<T> controller, Pane owner) {
         task.setOnRunning(event -> {
             controller.bindProgressToTask(task);
             controller.setProgressVisibility(true);
         });
 
         task.setOnFailed(event -> {
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            controller.setProgressVisibility(false);
-                            controller.unbindProgress();
-                        }
-                    },
-                    3000
-            );
+            hideMessageAfterTimeout(controller);
             dialogueManager.showError("Oops...", "Something went wrong!", owner);
         });
     }
 
-    protected void setUpDeleteTask(Task<TaskState> task, ViewController<T> viewController, Pane owner) {
+    protected void setUpDeleteTask(Task<ResultState> task, ViewController<T> viewController, Pane owner) {
         setUpTask(task, viewController, owner);
 
         task.setOnSucceeded(event -> {
-            // unbind the progress label and spinner from the task and set spinner to 100%
-            viewController.unbindProgress();
+            hideMessageAfterTimeout(viewController);
 
-            // after 3 seconds, the progress bar will be hidden
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            viewController.setProgressVisibility(false);
-                        }
-                    },
-                    3000
-            );
-
-            if (task.getValue() == TaskState.SUCCESSFUL) {
+            if (task.getValue() == ResultState.SUCCESSFUL) {
                 viewController.refreshItems();
             }
 
-            else if (task.getValue() == TaskState.NO_PERMISSION){
+            else if (task.getValue() == ResultState.NO_PERMISSION){
                 dialogueManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
             }
 
@@ -114,6 +83,23 @@ public abstract class AddController<T> {
                 dialogueManager.showError("Oops...", "Something went wrong!", owner);
             }
         });
+    }
+
+
+    private void hideMessageAfterTimeout(ViewController<T> controller) {
+        // unbind the progress label and spinner from the task and set spinner to 100%
+        controller.unbindProgress();
+
+        // after 3 seconds, the progress bar will be hidden
+        new Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        controller.setProgressVisibility(false);
+                    }
+                },
+                3000
+        );
     }
 
     protected void closeWindow(Event event) {
