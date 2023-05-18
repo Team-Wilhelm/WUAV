@@ -29,22 +29,19 @@ public class SaveTask<T> extends Task<ResultState> {
 
         else {
             updateMessage("Saving...");
-            CompletableFuture<String> future;
-            String message;
+            ResultState resultState;
+
             if (isEditing) {
-                message = model.update(objectToSave);
-            }
-            else {
-                future = model.add(objectToSave);
-                message = future.join();
+                resultState = model.update(objectToSave);
+            } else {
+                resultState = model.add(objectToSave);
             }
 
-
-            if (message.equals("saved") || message.equals("updated")) {
+            if (resultState.equals(ResultState.SUCCESSFUL)) {
                 updateMessage("Saved successfully");
                 return ResultState.SUCCESSFUL;
             }
-            else if (message.equals("No Permission")){
+            else if (resultState.equals(ResultState.NO_PERMISSION)){
                 return ResultState.NO_PERMISSION;
             }
 

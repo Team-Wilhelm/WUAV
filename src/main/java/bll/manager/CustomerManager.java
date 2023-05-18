@@ -1,6 +1,7 @@
 package bll.manager;
 
 import be.Customer;
+import utils.enums.ResultState;
 import utils.enums.UserRole;
 import bll.IManager;
 import dal.dao.CustomerDAO;
@@ -21,32 +22,35 @@ public class CustomerManager implements IManager<Customer> {
 
     @Override
     @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER, UserRole.TECHNICIAN})
-    public String add(Customer customer) {
+    public ResultState add(Customer customer) {
         if (checker.hasAccess(this.getClass())) {
             return dao.add(customer);
         }
         else {
-            return "No Permission";}
+            return ResultState.NO_PERMISSION;
+        }
     }
 
     @Override
     @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER, UserRole.TECHNICIAN})
-    public String update(Customer customer) {
+    public ResultState update(Customer customer) {
         if (checker.hasAccess(this.getClass())) {
             return dao.update(customer);
         }
         else {
-            return "No Permission";}
+            return ResultState.NO_PERMISSION;
+        }
     }
 
     @Override
     @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER, UserRole.TECHNICIAN})
-    public String delete(UUID id) {
+    public ResultState delete(UUID id) {
         if (checker.hasAccess(this.getClass())) {
             return dao.delete(id);
         }
         else {
-            return "No Permission";}
+            return ResultState.NO_PERMISSION;
+        }
     }
 
     @Override

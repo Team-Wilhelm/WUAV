@@ -23,18 +23,14 @@ public class DeleteTask<T> extends Task<ResultState> {
         }
         else {
             updateMessage("Deleting...");
-            String message = model.delete(objectToDelete);;
+            ResultState resultState = model.delete(objectToDelete);;
 
-            if (message.equals("deleted")) {
+            if (resultState.equals(ResultState.SUCCESSFUL)) {
                 updateMessage("Deleted successfully");
                 return ResultState.SUCCESSFUL;
-            }
-
-            else if(message.equals("No Permission")){
+            } else if(resultState.equals(ResultState.NO_PERMISSION)){
                 return ResultState.NO_PERMISSION;
-            }
-
-            else {
+            } else {
                 updateMessage("Deleting was not successful");
                 return ResultState.FAILED;
             }
