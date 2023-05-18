@@ -42,23 +42,13 @@ public class DocumentModel implements IModel<Document> {
     }
 
     @Override
-    public CompletableFuture<String> update(Document document) {
-        String message = documentManager.update(document);
-        CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
-        return future.thenApplyAsync(documents -> {
-            setAllDocuments();
-            return message;
-        });
+    public String update(Document document) {
+        return documentManager.update(document);
     }
 
     @Override
-    public CompletableFuture<String> delete(UUID id) {
-        String message = documentManager.delete(id);
-        CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
-        return future.thenApplyAsync(documents -> {
-            setAllDocuments();
-            return message;
-        });
+    public String delete(UUID id) {
+        return documentManager.delete(id);
     }
 
     @Override

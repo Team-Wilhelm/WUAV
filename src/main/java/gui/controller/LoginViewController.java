@@ -53,15 +53,19 @@ public class LoginViewController implements Initializable {
 
     public Boolean loginUser(Event event){
         User user = userModel.getUserByUsername(usernameInput.getText());
+
+        if(user == null) {
+            DialogueManager.getInstance().showError(
+                    "Login failed!",
+                    "Check that username and password are correct",
+                    btnLogin.getScene().getWindow());
+            return false;
+        }
         if(userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText(), user.getSalt()))){
             userModel.setLoggedInUser(user);
             openMenuView();
             return true;
         }
-        DialogueManager.getInstance().showError(
-                "Login failed!",
-                "Check that username and password are correct",
-                btnLogin.getScene().getWindow());
         return false;
     }
 

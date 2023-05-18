@@ -40,25 +40,13 @@ public class CustomerModel implements IModel<Customer> {
     }
 
     @Override
-    public CompletableFuture<String> update(Customer customer) {
-        String message = customerManager.update(customer);
-        CompletableFuture<Map<UUID, Customer>> future = CompletableFuture.supplyAsync(() -> customerManager.getAll());
-        return future.thenApplyAsync(customers -> {
-            allCustomers.clear();
-            allCustomers.putAll(customers);
-            return message;
-        });
+    public String update(Customer customer) {
+        return customerManager.update(customer);
     }
 
     @Override
-    public CompletableFuture<String> delete(UUID id) {
-        String message = customerManager.delete(id);
-        CompletableFuture<Map<UUID, Customer>> future = CompletableFuture.supplyAsync(() -> customerManager.getAll());
-        return future.thenApplyAsync(customers -> {
-            allCustomers.clear();
-            allCustomers.putAll(customers);
-            return message;
-        });
+    public String delete(UUID id) {
+        return customerManager.delete(id);
     }
 
     @Override

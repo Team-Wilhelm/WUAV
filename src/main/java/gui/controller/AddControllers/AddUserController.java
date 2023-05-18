@@ -130,6 +130,8 @@ public class AddUserController extends AddController<User> implements Initializa
         isUpdating.set(true);
         disableFields(false);
         btnSave.setDisable(false);
+        userController.refreshItems();
+        //TODO make refresh
     }
 
     @FXML
@@ -140,6 +142,7 @@ public class AddUserController extends AddController<User> implements Initializa
             setUpDeleteTask(deleteTask, userController, txtName.getScene().getWindow());
             executorService.execute(deleteTask);
             closeWindow(actionEvent);
+            userController.refreshItems();
         }
     }
 

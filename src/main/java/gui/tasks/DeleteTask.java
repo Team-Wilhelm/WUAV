@@ -23,8 +23,7 @@ public class DeleteTask<T> extends Task<TaskState> {
         }
         else {
             updateMessage("Deleting...");
-            CompletableFuture<String> future = model.delete(objectToDelete);
-            String message = future.join();
+            String message = model.delete(objectToDelete);;
 
             if (message.equals("deleted")) {
                 updateMessage("Deleted successfully");

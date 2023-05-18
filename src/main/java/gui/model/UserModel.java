@@ -44,25 +44,13 @@ public class UserModel implements IModel<User> {
     }
 
     @Override
-    public CompletableFuture<String> update(User user) {
-        String message = userManager.update(user);
-        CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
-        return future.thenApplyAsync(users -> {
-            allUsers.clear();
-            allUsers.putAll(users);
-            return message;
-        });
+    public String update(User user) {
+        return userManager.update(user);
     }
 
     @Override
-    public CompletableFuture<String> delete(UUID id) {
-        String message = userManager.delete(id);
-        CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
-        return future.thenApplyAsync(users -> {
-            allUsers.clear();
-            allUsers.putAll(users);
-            return message;
-        });
+    public String delete(UUID id) {
+        return userManager.delete(id);
     }
 
     /**
