@@ -106,8 +106,7 @@ public class UserController extends ViewController<User> implements Initializabl
             if (userCard == null) {
                 userCard = userModel.addUserCard(user);
             }
-
-            //TODO change into observer pattern
+            
             if (lastFocusedCard != null && userCard.getUser() == lastFocusedCard.getUser()) {
                 userCard = userModel.addUserCard(user);
                 loadedCards.put(user, userCard);
