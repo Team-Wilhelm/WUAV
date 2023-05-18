@@ -17,6 +17,7 @@ import java.util.Objects;
 
 public class Main extends Application {
     //TODO check for customers who have been in the system for over 48 months and delete them
+    //TODO custom window frame
     @Override
     public void start(Stage primaryStage) throws Exception {
         long start = System.currentTimeMillis();
@@ -41,7 +42,7 @@ public class Main extends Application {
         primaryStage.show();
 
         primaryStage.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-            if (e.getClickCount() == 2 && primaryStage.isMaximized()) {
+            if (e.getClickCount() == 2 && primaryStage.isMaximized() && e.getScreenY() < 30) {
                 primaryStage.setMaximized(false);
                 primaryStage.setWidth(Screen.getPrimary().getBounds().getWidth() - 200);
                 primaryStage.setHeight(Screen.getPrimary().getBounds().getHeight() - 200);

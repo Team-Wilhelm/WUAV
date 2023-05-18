@@ -55,8 +55,8 @@ public class PasswordDialogue extends MFXStageDialog {
     }
 
     public PasswordDialogue(Window owner, Pane ownerNode, User userToUpdate) {
-        //TODO add functionality to top three buttons
         super();
+        dialogContent.getStylesheets().add("/css/style.css");
         this.owner = owner;
         this.ownerNode = ownerNode;
         this.userToUpdate = userToUpdate;

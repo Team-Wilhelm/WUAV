@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.Pane;
 import javafx.stage.Window;
 import gui.util.DialogueManager;
 
@@ -20,7 +21,7 @@ public abstract class AddController<T> {
     protected abstract void setIsEditing(T objectToEdit);
     private final DialogueManager dialogueManager = DialogueManager.getInstance();
 
-    protected void setUpSaveTask(SaveTask<T> task, ViewController<T> controller, Window owner, AddController<T> addController) {
+    protected void setUpSaveTask(SaveTask<T> task, ViewController<T> controller, Pane owner, AddController<T> addController) {
         setUpTask(task, controller, owner);
 
         task.setOnSucceeded(event -> {
@@ -62,7 +63,7 @@ public abstract class AddController<T> {
         });
     }
 
-    private void setUpTask(Task<TaskState> task, ViewController<T> controller, Window owner) {
+    private void setUpTask(Task<TaskState> task, ViewController<T> controller, Pane owner) {
         task.setOnRunning(event -> {
             controller.bindProgressToTask(task);
             controller.setProgressVisibility(true);
@@ -83,7 +84,7 @@ public abstract class AddController<T> {
         });
     }
 
-    protected void setUpDeleteTask(Task<TaskState> task, ViewController<T> viewController, Window owner) {
+    protected void setUpDeleteTask(Task<TaskState> task, ViewController<T> viewController, Pane owner) {
         setUpTask(task, viewController, owner);
 
         task.setOnSucceeded(event -> {
@@ -117,6 +118,10 @@ public abstract class AddController<T> {
 
     protected void closeWindow(Event event) {
         ((Node) event.getSource()).getScene().getWindow().hide();
+    }
+
+    protected void closeWindow(Node node) {
+        node.getScene().getWindow().hide();
     }
 
     protected boolean isInputEmpty(MFXTextField textField) {
