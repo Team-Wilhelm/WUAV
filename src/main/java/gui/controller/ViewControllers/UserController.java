@@ -132,16 +132,12 @@ public class UserController extends ViewController<User> implements Initializabl
 
     private void editUser(Window window) {
         if (lastFocusedCard != null) {
-            try {
-                FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
-                AddUserController controller = loader.getController();
-                controller.setUserController(this);
-                controller.setIsEditing(lastFocusedCard.getUser());
-                controller.setVisibilityForUserRole();
-                controller.setShortcutsAndAccelerators();
-            } catch (Exception e) {
-               e.printStackTrace();
-            }
+            FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
+            AddUserController controller = loader.getController();
+            controller.setUserController(this);
+            controller.setIsEditing(lastFocusedCard.getUser());
+            controller.setVisibilityForUserRole();
+            controller.setShortcutsAndAccelerators();
         } else {
             DialogueManager.getInstance().showWarning("No user selected", "Please select a user to edit", flowPane);
         }

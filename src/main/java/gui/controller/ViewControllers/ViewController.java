@@ -21,10 +21,17 @@ public abstract class ViewController<T> {
     public abstract void refreshItems(List<T> items);
     public abstract void refreshItems();
 
-    protected FXMLLoader openWindow(String fxmlPath, Modality modalityType) throws IOException {
+    protected FXMLLoader openWindow(String fxmlPath, Modality modalityType) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(fxmlPath));
         Stage stage = new Stage();
-        Scene scene = new Scene(fxmlLoader.load());
+        Scene scene;
+
+        try {
+            scene = new Scene(fxmlLoader.load());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
         stage.setScene(scene);
         stage.setTitle("WUAV Documentation Management System");
@@ -35,8 +42,8 @@ public abstract class ViewController<T> {
         stage.setOnShown(e -> Platform.runLater(() -> {
             stage.requestFocus();
             stage.toFront();
-        })
-        );
+        }));
+
         return fxmlLoader;
     }
 }

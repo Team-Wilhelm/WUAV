@@ -16,7 +16,6 @@ public class Document {
     private List<ImageWrapper> documentImages;
     private String jobDescription, optionalNotes, jobTitle;
     private BooleanProperty isLoadingImages;
-    //TODO bind to gui
 
     public Document (){
         this.technicians = new ArrayList<>();

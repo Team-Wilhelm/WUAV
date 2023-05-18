@@ -1,6 +1,8 @@
 package gui.controller.ViewControllers;
 
 import be.Document;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.layout.GridPane;
 import utils.enums.UserRole;
 import gui.model.UserModel;
@@ -48,7 +50,7 @@ public class DocumentController extends ViewController<Document> implements Init
     private ObservableList<Document> documentList = FXCollections.observableArrayList();
     private final DocumentModel documentModel = DocumentModel.getInstance();
     private boolean hasAccess = false;
-    private AccessChecker checker = new AccessChecker();
+    private BooleanBinding anyDocumentsLoadingImages;
 
     public DocumentController() {}
 
@@ -61,11 +63,14 @@ public class DocumentController extends ViewController<Document> implements Init
 
         refreshItems();
         populateTableView();
+        addTooltips();
 
         btnAddDocument.getStyleClass().addAll("addButton", "rounded");
         btnAddDocument.setText("");
 
-        addTooltips();
+        progressLabel.visibleProperty().bind(progressSpinner.visibleProperty()); // show label when spinner is visible
+
+        checkIfImagesAreLoaded();
     }
 
     //region progress methods
@@ -96,7 +101,6 @@ public class DocumentController extends ViewController<Document> implements Init
     public void refreshItems(List<Document> documentsToDisplay) {
         documentList.clear();
         documentList.addAll(documentsToDisplay);
-        documentList.forEach(d -> System.out.println(d.isLoadingImages()));
     }
 
     @Override
@@ -107,11 +111,7 @@ public class DocumentController extends ViewController<Document> implements Init
     @FXML
     private void addDocumentAction() {
         AddDocumentController controller;
-        try {
-            controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
         controller.setDocumentController(this);
         controller.setVisibilityForUserRole();
     }
@@ -170,14 +170,10 @@ public class DocumentController extends ViewController<Document> implements Init
     private void tableViewDoubleClickAction(MouseEvent event) {
         if (event.getClickCount() == 2) {
             if (!tblDocument.getSelectionModel().getSelection().isEmpty()) {
-                try {
-                    AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
-                    controller.setDocumentController(this);
-                    controller.setIsEditing(tblDocument.getSelectionModel().getSelectedValue());;
-                    controller.setVisibilityForUserRole();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
+                controller.setDocumentController(this);
+                controller.setIsEditing(tblDocument.getSelectionModel().getSelectedValue());
+                controller.setVisibilityForUserRole();
             }
             else {
                 DialogueManager.getInstance().showError("No document selected", "Please select a document", gridPane);
@@ -198,10 +194,36 @@ public class DocumentController extends ViewController<Document> implements Init
             tblDocument.getTableColumns().remove(tblDocument.getTableColumns().size() - 1);
         }
         btnAddDocument.setVisible(hasAccess);
-        //TODO make gridpane take all available space
     }
 
     public void addShortcuts() {
         btnAddDocument.getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::addDocumentAction);
+    }
+
+    /**
+     * Checks if any of the documents are still loading images and shows progress through the progress spinner,
+     * to let the user know if the images are still loading, since it's happening asynchronously.
+     */
+    private void checkIfImagesAreLoaded() {
+        anyDocumentsLoadingImages = Bindings.createBooleanBinding(() ->
+                documentList.stream().anyMatch(Document::isLoadingImages), documentList);
+        progressSpinner.visibleProperty().bind(anyDocumentsLoadingImages);
+
+        documentList.forEach(d -> d.isLoadingImagesProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                progressLabel.setText("Loading images...");
+            } else {
+                progressSpinner.setProgress(100);
+                progressLabel.setText("Images loaded");
+                progressSpinner.visibleProperty().unbind();
+
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        progressSpinner.setVisible(false);
+                    }
+                }, 3000);
+            }
+        }));
     }
 }

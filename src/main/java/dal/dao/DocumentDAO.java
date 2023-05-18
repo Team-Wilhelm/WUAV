@@ -188,7 +188,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 rs.getDate("DateOfCreation")
             );
         document.setLoadingImages(true);
-        //TODO make sure it's okay
         CompletableFuture.runAsync(() -> assignImagesToDocument(document), ThreadPool.getInstance().getExecutorService());
         return document;
     }
