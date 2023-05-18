@@ -57,6 +57,7 @@ public class UserModel implements IModel<User> {
 
     @Override
     public ResultState delete(UUID id) {
+        allUsers.remove(id);
         return userManager.delete(id);
     }
 
