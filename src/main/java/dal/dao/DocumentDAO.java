@@ -191,8 +191,15 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 rs.getString("JobTitle"),
                 rs.getDate("DateOfCreation")
             );
-        assignImagesToDocument(document);
+        document.setLoadingImages(true);
+        //TODO make sure it's okay
+        CompletableFuture.runAsync(() -> assignImagesToDocument(document), ThreadPool.getInstance().getExecutorService());
         return document;
+    }
+
+    public CompletableFuture<Void> assignImagesToDocumentAsync(Document document) {
+        // Wrap the execution of the method in a CompletableFuture
+        return CompletableFuture.runAsync(() -> assignImagesToDocument(document), ThreadPool.getInstance().getExecutorService());
     }
 
     public void assignImagesToDocument(Document document){
@@ -212,6 +219,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 images.add(new ImageWrapper(filepath, filename, imageFactory.create(filepath), description));
             }
             document.setDocumentImages(images);
+            document.setLoadingImages(false);
+            System.out.println("Document " + document.getJobTitle() + " has " + document.getDocumentImages().size() + " images");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

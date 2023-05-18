@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class DialogueManager {
     //TODO optimize this class
+    //TODO password dialog
     private MFXStageDialog dialog;
     private MFXGenericDialog dialogContent;
     private static DialogueManager instance = null;
