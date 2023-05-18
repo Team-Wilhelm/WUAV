@@ -4,12 +4,14 @@ import be.User;
 import gui.nodes.UserCard;
 import bll.ManagerFactory;
 import bll.manager.UserManager;
+import utils.enums.ResultState;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public class UserModel implements IModel<User> {
     private static UserModel instance;
@@ -33,36 +35,23 @@ public class UserModel implements IModel<User> {
     }
 
     @Override
-    public CompletableFuture<String> add(User user) {
-        String message = userManager.add(user);
-        CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
-        return future.thenApplyAsync(users -> {
-            allUsers.clear();
-            allUsers.putAll(users);
-            return message;
-        });
+    public ResultState add(User user) {
+        ResultState resultState = userManager.add(user);
+        if (resultState.equals(ResultState.SUCCESSFUL)) {
+            allUsers.put(user.getUserID(), user);
+        }
+        return resultState;
     }
 
     @Override
-    public CompletableFuture<String> update(User user) {
-        String message = userManager.update(user);
-        CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
-        return future.thenApplyAsync(users -> {
-            allUsers.clear();
-            allUsers.putAll(users);
-            return message;
-        });
+    public ResultState update(User user) {
+        return userManager.update(user);
     }
 
     @Override
-    public CompletableFuture<String> delete(UUID id) {
-        String message = userManager.delete(id);
-        CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
-        return future.thenApplyAsync(users -> {
-            allUsers.clear();
-            allUsers.putAll(users);
-            return message;
-        });
+    public ResultState delete(UUID id) {
+        allUsers.remove(id);
+        return userManager.delete(id);
     }
 
     /**
@@ -79,7 +68,7 @@ public class UserModel implements IModel<User> {
         return userManager.getById(id);
     }
 
-    public User getByIDFFromModel(UUID id) {
+    public User getByIDFromModel(UUID id) {
         return allUsers.get(id);
     }
 
@@ -124,7 +113,6 @@ public class UserModel implements IModel<User> {
         for (User user : allUsers.values()) {
             UserCard userCard = new UserCard(user);
             loadedCards.put(user, userCard);
-            //user.addObserver(userCard);
         }
     }
 
@@ -135,7 +123,6 @@ public class UserModel implements IModel<User> {
     public UserCard addUserCard(User user){
         UserCard userCard = new UserCard(user);
         loadedCards.put(user, userCard);
-        //user.addObserver(userCard);
         return userCard;
     }
 }

@@ -7,7 +7,6 @@ import java.util.concurrent.Future;
 
 public class ThreadPool {
     private static ThreadPool instance;
-    private static int threadCount = 0;
     private ExecutorService executorService;
 
     private ThreadPool() {
@@ -38,5 +37,9 @@ public class ThreadPool {
             if (!executorService.isTerminated())
                 executorService.shutdownNow();
         }
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
     }
 }

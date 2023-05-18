@@ -1,5 +1,8 @@
 package be;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +15,12 @@ public class Document {
     private List<User> technicians;
     private List<ImageWrapper> documentImages;
     private String jobDescription, optionalNotes, jobTitle;
+    private BooleanProperty isLoadingImages;
 
     public Document (){
         this.technicians = new ArrayList<>();
         this.documentImages = new ArrayList<>();
+        this.isLoadingImages = new SimpleBooleanProperty(false);
     }
 
     public Document(Customer customer, String jobDescription, String optionalNotes, String jobTitle, Date dateOfCreation) {
@@ -122,5 +127,17 @@ public class Document {
     @Override
     public int hashCode() {
         return documentID.hashCode();
+    }
+
+    public BooleanProperty isLoadingImagesProperty() {
+        return isLoadingImages;
+    }
+
+    public boolean isLoadingImages() {
+        return isLoadingImages.get();
+    }
+
+    public void setLoadingImages(boolean isLoadingImages) {
+        this.isLoadingImages.set(isLoadingImages);
     }
 }

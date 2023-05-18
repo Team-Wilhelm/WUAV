@@ -1,7 +1,7 @@
 package gui.controller.AddControllers;
 
 import be.User;
-import gui.nodes.PasswordDialogue;
+import gui.nodes.dialogues.PasswordDialogue;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -13,7 +13,7 @@ import gui.controller.ViewControllers.UserController;
 import gui.model.UserModel;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
-import gui.tasks.TaskState;
+import utils.enums.ResultState;
 import gui.util.DialogueManager;
 import gui.util.CropImageToCircle;
 import gui.util.ImageCropper;
@@ -137,10 +137,10 @@ public class AddUserController extends AddController<User> implements Initializa
         CompletableFuture<ButtonType> result = dialogueManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", gridPane);
         result.thenAccept(r -> {
             if (r.equals(ButtonType.OK)) {
-                Task<TaskState> deleteTask = new DeleteTask<>(userToUpdate.getUserID(), userModel);
+                Task<ResultState> deleteTask = new DeleteTask<>(userToUpdate.getUserID(), userModel);
                 setUpDeleteTask(deleteTask, userController, gridPane);
                 executorService.execute(deleteTask);
-                closeWindow(actionEvent);
+                closeWindow(gridPane);
             }
         });
     }
@@ -156,7 +156,9 @@ public class AddUserController extends AddController<User> implements Initializa
 
     private void showPasswordDialogue() {
         comboOptions.getSelectionModel().clearSelection();
-        PasswordDialogue passwordDialogue = new PasswordDialogue(txtName.getScene().getWindow(), gridPane, userToUpdate);
+        PasswordDialogue passwordDialogue = DialogueManager.getInstance().getPasswordDialogue(gridPane);
+        passwordDialogue.setUserToUpdate(userToUpdate);
+        passwordDialogue.setAdminEditing(UserModel.getLoggedInUser().getUserRole() == UserRole.ADMINISTRATOR);
         passwordDialogue.showDialog();
         passwordDialogue.setOnHidden(event -> {
             if (passwordDialogue.isPasswordChanged()) {
@@ -347,6 +349,10 @@ public class AddUserController extends AddController<User> implements Initializa
                 }
             }
         });
+    }
+
+    public void refreshCard() {
+        userController.refreshCard(userToUpdate);
     }
     //endregion
 }

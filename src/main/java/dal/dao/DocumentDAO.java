@@ -3,16 +3,13 @@ package dal.dao;
 import be.Document;
 import be.ImageWrapper;
 import be.User;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import dal.DBConnection;
-import dal.DocumentImageFactory;
+import dal.factories.DocumentImageFactory;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
-import gui.util.drawing.MyShape;
 import utils.ThreadPool;
+import utils.enums.ResultState;
 
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,16 +20,19 @@ import java.util.concurrent.*;
 
 public class DocumentDAO extends DAO implements IDAO<Document> {
     private final DBConnection dbConnection;
-    private final DocumentImageFactory imageFactory = DocumentImageFactory.getInstance();
-    private ThreadPool executorService = ThreadPool.getInstance();
+    private final DocumentImageFactory imageFactory;
+    private ConcurrentHashMap<UUID, Document> documents;
 
     public DocumentDAO() {
         dbConnection = DBConnection.getInstance();
+        imageFactory = DocumentImageFactory.getInstance();
+        documents = new ConcurrentHashMap<>();
+        refreshCache();
     }
 
     @Override
-    public String add(Document document) {
-        String result = "saved";
+    public ResultState add(Document document) {
+        ResultState result = ResultState.SUCCESSFUL;
 
         // Check, if the customer is already in the database, if not, add them
         CustomerDAO customerDAO = new CustomerDAO();
@@ -76,12 +76,12 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             }
             ps.executeBatch();
 
-
             //Save and link image filepaths to document
             saveImagesForDocument(connection, document);
+            documents.put(document.getDocumentID(), document);
         } catch (Exception e) {
             e.printStackTrace();
-            result = e.getMessage();
+            result = ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
@@ -89,8 +89,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     }
 
     @Override
-    public String update(Document document) {
-        String result = "updated";
+    public ResultState update(Document document) {
         String sql = "UPDATE Document SET JobTitle = ?, JobDescription = ?, Notes = ?, CustomerID = ?, DateOfCreation = ? " +
                 "WHERE DocumentID = ?";
         Connection connection = null;
@@ -113,19 +112,19 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
             //Save and link image filepaths to document
             saveImagesForDocument(connection, document);
-            return result;
+            documents.put(document.getDocumentID(), document);
+
+            return ResultState.SUCCESSFUL;
         } catch (Exception e) {
             e.printStackTrace();
-            result = e.getMessage();
-            return result;
+            return ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
     }
 
     @Override
-    public String delete(UUID id) {
-        String result = "deleted";
+    public ResultState delete(UUID id) {
         String sql = "UPDATE Document SET Deleted = 1 WHERE DocumentID = ?;" +
                 "DELETE FROM Document_Image_Link WHERE DocumentID = ?";
         Connection connection = null;
@@ -135,39 +134,27 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             ps.setString(1, id.toString());
             ps.setString(2, id.toString());
             ps.executeUpdate();
+            documents.remove(id);
+            return ResultState.SUCCESSFUL;
         } catch (SQLException e) {
             e.printStackTrace();
-            result = e.getMessage();
+            return ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        return result;
     }
 
     @Override
     public Map<UUID, Document> getAll() {
-        long startTime = System.currentTimeMillis();
-        String sql = "SELECT * FROM Document WHERE Deleted = 0";
-        ConcurrentHashMap<UUID, Document> documents = new ConcurrentHashMap<>();
-        Connection connection = null;
-        try {
-            connection = dbConnection.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Document document = createDocumentFromResultSet(rs);
-                documents.put(document.getDocumentID(), document);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            dbConnection.releaseConnection(connection);
-        }
         return documents;
     }
 
     @Override
     public Document getById(UUID id) {
+        if (documents.containsKey(id)) {
+            return documents.get(id);
+        }
+
         String sql = "SELECT * FROM Document WHERE DocumentID = ? AND Deleted = 0";
         Connection connection = null;
         try {
@@ -187,16 +174,21 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     }
 
     private Document createDocumentFromResultSet(ResultSet rs) throws SQLException {
+        UUID documentID = UUID.fromString(rs.getString("DocumentID"));
+        if (documents.containsKey(documentID)) {
+            return documents.get(documentID);
+        }
+
         Document document = new Document (
-                UUID.fromString(rs.getString("DocumentID")),
+                documentID,
                 new CustomerDAO().getById(UUID.fromString(rs.getString("CustomerID"))),
                 rs.getString("JobDescription"),
                 rs.getString("Notes"),
                 rs.getString("JobTitle"),
                 rs.getDate("DateOfCreation")
             );
-        //TODO notify document when images are assigned to it, so it can update the view
-        assignImagesToDocument(document);
+        document.setLoadingImages(true);
+        CompletableFuture.runAsync(() -> assignImagesToDocument(document), ThreadPool.getInstance().getExecutorService());
         return document;
     }
 
@@ -217,7 +209,28 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 images.add(new ImageWrapper(filepath, filename, imageFactory.create(filepath), description));
             }
             document.setDocumentImages(images);
+            document.setLoadingImages(false);
         } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbConnection.releaseConnection(connection);
+        }
+    }
+
+    public void refreshCache() {
+        documents.clear();
+        long startTime = System.currentTimeMillis();
+        String sql = "SELECT * FROM Document WHERE Deleted = 0";
+        Connection connection = null;
+        try {
+            connection = dbConnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Document document = createDocumentFromResultSet(rs);
+                documents.put(document.getDocumentID(), document);
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             dbConnection.releaseConnection(connection);
@@ -342,6 +355,5 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         }
         return "";
     }
-
 }
 

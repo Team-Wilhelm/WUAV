@@ -1,11 +1,12 @@
-package dal;
+package dal.factories;
 
 import javafx.scene.image.Image;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DocumentImageFactory {
-    private HashMap<String, Image> imageCache = new HashMap<>();
+    private ConcurrentHashMap<String, Image> imageCache = new ConcurrentHashMap<>();
     private static DocumentImageFactory instance;
 
     private DocumentImageFactory() {}

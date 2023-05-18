@@ -62,17 +62,14 @@ public class LoginViewController implements Initializable {
                     "Check that username and password are correct",
                     borderPane);
             return false;
+        } else {
+            if (userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText(), user.getSalt()))) {
+                userModel.setLoggedInUser(user);
+                openMenuView();
+                return true;
+            }
+            return false;
         }
-        if(userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText(), user.getSalt()))){
-            userModel.setLoggedInUser(user);
-            openMenuView();
-            return true;
-        }
-        DialogueManager.getInstance().showError(
-                "Login failed!",
-                "Check that username and password are correct",
-                borderPane);
-        return false;
     }
 
     private void openMenuView(){

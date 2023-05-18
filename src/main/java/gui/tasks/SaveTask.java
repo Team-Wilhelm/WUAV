@@ -2,10 +2,11 @@ package gui.tasks;
 
 import gui.model.IModel;
 import javafx.concurrent.Task;
+import utils.enums.ResultState;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SaveTask<T> extends Task<TaskState> {
+public class SaveTask<T> extends Task<ResultState> {
     private final T objectToSave;
     private final boolean isEditing;
     private final IModel<T> model;
@@ -18,36 +19,35 @@ public class SaveTask<T> extends Task<TaskState> {
     }
 
     @Override
-    protected TaskState call() {
+    protected ResultState call() {
         Thread.currentThread().setName("SaveTask");
 
         if (isCancelled()) {
             updateMessage("Saving was not successful");
-            return TaskState.NOT_SUCCESSFUL;
+            return ResultState.FAILED;
         }
 
         else {
             updateMessage("Saving...");
-            CompletableFuture<String> future;
-            if (isEditing) {
-                future = model.update(objectToSave);
-            }
-            else {
-                future = model.add(objectToSave);
-            }
-            String message = future.join();
+            ResultState resultState;
 
-            if (message.equals("saved") || message.equals("updated")) {
-                updateMessage("Saved successfully");
-                return TaskState.SUCCESSFUL;
+            if (isEditing) {
+                resultState = model.update(objectToSave);
+            } else {
+                resultState = model.add(objectToSave);
             }
-            else if (message.equals("No Permission")){
-                return TaskState.NO_PERMISSION;
+
+            if (resultState.equals(ResultState.SUCCESSFUL)) {
+                updateMessage("Saved successfully");
+                return ResultState.SUCCESSFUL;
+            }
+            else if (resultState.equals(ResultState.NO_PERMISSION)){
+                return ResultState.NO_PERMISSION;
             }
 
             else {
                 updateMessage("Saving was not successful");
-                return TaskState.NOT_SUCCESSFUL;
+                return ResultState.FAILED;
             }
         }
     }
@@ -69,6 +69,6 @@ public class SaveTask<T> extends Task<TaskState> {
     }
 
     public interface Callback {
-        void onTaskCompleted(TaskState taskState);
+        void onTaskCompleted(ResultState resultState);
     }
 }

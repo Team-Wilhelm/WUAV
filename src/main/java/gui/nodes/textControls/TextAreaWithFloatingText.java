@@ -1,4 +1,4 @@
-package gui.nodes;
+package gui.nodes.textControls;
 
 import io.github.palexdev.materialfx.controls.MFXContextMenu;
 import io.github.palexdev.materialfx.controls.MFXContextMenuItem;
@@ -9,7 +9,6 @@ import javafx.beans.property.*;
 import javafx.css.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
@@ -17,10 +16,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
-import java.security.Key;
-
 
 public class TextAreaWithFloatingText extends StackPane {
+    //TODO textArea no longer resizes
     // Child nodes
     private TextArea textArea;
     private Label floatingLabel;
@@ -29,7 +27,8 @@ public class TextAreaWithFloatingText extends StackPane {
     // Properties
     private final StringProperty floatingTextProperty = new SimpleStringProperty();
     private final BooleanProperty isFloatingProperty = new SimpleBooleanProperty(false);
-    private int fontSize = 16;
+    /*private IntegerProperty fontSizeProperty = new SimpleIntegerProperty(16);
+    private IntegerProperty maxTextLengthProperty = new SimpleIntegerProperty(Integer.MAX_VALUE);*/
 
     public TextAreaWithFloatingText() {
         this("");
@@ -37,6 +36,8 @@ public class TextAreaWithFloatingText extends StackPane {
 
     public TextAreaWithFloatingText(String floatingText) {
         super();
+        System.out.println("TextAreaWithFloatingText constructor");
+        //getStylesheets().add("/css/TextAreaWithFloatingText.css");
         getStyleClass().setAll("text-area-with-floating-text");
 
         // StackPane, textArea and floatingLabel
@@ -51,6 +52,12 @@ public class TextAreaWithFloatingText extends StackPane {
                 textArea.selectPositionCaret(textArea.getText().length());
             }
         });
+
+       /* this.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.length() > maxTextLengthProperty.get()) {
+                textArea.setText(oldValue);
+            }
+        });*/
 
         createBindings();
         defaultContextMenu();
@@ -89,14 +96,14 @@ public class TextAreaWithFloatingText extends StackPane {
 
         // When the text area is focused or empty, the label should become larger
         isFloatingProperty.bind(Bindings.createBooleanBinding(() -> textArea.isFocused()
-                        || !textArea.getText().isEmpty(),
+                        || textArea.getText() != null || !textArea.getText().isEmpty(),
                 textArea.focusedProperty(),
                 textArea.textProperty()));
 
         floatingLabel.fontProperty().bind(Bindings
                 .when(isFloatingProperty)
-                .then(Font.font(fontSize - 2))
-                .otherwise(Font.font(fontSize)));
+                .then(Font.font(14))
+                .otherwise(Font.font(16)));
 
         isFloatingProperty.addListener((observable, oldValue, newValue) -> {
             resizeChildren();
@@ -232,5 +239,40 @@ public class TextAreaWithFloatingText extends StackPane {
         textArea.setEditable(editable);
     }
 
+    public void setPromptText(String promptText) {
+        textArea.setPromptText(promptText);
+    }
+
+    public String getPromptText() {
+        return textArea.getPromptText();
+    }
+
+    public StringProperty promptTextProperty() {
+        return textArea.promptTextProperty();
+    }
+
+/*    public IntegerProperty fontSizeProperty() {
+        return fontSizeProperty;
+    }
+
+    public void setFontSize(int fontSize) {
+        fontSizeProperty.set(fontSize);
+    }
+
+    public int getFontSize() {
+        return fontSizeProperty.get();
+    }
+
+    public int maxTextLengthProperty() {
+        return maxTextLengthProperty.get();
+    }
+
+    public void setMaxTextLength(int maxTextLength) {
+        maxTextLengthProperty.set(maxTextLength);
+    }
+
+    public int getMaxTextLength() {
+        return maxTextLengthProperty.get();
+    }*/
     // endregion
 }

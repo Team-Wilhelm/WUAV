@@ -2,6 +2,8 @@ package gui.nodes;
 
 import be.ImageWrapper;
 import be.interfaces.Observer;
+import gui.nodes.dialogues.TextInputDialogue;
+import gui.util.DialogueManager;
 import io.github.palexdev.materialfx.controls.MFXContextMenu;
 import io.github.palexdev.materialfx.controls.MFXContextMenuItem;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
@@ -20,6 +22,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class ImagePreview extends VBox {
     private Observer<ImagePreview> observer;
@@ -101,17 +104,17 @@ public class ImagePreview extends VBox {
     }
 
     public void openAddDescriptionDialogue() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Add description");
-        dialog.setHeaderText("Add a description to the image");
-        dialog.setContentText("Description:");
-        dialog.getEditor().setText(imageWrapper.getDescription());
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(imageWrapper::setDescription);
-        notifyObservers(observable, this);
+        CompletableFuture<String> result = DialogueManager.getInstance().showTextInputDialogue("Add description",
+                "Add a description to the image", imageWrapper.getDescription(), this);
+        result.thenAccept(s -> {
+            imageWrapper.setDescription(s);
+            notifyObservers(observable, this);
+        });
     }
 
     public void openSeeDescriptionDialogue() {
+        //TODO change to a custom dialog, use dialogueManager
+        //TODO limit the size of the description to 256 characters
         Dialog<String> dialog = new Dialog<>();
         ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().add(type);

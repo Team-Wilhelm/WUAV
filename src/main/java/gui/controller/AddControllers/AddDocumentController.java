@@ -3,6 +3,8 @@ package gui.controller.AddControllers;
 import be.*;
 import be.interfaces.Observable;
 import be.interfaces.Observer;
+import gui.nodes.textControls.MFXTextFieldWithAutofill;
+import gui.nodes.textControls.TextAreaWithFloatingText;
 import utils.enums.CustomerType;
 import utils.enums.UserRole;
 import bll.pdf.PdfGenerator;
@@ -12,7 +14,7 @@ import gui.model.DocumentModel;
 import gui.model.UserModel;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
-import gui.tasks.TaskState;
+import utils.enums.ResultState;
 import gui.util.DialogueManager;
 import io.github.palexdev.materialfx.controls.*;
 import gui.nodes.*;
@@ -41,8 +43,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-import julia.nodes.MFXTextFieldWithAutofill;
-import julia.nodes.TextAreaWithFloatingText;
 import utils.BlobService;
 import utils.ThreadPool;
 import javax.imageio.ImageIO;
@@ -56,7 +56,6 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class AddDocumentController extends AddController<Document> implements Initializable, Observer<ImagePreview> {
@@ -158,6 +157,7 @@ public class AddDocumentController extends AddController<Document> implements In
         });
 
         addTooltips();
+        System.out.println(Arrays.toString(txtJobDescription.getStylesheets().toArray()));
     }
 
     @FXML
@@ -216,9 +216,6 @@ public class AddDocumentController extends AddController<Document> implements In
         SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
         setUpSaveTask(task, documentController, gridPanePdf, this);
         executorService.execute(task);
-
-        System.out.println(Arrays.toString(currentDocument.getTechnicians().toArray()));
-        System.out.println(Arrays.toString(UserModel.getLoggedInUser().getAssignedDocuments().values().toArray()));
         pdfTab.setDisable(false);
     }
 
@@ -227,7 +224,7 @@ public class AddDocumentController extends AddController<Document> implements In
         CompletableFuture<ButtonType> result = dialogueManager.showConfirmation("Delete document", "Are you sure you want to delete this document?", gridPaneJob);
         result.thenAccept(r -> {
             if (r.equals(ButtonType.OK)) {
-                Task<TaskState> deleteTask = new DeleteTask<>(documentToEdit.getDocumentID(), documentModel);
+                Task<ResultState> deleteTask = new DeleteTask<>(documentToEdit.getDocumentID(), documentModel);
                 setUpDeleteTask(deleteTask, documentController,gridPaneJob);
                 executorService.execute(deleteTask);
                 closeWindow(actionEvent);
@@ -259,7 +256,9 @@ public class AddDocumentController extends AddController<Document> implements In
         List<DocumentPropertyCheckboxWrapper> checkboxWrappers = propertiesList.getCheckBoxes().stream()
                 .filter(DocumentPropertyCheckboxWrapper::isSelected)
                 .toList();
-        pdfGenerator.generatePdf(documentToEdit, checkboxWrappers);
+        int numberOfPages = pdfGenerator.getNumberOfPages(documentToEdit, checkboxWrappers);
+        pdfGenerator.generatePdf(documentToEdit, checkboxWrappers, numberOfPages);
+        dialogueManager.showInformation("PDF created", "The PDF has been created successfully", gridPanePdf);
     }
 
     // region Listeners
@@ -757,4 +756,20 @@ public class AddDocumentController extends AddController<Document> implements In
             imagePreviews.forEach(ImagePreview::makeContextMenuNotEditable);
     }
     // endregion
+
+    //TODO add a confirmation dialog
+            /*
+            (Stage) btnAddDocument.getScene().getWindow().setOnCloseRequest(event -> {
+                if (documentModel.isModified()) {
+                    AlertManager.showConfirmationAlert("Are you sure you want to exit?", "You have unsaved changes. Are you sure you want to exit?", () -> {
+                        documentModel.save();
+                        Platform.exit();
+                    });
+                } else {
+                    Platform.exit();
+                }
+            });
+        });
+
+             */
 }

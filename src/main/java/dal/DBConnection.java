@@ -30,7 +30,7 @@ public class DBConnection {
         return instance;
     }
 
-    public Connection getConnection() throws SQLException {
+    public synchronized Connection getConnection() throws SQLException {
         Connection connection;
 
         if (connectionPool.isEmpty()) {

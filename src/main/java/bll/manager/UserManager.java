@@ -1,9 +1,10 @@
 package bll.manager;
 
 import be.User;
+import utils.enums.ResultState;
 import utils.enums.UserRole;
 import bll.IManager;
-import dal.DAOFactory;
+import dal.factories.DAOFactory;
 import dal.dao.UserDAO;
 import gui.model.UserModel;
 import utils.permissions.AccessChecker;
@@ -22,32 +23,35 @@ public class UserManager implements IManager<User> {
 
     @Override
     @RequiresPermission(UserRole.ADMINISTRATOR)
-    public String add(User user) {
+    public ResultState add(User user) {
         if (checker.hasAccess(this.getClass())) {
             return dao.add(user);
         }
         else {
-            return "No Permission";}
+            return ResultState.NO_PERMISSION;
+        }
     }
 
     @Override
     @RequiresPermission(UserRole.ADMINISTRATOR)
-    public String update(User user) {
+    public ResultState update(User user) {
         if (user.equals(UserModel.getLoggedInUser()) || checker.hasAccess(this.getClass())) {
             return dao.update(user);
         }
         else {
-            return "No Permission";}
+            return ResultState.NO_PERMISSION;
+        }
     }
 
     @Override
     @RequiresPermission(UserRole.ADMINISTRATOR)
-    public String delete(UUID id) {
+    public ResultState delete(UUID id) {
         if (checker.hasAccess(this.getClass())) {
             return dao.delete(id);
         }
         else {
-           return "No Permission";}
+            return ResultState.NO_PERMISSION;
+        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import gui.nodes.textControls.MFXTextFieldWithAutofill?>
+<?import gui.nodes.textControls.TextAreaWithFloatingText?>
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import io.github.palexdev.materialfx.controls.MFXDatePicker?>
 <?import io.github.palexdev.materialfx.controls.MFXFilterComboBox?>
@@ -14,8 +16,6 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import julia.nodes.TextAreaWithFloatingText ?>
-<?import julia.nodes.MFXTextFieldWithAutofill?>
 
 <TabPane fx:id="tabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="750.0" minWidth="900.0" styleClass="background" stylesheets="@../../css/style.css" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.AddControllers.AddDocumentController">
    <tabs>
@@ -137,7 +137,7 @@
                   <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <HBox fx:id="canvasHolder" prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="3" GridPane.rowSpan="2"/>
+                  <HBox fx:id="canvasHolder" prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="3" GridPane.rowSpan="2" />
                </children>
             </GridPane>
          </content>

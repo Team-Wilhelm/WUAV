@@ -1,3 +1,7 @@
+* {
+    dark-grey: #3e3e3e;
+}
+
 .text-area-with-floating-text {
     -mfx-background-color: base-colour;
     -mfx-background-radius: 5;

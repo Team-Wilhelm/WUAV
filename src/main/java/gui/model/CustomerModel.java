@@ -3,11 +3,13 @@ package gui.model;
 import be.Customer;
 import bll.IManager;
 import bll.ManagerFactory;
+import utils.enums.ResultState;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class CustomerModel implements IModel<Customer> {
     private static CustomerModel instance;
@@ -28,37 +30,22 @@ public class CustomerModel implements IModel<Customer> {
     }
 
     @Override
-    public CompletableFuture<String> add(Customer customer) {
-        String message = customerManager.add(customer);
-
-        CompletableFuture<Map<UUID, Customer>> future = CompletableFuture.supplyAsync(() -> customerManager.getAll());
-        return future.thenApplyAsync(customers -> {
-            allCustomers.clear();
-            allCustomers.putAll(customers);
-            return message;
-        });
+    public ResultState add(Customer customer) {
+        ResultState resultState = customerManager.add(customer);
+        if (resultState.equals(ResultState.SUCCESSFUL)) {
+            allCustomers.put(customer.getCustomerID(), customer);
+        }
+        return resultState;
     }
 
     @Override
-    public CompletableFuture<String> update(Customer customer) {
-        String message = customerManager.update(customer);
-        CompletableFuture<Map<UUID, Customer>> future = CompletableFuture.supplyAsync(() -> customerManager.getAll());
-        return future.thenApplyAsync(customers -> {
-            allCustomers.clear();
-            allCustomers.putAll(customers);
-            return message;
-        });
+    public ResultState update(Customer customer) {
+        return customerManager.update(customer);
     }
 
     @Override
-    public CompletableFuture<String> delete(UUID id) {
-        String message = customerManager.delete(id);
-        CompletableFuture<Map<UUID, Customer>> future = CompletableFuture.supplyAsync(() -> customerManager.getAll());
-        return future.thenApplyAsync(customers -> {
-            allCustomers.clear();
-            allCustomers.putAll(customers);
-            return message;
-        });
+    public ResultState delete(UUID id) {
+        return customerManager.delete(id);
     }
 
     @Override
