@@ -16,9 +16,11 @@ import java.util.*;
 
 public class UserDAO extends DAO implements IDAO<User> {
     private final DBConnection dbConnection;
+    private DocumentDAO documentDAO;
 
     public UserDAO() {
         dbConnection = DBConnection.getInstance();
+        documentDAO = new DocumentDAO();
     }
 
     @Override
@@ -146,7 +148,7 @@ public class UserDAO extends DAO implements IDAO<User> {
                 i++;
             }
             assert user != null;
-            user.setAssignedDocuments(new DocumentDAO().getDocumentsByIDs(documentIDs));
+            user.setAssignedDocuments(documentDAO.getDocumentsByIDs(documentIDs));
             return user;
         } catch (Exception e) {
             e.printStackTrace();
@@ -187,7 +189,7 @@ public class UserDAO extends DAO implements IDAO<User> {
                 resultSet.getString("ProfilePicture")
         );
         if (assignDocuments) {
-            user.setAssignedDocuments(new DocumentDAO().getDocumentsByIDs(documentIDs));
+            user.setAssignedDocuments(documentDAO.getDocumentsByIDs(documentIDs));
         }
         return user;
     }

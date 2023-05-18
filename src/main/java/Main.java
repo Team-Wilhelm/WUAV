@@ -68,7 +68,6 @@ public class Main extends Application {
 
     @Override
     public void stop() {
-        System.out.println(DocumentDAO.getNumberOfDocuments());
         ThreadPool.getInstance().shutdown();
     }
 }

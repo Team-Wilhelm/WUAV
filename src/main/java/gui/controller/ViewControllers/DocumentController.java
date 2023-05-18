@@ -59,7 +59,7 @@ public class DocumentController extends ViewController<Document> implements Init
         searchBar.textProperty().addListener((observable, oldValue, newValue) ->
                 tblDocument.getItems().setAll(documentModel.searchDocuments(searchBar.getText().toLowerCase().trim())));
 
-        documentList.addAll(documentModel.getAll().values());
+        refreshItems();
         populateTableView();
 
         btnAddDocument.getStyleClass().addAll("addButton", "rounded");
@@ -96,6 +96,7 @@ public class DocumentController extends ViewController<Document> implements Init
     public void refreshItems(List<Document> documentsToDisplay) {
         documentList.clear();
         documentList.addAll(documentsToDisplay);
+        documentList.forEach(d -> System.out.println(d.isLoadingImages()));
     }
 
     @Override

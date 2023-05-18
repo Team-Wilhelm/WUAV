@@ -19,13 +19,15 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class DocumentDAO extends DAO implements IDAO<Document> {
-    static int numberOfDocuments = 0;
     private final DBConnection dbConnection;
-    private final DocumentImageFactory imageFactory = DocumentImageFactory.getInstance();
-    private ThreadPool executorService = ThreadPool.getInstance();
+    private final DocumentImageFactory imageFactory;
+    private ConcurrentHashMap<UUID, Document> documents;
 
     public DocumentDAO() {
         dbConnection = DBConnection.getInstance();
+        imageFactory = DocumentImageFactory.getInstance();
+        documents = new ConcurrentHashMap<>();
+        refreshCache();
     }
 
     @Override
@@ -76,6 +78,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
             //Save and link image filepaths to document
             saveImagesForDocument(connection, document);
+            documents.put(document.getDocumentID(), document);
         } catch (Exception e) {
             e.printStackTrace();
             result = ResultState.FAILED;
@@ -109,6 +112,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
             //Save and link image filepaths to document
             saveImagesForDocument(connection, document);
+            documents.put(document.getDocumentID(), document);
+
             return ResultState.SUCCESSFUL;
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,6 +134,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             ps.setString(1, id.toString());
             ps.setString(2, id.toString());
             ps.executeUpdate();
+            documents.remove(id);
             return ResultState.SUCCESSFUL;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -140,29 +146,15 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     @Override
     public Map<UUID, Document> getAll() {
-        long startTime = System.currentTimeMillis();
-        String sql = "SELECT * FROM Document WHERE Deleted = 0";
-        ConcurrentHashMap<UUID, Document> documents = new ConcurrentHashMap<>();
-        Connection connection = null;
-        try {
-            connection = dbConnection.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Document document = createDocumentFromResultSet(rs);
-                documents.put(document.getDocumentID(), document);
-            }
-            System.out.println("DocumentDAO.getAll() took " + (System.currentTimeMillis() - startTime) + "ms");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            dbConnection.releaseConnection(connection);
-        }
         return documents;
     }
 
     @Override
     public Document getById(UUID id) {
+        if (documents.containsKey(id)) {
+            return documents.get(id);
+        }
+
         String sql = "SELECT * FROM Document WHERE DocumentID = ? AND Deleted = 0";
         Connection connection = null;
         try {
@@ -182,9 +174,13 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     }
 
     private Document createDocumentFromResultSet(ResultSet rs) throws SQLException {
-        numberOfDocuments++;
+        UUID documentID = UUID.fromString(rs.getString("DocumentID"));
+        if (documents.containsKey(documentID)) {
+            return documents.get(documentID);
+        }
+
         Document document = new Document (
-                UUID.fromString(rs.getString("DocumentID")),
+                documentID,
                 new CustomerDAO().getById(UUID.fromString(rs.getString("CustomerID"))),
                 rs.getString("JobDescription"),
                 rs.getString("Notes"),
@@ -195,11 +191,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         //TODO make sure it's okay
         CompletableFuture.runAsync(() -> assignImagesToDocument(document), ThreadPool.getInstance().getExecutorService());
         return document;
-    }
-
-    public CompletableFuture<Void> assignImagesToDocumentAsync(Document document) {
-        // Wrap the execution of the method in a CompletableFuture
-        return CompletableFuture.runAsync(() -> assignImagesToDocument(document), ThreadPool.getInstance().getExecutorService());
     }
 
     public void assignImagesToDocument(Document document){
@@ -220,8 +211,28 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             }
             document.setDocumentImages(images);
             document.setLoadingImages(false);
-            System.out.println("Document " + document.getJobTitle() + " has " + document.getDocumentImages().size() + " images");
         } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbConnection.releaseConnection(connection);
+        }
+    }
+
+    public void refreshCache() {
+        documents.clear();
+        long startTime = System.currentTimeMillis();
+        String sql = "SELECT * FROM Document WHERE Deleted = 0";
+        Connection connection = null;
+        try {
+            connection = dbConnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Document document = createDocumentFromResultSet(rs);
+                documents.put(document.getDocumentID(), document);
+            }
+            System.out.println("DocumentDAO.getAll() took " + (System.currentTimeMillis() - startTime) + "ms");
+        } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             dbConnection.releaseConnection(connection);
@@ -345,10 +356,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             dbConnection.releaseConnection(connection);
         }
         return "";
-    }
-
-    public static int getNumberOfDocuments() {
-        return numberOfDocuments;
     }
 }
 
