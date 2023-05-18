@@ -25,8 +25,8 @@ public abstract class AddController<T> {
 
         task.setOnSucceeded(event -> {
             task.setCallback(taskState -> {
+                controller.refreshItems();
                 if (taskState == ResultState.SUCCESSFUL) {
-                    controller.refreshItems();
                     addController.setIsEditing(task.getObjectToSave());
                     if (addController instanceof AddUserController){
                         ((AddUserController) addController).refreshCard();
@@ -45,19 +45,7 @@ public abstract class AddController<T> {
                 }
             });
 
-            // unbind the progress label and spinner from the task and set spinner to 100%
-            controller.unbindProgress();
-
-            // after 3 seconds, the progress bar will be hidden
-            new Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            controller.setProgressVisibility(false);
-                        }
-                    },
-                    3000
-            );
+            hideMessageAfterTimeout(controller);
 
             if (task.getCallback() != null) {
                 task.getCallback().onTaskCompleted(task.getValue());
@@ -72,16 +60,7 @@ public abstract class AddController<T> {
         });
 
         task.setOnFailed(event -> {
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            controller.setProgressVisibility(false);
-                            controller.unbindProgress();
-                        }
-                    },
-                    3000
-            );
+            hideMessageAfterTimeout(controller);
             dialogueManager.showError("Oops...", "Something went wrong!", owner);
         });
     }
@@ -90,19 +69,7 @@ public abstract class AddController<T> {
         setUpTask(task, viewController, owner);
 
         task.setOnSucceeded(event -> {
-            // unbind the progress label and spinner from the task and set spinner to 100%
-            viewController.unbindProgress();
-
-            // after 3 seconds, the progress bar will be hidden
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            viewController.setProgressVisibility(false);
-                        }
-                    },
-                    3000
-            );
+            hideMessageAfterTimeout(viewController);
 
             if (task.getValue() == ResultState.SUCCESSFUL) {
                 viewController.refreshItems();
@@ -116,6 +83,23 @@ public abstract class AddController<T> {
                 dialogueManager.showError("Oops...", "Something went wrong!", owner);
             }
         });
+    }
+
+
+    private void hideMessageAfterTimeout(ViewController<T> controller) {
+        // unbind the progress label and spinner from the task and set spinner to 100%
+        controller.unbindProgress();
+
+        // after 3 seconds, the progress bar will be hidden
+        new Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        controller.setProgressVisibility(false);
+                    }
+                },
+                3000
+        );
     }
 
     protected void closeWindow(Event event) {

@@ -31,23 +31,19 @@ public class DocumentModel implements IModel<Document> {
 
     @Override
     public ResultState add(Document document) {
-        CompletableFuture<ResultState> future = new CompletableFuture<>();
-        future.complete(documentManager.add(document));
-        ResultState resultState;
-        try {
-            resultState = future.get();
-            if (resultState.equals(ResultState.SUCCESSFUL)) {
-                allDocuments.put(document.getDocumentID(), document);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+        ResultState resultState = documentManager.add(document);
+        if (resultState.equals(ResultState.SUCCESSFUL)) {
+            allDocuments.put(document.getDocumentID(), document);
         }
-        future.thenRun(() -> allDocuments.put(document.getDocumentID(), document));
         return resultState;
     }
 
     @Override
     public ResultState update(Document document) {
+        ResultState resultState = documentManager.update(document);
+        if (resultState.equals(ResultState.SUCCESSFUL)) {
+            allDocuments.put(document.getDocumentID(), document);
+        }
         return documentManager.update(document);
     }
 

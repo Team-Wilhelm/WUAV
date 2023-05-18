@@ -31,16 +31,9 @@ public class CustomerModel implements IModel<Customer> {
 
     @Override
     public ResultState add(Customer customer) {
-        CompletableFuture<ResultState> future = new CompletableFuture<>();
-        future.complete(customerManager.add(customer));
-        ResultState resultState;
-        try {
-            resultState = future.get();
-            if (resultState.equals(ResultState.SUCCESSFUL)) {
-                allCustomers.put(customer.getCustomerID(), customer);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+        ResultState resultState = customerManager.add(customer);
+        if (resultState.equals(ResultState.SUCCESSFUL)) {
+            allCustomers.put(customer.getCustomerID(), customer);
         }
         return resultState;
     }

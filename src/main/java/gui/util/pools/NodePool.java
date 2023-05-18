@@ -1,14 +1,13 @@
-package gui.util;
+package gui.util.pools;
 
 import javafx.scene.Node;
 import utils.enums.NodeType;
 
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Queue;
 
 public class NodePool {
+    //TODO: Implement NodePool
     private static NodePool instance;
     private HashMap<NodeType, Deque<Node>> nodePool;
 
