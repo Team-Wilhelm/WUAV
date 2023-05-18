@@ -1,0 +1,9 @@
+.mfx-tableview {
+    -fx-background-color: base-colour;
+    -fx-border-color: dark-grey;
+    -fx-text-fill: black;
+}
+
+.mfx-tableview .column-header .label {
+    -fx-font-weight: bold;
+}
