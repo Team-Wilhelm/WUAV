@@ -2,8 +2,8 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<HBox prefHeight="600.0" prefWidth="1350.0" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.CanvasController">
-    <VBox fx:id="toolbar" alignment="CENTER" prefWidth="350.0" spacing="10"
+<HBox prefHeight="650.0" prefWidth="900.0" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.CanvasController">
+    <VBox fx:id="toolbar" alignment="CENTER" prefWidth="350.0" spacing="10" minWidth="350"
           style="-fx-background-color: rgb(242,200,15)" styleClass="toolBox">
         <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

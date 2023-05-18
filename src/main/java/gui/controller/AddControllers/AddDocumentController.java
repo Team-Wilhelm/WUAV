@@ -28,13 +28,16 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -55,9 +58,11 @@ import java.util.ResourceBundle;
 
 public class AddDocumentController extends AddController<Document> implements Initializable, Observer<ImagePreview> {
     @FXML
+    public HBox canvasHolder;
+    @FXML
     private TabPane tabPane;
     @FXML
-    private Tab jobInformationTab, customerInformationTab, picturesTab, pdfTab;
+    private Tab jobInformationTab, customerInformationTab, picturesTab, pdfTab, canvasTab;
     @FXML
     private FlowPane flowPanePictures;
     @FXML
@@ -135,6 +140,19 @@ public class AddDocumentController extends AddController<Document> implements In
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
         btnSave.disableProperty().bind(isInputChanged.not());
         btnDelete.disableProperty().bind(isEditing.not());
+
+
+        canvasTab.setOnSelectionChanged(event -> {
+            if (canvasTab.isSelected()) {
+
+                canvasHolder.getChildren().clear();
+                try {
+                    Parent canvasRoot = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/view/CanvasView.fxml")));
+                    canvasHolder.getChildren().add(canvasRoot);
+                } catch (IOException e) {}
+                catch (NullPointerException e) { }
+            }
+        });
 
         addTooltips();
     }

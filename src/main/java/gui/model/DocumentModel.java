@@ -5,6 +5,7 @@ import be.User;
 import gui.nodes.DocumentCard;
 import bll.manager.DocumentManager;
 import bll.ManagerFactory;
+import gui.util.drawing.MyShape;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -95,5 +96,12 @@ public class DocumentModel implements IModel<Document> {
                                 //|| document.getTechnicians().stream().allMatch(user -> user.getUsername().toLowerCase().contains(query.toLowerCase()))
                         ).forEach(filteredDocuments::add);
         return filteredDocuments;
+    }
+
+    public void addDrawingToDocument(Document document, String drawing){
+        documentManager.addDrawingToDocument(document, drawing);
+    }
+    public String getDrawingFromDocument(Document document){
+        return documentManager.getDrawingFromDocument(document);
     }
 }

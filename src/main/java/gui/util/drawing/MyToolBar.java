@@ -1,8 +1,12 @@
 package gui.util.drawing;
 
+import be.Customer;
+import be.Document;
+import gui.model.DocumentModel;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXRectangleToggleNode;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -12,13 +16,14 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import utils.BlobService;
 
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * The toolbar that holds drawing tools and color picker.
@@ -164,22 +169,36 @@ public class MyToolBar extends VBox {
 
         // Add save button
         MFXButton saveButton = new MFXButton("Save");
+        saveButton.setPrefWidth(200);
+
+        HBox saveButtonBox = new HBox();
+        saveButtonBox.getChildren().add(saveButton);
+        saveButtonBox.setAlignment(Pos.CENTER);
+
         saveButton.setOnAction(e -> {
-            WritableImage wi = new WritableImage(1000, 600);
+            var doc = new Document(UUID.fromString("CC9BAE95-BDE9-45BD-815F-045DCB4ACDFD"), new Customer(), "test", "test", "test", java.sql.Date.valueOf(LocalDate.now()));
+            WritableImage wi = new WritableImage(550, 650);
             Image snapshot = canvas.snapshot(null, wi);
             File output = new File("snapshot" + new Date().getTime() + ".png");
             try {
                 ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", output);
+                var url = BlobService.getInstance().UploadFile(output.getAbsolutePath(), doc.getDocumentID());
+                output.delete();
+                DocumentModel.getInstance().addDrawingToDocument(doc, url);
             } catch (IOException eex) {
                 throw new RuntimeException(eex);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
             }
-            System.out.println(snapshot);
         });
-        MFXButton backButton = new MFXButton("Back");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         spacer.setMinWidth(Region.USE_PREF_SIZE);
+
+        Region spacer2 = new Region();
+        VBox.setVgrow(spacer2, Priority.ALWAYS);
+        spacer2.setMinHeight(50);
         getChildren().addAll(
                 new Label("Toolbox"),
                 handleBox,
@@ -189,9 +208,8 @@ public class MyToolBar extends VBox {
                 entityBox,
                 new Label("Cables"),
                 cableBox,
-                new Region(),
-                saveButton,
-                backButton
+                spacer2,
+                saveButtonBox
                 );
     }
 

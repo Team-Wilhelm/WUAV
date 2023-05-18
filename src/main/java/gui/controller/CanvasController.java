@@ -17,12 +17,24 @@ public class CanvasController implements Initializable {
     public Canvas canvas;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        CanvasPane canvas = new CanvasPane(1000, 600);
+        CanvasPane canvas = new CanvasPane(550, 711);
         toolbar.getChildren().add(new MyToolBar(canvas));
         canvasVbox.getChildren().addAll(canvas);
+
         Platform.runLater(() -> {
-            Scene scene = canvasVbox.getScene();
-            scene.setOnKeyPressed(event -> canvas.getEventHandler().handle(event));
+            try {
+                Scene scene = canvasVbox.getScene();
+                scene.setOnKeyPressed(event -> canvas.getEventHandler().handle(event));
+            } catch (NullPointerException npe) { }
         });
+    }
+    private void updateCanvasSize() {
+        // Subtract the width of the toolbar from the tab pane width
+        double canvasWidth = canvasVbox.getWidth();
+        double canvasHeight = canvasVbox.getHeight();
+
+        // Set the size of the canvas
+        canvas.setWidth(canvasWidth);
+        canvas.setHeight(canvasHeight);
     }
 }

@@ -18,7 +18,7 @@ public class CanvasPane extends Pane {
     /**
      * The canvas.
      */
-    private final Canvas canvas;
+    public Canvas canvas;
 
     /**
      * Holds a list of shapes to render on the canvas.
@@ -44,6 +44,31 @@ public class CanvasPane extends Pane {
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, handler);
         canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, handler);
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, handler);
+
+        drawGrid();
+    }
+
+    private void drawGrid() {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        double cellWidth = 20;  // Width of each grid cell
+        double cellHeight = 20; // Height of each grid cell
+        double width = getWidth();
+        double height = getHeight();
+
+        gc.setStroke(Color.LIGHTGRAY);
+        gc.setLineWidth(0.5);
+
+        // Draw vertical lines
+        for (double x = 0; x < width; x += cellWidth) {
+            gc.strokeLine(x, 0, x, height);
+        }
+
+        // Draw horizontal lines
+        for (double y = 0; y < height; y += cellHeight) {
+            gc.strokeLine(0, y, width, y);
+        }
+        gc.setStroke(null);
+        gc.setLineWidth(0);
     }
 
     /**
@@ -78,6 +103,7 @@ public class CanvasPane extends Pane {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(color);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawGrid();
     }
 
     /**

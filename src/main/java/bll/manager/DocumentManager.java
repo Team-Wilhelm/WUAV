@@ -60,7 +60,13 @@ public class DocumentManager implements IManager<Document> {
         return dao.getById(id);
     }
 
-    public void assignUserToDocument(User user, Document document, boolean isAssigning){
+    public void assignUserToDocument(User user, Document document, boolean isAssigning) {
         dao.assignUserToDocument(user, document, isAssigning);
+    }
+    public void addDrawingToDocument(Document document, String drawing) {
+        dao.addDrawingToDocument(document, drawing);
+    }
+    public String getDrawingFromDocument(Document document) {
+        return dao.getDrawingOnDocument(document);
     }
 }

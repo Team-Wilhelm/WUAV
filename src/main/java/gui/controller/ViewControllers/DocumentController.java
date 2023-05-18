@@ -17,12 +17,8 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import gui.util.AlertManager;
@@ -84,6 +80,7 @@ public class DocumentController extends ViewController<Document> implements Init
         });
 
              */
+            /*
             btnAddDocument.getScene().setOnKeyPressed(event -> {
                 if (event.isControlDown() && event.getCode().equals(KeyCode.N)) {
                     try {
@@ -93,6 +90,7 @@ public class DocumentController extends ViewController<Document> implements Init
                     }
                 }
             });
+            */
         });
     }
 
@@ -203,7 +201,7 @@ public class DocumentController extends ViewController<Document> implements Init
                 try {
                     AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
                     controller.setDocumentController(this);
-                    controller.setIsEditing(tblDocument.getSelectionModel().getSelectedValue());;
+                    //controller.setIsEditing(tblDocument.getSelectionModel().getSelectedValue());;
                     controller.setVisibilityForUserRole();
                 } catch (Exception e) {
                     e.printStackTrace();

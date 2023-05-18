@@ -3,12 +3,16 @@ package dal.dao;
 import be.Document;
 import be.ImageWrapper;
 import be.User;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import dal.DBConnection;
 import dal.DocumentImageFactory;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
+import gui.util.drawing.MyShape;
 import utils.ThreadPool;
 
+import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -296,5 +300,48 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         ps.setString(4, document.getCustomer().getCustomerID().toString());
         ps.setDate(5, document.getDateOfCreation());
     }
+
+    public void addDrawingToDocument(Document document, String canvasImage) {
+        String sql = "MERGE INTO Document_Drawing_Link AS target " +
+                "USING (VALUES (?, ?)) AS source (DocumentID, Drawing) " +
+                "ON (target.DocumentID = source.DocumentID) " +
+                "WHEN MATCHED THEN " +
+                "  UPDATE SET target.Drawing = source.Drawing " +
+                "WHEN NOT MATCHED THEN " +
+                "  INSERT (DocumentID, Drawing) VALUES (source.DocumentID, source.Drawing);";
+        Connection connection = null;
+        try {
+            connection = dbConnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, document.getDocumentID().toString());
+            ps.setString(2, canvasImage);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            dbConnection.releaseConnection(connection);
+        }
+    }
+
+    public String getDrawingOnDocument(Document document){
+        String sql = "SELECT * FROM Document_Drawing_Link WHERE DocumentID = ?";
+        Connection connection = null;
+        try{
+            connection = dbConnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, document.getDocumentID().toString());
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                String drawing = rs.getString("Drawing");
+                return drawing;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            dbConnection.releaseConnection(connection);
+        }
+        return "";
+    }
+
 }
 
