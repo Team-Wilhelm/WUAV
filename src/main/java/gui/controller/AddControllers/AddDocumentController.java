@@ -255,7 +255,10 @@ public class AddDocumentController extends AddController<Document> implements In
         List<DocumentPropertyCheckboxWrapper> checkboxWrappers = propertiesList.getCheckBoxes().stream()
                 .filter(DocumentPropertyCheckboxWrapper::isSelected)
                 .toList();
-        pdfGenerator.generatePdf(documentToEdit, checkboxWrappers);
+        int numberOfPages = pdfGenerator.getNumberOfPages(documentToEdit, checkboxWrappers);
+        pdfGenerator.generatePdf(documentToEdit, checkboxWrappers, numberOfPages);
+        //TODO show information without confirmation action
+        dialogueManager.showConfirmation("PDF created", "The PDF has been created successfully", gridPanePdf);
     }
 
     // region Listeners

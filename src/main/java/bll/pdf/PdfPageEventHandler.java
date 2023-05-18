@@ -15,9 +15,11 @@ import java.io.IOException;
 
 public class PdfPageEventHandler implements IEventHandler {
     protected PdfDocument pdfDoc;
+    protected int numberOfPages;
 
-    public PdfPageEventHandler(PdfDocument pdfDoc) {
+    public PdfPageEventHandler(PdfDocument pdfDoc, int numberOfPages) {
         this.pdfDoc = pdfDoc;
+        this.numberOfPages = numberOfPages;
     }
        @Override
     public void handleEvent(Event event) {
@@ -38,7 +40,7 @@ public class PdfPageEventHandler implements IEventHandler {
             // Add the header and page numbers to all pages except the first
             if (pageNumber != 1) {
                 // Set the text and position of the page number
-                String pageNumberText = String.valueOf(pageNumber);
+                String pageNumberText = (pageNumber + " of " + numberOfPages);
                 float pageNumberTextCenter = (page.getPageSize().getWidth() - (FONT.getWidth(pageNumberText, 10))) / 2;
 
                 canvas.beginText().setFontAndSize(FONT, 10)
