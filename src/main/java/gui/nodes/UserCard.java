@@ -69,11 +69,9 @@ public class UserCard extends VBox {
         return user;
     }
 
-    //TODO look into observer pattern for this
-    /*@Override
-    public void update(Observable<User> o, User arg) {
+    public void refreshCard(User user) {
         nameLabel.setText(user.getFullName());
         positionLabel.setText(user.getUserRole().toString());
         profileImage.setImage(user.getProfilePicture());
-    }*/
+    }
 }

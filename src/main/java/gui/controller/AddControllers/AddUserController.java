@@ -2,6 +2,7 @@ package gui.controller.AddControllers;
 
 import be.User;
 import gui.nodes.PasswordDialogue;
+import gui.nodes.UserCard;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -130,8 +131,6 @@ public class AddUserController extends AddController<User> implements Initializa
         isUpdating.set(true);
         disableFields(false);
         btnSave.setDisable(false);
-        userController.refreshItems();
-        //TODO make refresh
     }
 
     @FXML
@@ -142,7 +141,6 @@ public class AddUserController extends AddController<User> implements Initializa
             setUpDeleteTask(deleteTask, userController, txtName.getScene().getWindow());
             executorService.execute(deleteTask);
             closeWindow(actionEvent);
-            userController.refreshItems();
         }
     }
 
@@ -342,6 +340,10 @@ public class AddUserController extends AddController<User> implements Initializa
                 }
             }
         });
+    }
+
+    public void refreshCard() {
+        userController.refreshCard(userToUpdate);
     }
     //endregion
 }

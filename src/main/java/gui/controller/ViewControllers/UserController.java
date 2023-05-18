@@ -154,6 +154,13 @@ public class UserController extends ViewController<User> implements Initializabl
         refreshItems(List.copyOf(userModel.getAll().values()));
     }
 
+    public void refreshCard(User user){
+        UserCard userCard = userModel.getLoadedCards().get(user);
+        if (userCard != null) {
+            userCard.refreshCard(user);
+        }
+    }
+
     @FXML
     private void addEmployeeAction(ActionEvent actionEvent) throws IOException {
             FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);

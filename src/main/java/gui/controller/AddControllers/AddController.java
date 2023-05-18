@@ -28,6 +28,9 @@ public abstract class AddController<T> {
                 if (taskState == TaskState.SUCCESSFUL) {
                     controller.refreshItems();
                     addController.setIsEditing(task.getObjectToSave());
+                    if (addController instanceof AddUserController){
+                        ((AddUserController) addController).refreshCard();
+                    }
                     if (addController instanceof AddDocumentController) {
                         ((AddDocumentController) addController).setUpPdfListView();
                     }
