@@ -1,19 +1,17 @@
 package gui.controller.ViewControllers;
 
 import be.User;
-import be.enums.UserRole;
+import utils.enums.UserRole;
 import gui.nodes.UserCard;
-import gui.SceneManager;
+import gui.util.SceneManager;
 import gui.controller.AddControllers.AddUserController;
 import gui.model.UserModel;
 import gui.tasks.TaskState;
-import gui.util.AlertManager;
+import gui.util.DialogueManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -56,6 +54,7 @@ public class UserController extends ViewController<User> implements Initializabl
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //TODO disable edit button while saving
         setProgressVisibility(false);
 
         Bindings.bindContent(flowPane.getChildren(), userCards);
@@ -141,11 +140,12 @@ public class UserController extends ViewController<User> implements Initializabl
                 controller.setUserController(this);
                 controller.setIsEditing(lastFocusedCard.getUser());
                 controller.setVisibilityForUserRole();
+                controller.setShortcutsAndAccelerators();
             } catch (Exception e) {
                e.printStackTrace();
             }
         } else {
-            AlertManager.getInstance().showWarning("No user selected", "Please select a user to edit", window);
+            DialogueManager.getInstance().showWarning("No user selected", "Please select a user to edit", window);
         }
     }
 
@@ -159,6 +159,7 @@ public class UserController extends ViewController<User> implements Initializabl
             FXMLLoader loader = openWindow(SceneManager.ADD_EMPLOYEE_SCENE, Modality.APPLICATION_MODAL);
             AddUserController controller = loader.getController();
             controller.setUserController(this);
+            controller.setShortcutsAndAccelerators();
     }
 
     public void setVisibilityForUserRole() {

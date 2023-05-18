@@ -1,7 +1,7 @@
 package bll.manager;
 
 import be.Customer;
-import be.enums.UserRole;
+import utils.enums.UserRole;
 import bll.IManager;
 import dal.dao.CustomerDAO;
 import dal.DAOFactory;

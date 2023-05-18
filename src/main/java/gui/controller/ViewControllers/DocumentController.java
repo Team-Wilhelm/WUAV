@@ -1,10 +1,10 @@
 package gui.controller.ViewControllers;
 
 import be.Document;
-import be.enums.UserRole;
+import utils.enums.UserRole;
 import gui.model.UserModel;
 import gui.nodes.DocumentCard;
-import gui.SceneManager;
+import gui.util.SceneManager;
 import gui.controller.AddControllers.AddDocumentController;
 import gui.model.DocumentModel;
 import gui.tasks.TaskState;
@@ -17,15 +17,14 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
-import gui.util.AlertManager;
+import gui.util.DialogueManager;
 import javafx.stage.Window;
 import utils.permissions.AccessChecker;
 import java.io.IOException;
@@ -84,15 +83,6 @@ public class DocumentController extends ViewController<Document> implements Init
         });
 
              */
-            btnAddDocument.getScene().setOnKeyPressed(event -> {
-                if (event.isControlDown() && event.getCode().equals(KeyCode.N)) {
-                    try {
-                        addDocumentAction();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
         });
     }
 
@@ -139,8 +129,13 @@ public class DocumentController extends ViewController<Document> implements Init
     }
 
     @FXML
-    private void addDocumentAction() throws IOException {
-        AddDocumentController controller = (AddDocumentController) openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
+    private void addDocumentAction() {
+        AddDocumentController controller;
+        try {
+            controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         controller.setDocumentController(this);
         controller.setVisibilityForUserRole();
     }
@@ -209,7 +204,7 @@ public class DocumentController extends ViewController<Document> implements Init
                 }
             }
             else {
-                AlertManager.getInstance().showError("No document selected", "Please select a document", btnAddDocument.getScene().getWindow());
+                DialogueManager.getInstance().showError("No document selected", "Please select a document", btnAddDocument.getScene().getWindow());
             }
         }
     }
@@ -228,5 +223,9 @@ public class DocumentController extends ViewController<Document> implements Init
         }
         btnAddDocument.setVisible(hasAccess);
         //TODO make gridpane take all available space
+    }
+
+    public void addShortcuts() {
+        btnAddDocument.getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::addDocumentAction);
     }
 }

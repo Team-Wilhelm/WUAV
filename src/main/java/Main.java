@@ -1,4 +1,4 @@
-import gui.SceneManager;
+import gui.util.SceneManager;
 import gui.model.UserModel;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
 import io.github.palexdev.materialfx.css.themes.Themes;
@@ -7,6 +7,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import utils.ThreadPool;
 
@@ -30,11 +32,30 @@ public class Main extends Application {
 
         primaryStage.setTitle("WUAV Documentation Management System");
         primaryStage.getIcons().add(new Image("/img/WUAV.png"));
+
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
+
         primaryStage.centerOnScreen();
         primaryStage.show();
+
+        primaryStage.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            if (e.getClickCount() == 2 && primaryStage.isMaximized()) {
+                primaryStage.setMaximized(false);
+                primaryStage.setWidth(Screen.getPrimary().getBounds().getWidth() - 200);
+                primaryStage.setHeight(Screen.getPrimary().getBounds().getHeight() - 200);
+                primaryStage.centerOnScreen();
+            } else if (e.getClickCount() == 2 && !primaryStage.isMaximized())
+                primaryStage.setMaximized(true);
+        });
+
+        //TODO set this to a proper close request
+        primaryStage.setOnCloseRequest(e -> {
+            e.consume();
+            primaryStage.close();
+            System.exit(0);
+        });
         System.out.println("Time to load: " + (System.currentTimeMillis() - start) + "ms");
     }
 

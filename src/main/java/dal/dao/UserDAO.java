@@ -1,7 +1,7 @@
 package dal.dao;
 
 import be.User;
-import be.enums.UserRole;
+import utils.enums.UserRole;
 import dal.DBConnection;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
@@ -196,10 +196,10 @@ public class UserDAO extends DAO implements IDAO<User> {
     private void fillPreparedStatement(PreparedStatement ps, User user) throws SQLException {
         ps.setString(1, user.getFullName());
         ps.setString(2, user.getUsername());
-        ps.setBytes(3, user.getPassword()[0]);
+        ps.setBytes(3, user.getPassword());
         ps.setString(4, user.getUserRole().toString());
         ps.setString(5, user.getPhoneNumber());
-        ps.setBytes(6, user.getPassword()[1]);
+        ps.setBytes(6, user.getSalt());
         ps.setString(7, user.getProfilePicturePath());
     }
 }
