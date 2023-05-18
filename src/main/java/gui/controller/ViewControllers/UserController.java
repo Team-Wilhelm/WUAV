@@ -6,7 +6,7 @@ import gui.nodes.UserCard;
 import gui.util.SceneManager;
 import gui.controller.AddControllers.AddUserController;
 import gui.model.UserModel;
-import gui.tasks.TaskState;
+import utils.enums.ResultState;
 import gui.util.DialogueManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
@@ -76,7 +76,7 @@ public class UserController extends ViewController<User> implements Initializabl
     }
 
     @Override
-    public void bindProgressToTask(Task<TaskState> task) {
+    public void bindProgressToTask(Task<ResultState> task) {
         progressSpinner.setProgress(0);
         progressSpinner.progressProperty().bind(task.progressProperty());
         progressLabel.textProperty().bind(task.messageProperty());
@@ -91,7 +91,6 @@ public class UserController extends ViewController<User> implements Initializabl
         progressLabel.setText(text);
     }
 
-    @Override
     public void refreshLastFocusedCard() {
         //if (lastFocusedCard != null)
             //lastFocusedCard.update(userModel.getAll().get(lastFocusedCard.getUser().getUserID()), userModel.getAll().get(lastFocusedCard.getUser().getUserID()));
@@ -145,7 +144,7 @@ public class UserController extends ViewController<User> implements Initializabl
                e.printStackTrace();
             }
         } else {
-            DialogueManager.getInstance().showWarning("No user selected", "Please select a user to edit", window);
+            DialogueManager.getInstance().showWarning("No user selected", "Please select a user to edit", flowPane);
         }
     }
 

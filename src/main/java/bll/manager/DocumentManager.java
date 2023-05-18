@@ -2,6 +2,7 @@ package bll.manager;
 
 import be.Document;
 import be.User;
+import utils.enums.ResultState;
 import utils.enums.UserRole;
 import bll.IManager;
 import dal.DAOFactory;
@@ -23,31 +24,34 @@ public class DocumentManager implements IManager<Document> {
 
     @Override
     @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER, UserRole.TECHNICIAN})
-    public String add(Document document) {
+    public ResultState add(Document document) {
         if (checker.hasAccess(this.getClass())) {
             return dao.add(document);
         }
         else {
-            return "No Permission";}
+            return ResultState.NO_PERMISSION;
+        }
     }
 
     @Override
     @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER})
-    public String update(Document document) {
+    public ResultState update(Document document) {
         if (document.getTechnicians().contains(UserModel.getLoggedInUser()) || checker.hasAccess(this.getClass())) {
             return dao.update(document);
         }
         else {
-            return "No Permission";}
+            return ResultState.NO_PERMISSION;
+        }
     }
 
     @Override
-    public String delete(UUID id) {
+    public ResultState delete(UUID id) {
         if (getById(id).getTechnicians().contains(UserModel.getLoggedInUser()) || checker.hasAccess(this.getClass())) {
             return dao.delete(id);
         }
         else {
-            return "No Permission";}
+            return ResultState.NO_PERMISSION;
+        }
     }
 
     @Override

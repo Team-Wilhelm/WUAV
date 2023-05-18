@@ -1,16 +1,15 @@
 package gui.controller.ViewControllers;
 
 import be.Document;
+import javafx.scene.layout.GridPane;
 import utils.enums.UserRole;
 import gui.model.UserModel;
-import gui.nodes.DocumentCard;
 import gui.util.SceneManager;
 import gui.controller.AddControllers.AddDocumentController;
 import gui.model.DocumentModel;
-import gui.tasks.TaskState;
+import utils.enums.ResultState;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -43,12 +42,12 @@ public class DocumentController extends ViewController<Document> implements Init
     private MFXButton btnAddDocument;
     @FXML
     private MFXTextField searchBar;
+    @FXML
+    private GridPane gridPane;
 
-    private ObservableList<DocumentCard> documentCards = FXCollections.observableArrayList();
     private ObservableList<Document> documentList = FXCollections.observableArrayList();
     private final DocumentModel documentModel = DocumentModel.getInstance();
     private boolean hasAccess = false;
-    private DocumentCard lastFocusedCard;
     private AccessChecker checker = new AccessChecker();
 
     public DocumentController() {}
@@ -67,23 +66,6 @@ public class DocumentController extends ViewController<Document> implements Init
         btnAddDocument.setText("");
 
         addTooltips();
-        //TODO
-        Platform.runLater(() -> {
-            /*
-            (Stage) btnAddDocument.getScene().getWindow().setOnCloseRequest(event -> {
-                if (documentModel.isModified()) {
-                    AlertManager.showConfirmationAlert("Are you sure you want to exit?", "You have unsaved changes. Are you sure you want to exit?", () -> {
-                        documentModel.save();
-                        Platform.exit();
-                    });
-                } else {
-                    Platform.exit();
-                }
-            });
-        });
-
-             */
-        });
     }
 
     //region progress methods
@@ -94,7 +76,7 @@ public class DocumentController extends ViewController<Document> implements Init
     }
 
     @Override
-    public void bindProgressToTask(Task<TaskState> task) {
+    public void bindProgressToTask(Task<ResultState> task) {
         progressSpinner.setProgress(0);
         progressSpinner.progressProperty().bind(task.progressProperty());
         progressLabel.textProperty().bind(task.messageProperty());
@@ -109,13 +91,6 @@ public class DocumentController extends ViewController<Document> implements Init
         progressLabel.setText(text);
     }
     //endregion
-
-    @Override
-    public void refreshLastFocusedCard() {
-        if (lastFocusedCard != null) {
-            //TODO: refresh last focused card
-        }
-    }
 
     @Override
     public void refreshItems(List<Document> documentsToDisplay) {
@@ -204,7 +179,7 @@ public class DocumentController extends ViewController<Document> implements Init
                 }
             }
             else {
-                DialogueManager.getInstance().showError("No document selected", "Please select a document", btnAddDocument.getScene().getWindow());
+                DialogueManager.getInstance().showError("No document selected", "Please select a document", gridPane);
             }
         }
     }

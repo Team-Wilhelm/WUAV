@@ -5,23 +5,21 @@ import be.User;
 import gui.nodes.DocumentCard;
 import bll.manager.DocumentManager;
 import bll.ManagerFactory;
+import utils.enums.ResultState;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class DocumentModel implements IModel<Document> {
     private static DocumentModel instance;
     private DocumentManager documentManager;
     private HashMap<UUID, Document> allDocuments;
-    private HashMap<Document, DocumentCard> createdDocumentCards;
 
     private DocumentModel() {
-        long start = System.currentTimeMillis();
         documentManager = (DocumentManager) ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
         allDocuments = new HashMap<>();
-        createdDocumentCards = new HashMap<>();
         setAllDocuments();
-        //createDocumentCards();
     }
 
     public static DocumentModel getInstance() {
@@ -32,22 +30,30 @@ public class DocumentModel implements IModel<Document> {
     }
 
     @Override
-    public CompletableFuture<String> add(Document document) {
-        String message = documentManager.add(document);
-        CompletableFuture<Map<UUID, Document>> future = CompletableFuture.supplyAsync(() -> documentManager.getAll());
-        return future.thenApplyAsync(documents -> {
-            setAllDocuments();
-            return message;
-        });
+    public ResultState add(Document document) {
+        CompletableFuture<ResultState> future = new CompletableFuture<>();
+        future.complete(documentManager.add(document));
+        ResultState resultState;
+        try {
+            resultState = future.get();
+            if (resultState.equals(ResultState.SUCCESSFUL)) {
+                allDocuments.put(document.getDocumentID(), document);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        future.thenRun(() -> allDocuments.put(document.getDocumentID(), document));
+        return resultState;
     }
 
     @Override
-    public String update(Document document) {
+    public ResultState update(Document document) {
         return documentManager.update(document);
     }
 
     @Override
-    public String delete(UUID id) {
+    public ResultState delete(UUID id) {
+        allDocuments.remove(id);
         return documentManager.delete(id);
     }
 
@@ -64,10 +70,6 @@ public class DocumentModel implements IModel<Document> {
     public void setAllDocuments() {
         this.allDocuments.clear();
         this.allDocuments.putAll(documentManager.getAll());
-    }
-
-    public HashMap<Document, DocumentCard> getCreatedDocumentCards() {
-        return createdDocumentCards;
     }
 
     public void assignUserToDocument(User user, Document document, boolean isAssigning){

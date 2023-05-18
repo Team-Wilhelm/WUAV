@@ -12,7 +12,7 @@ import gui.model.DocumentModel;
 import gui.model.UserModel;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
-import gui.tasks.TaskState;
+import utils.enums.ResultState;
 import gui.util.DialogueManager;
 import io.github.palexdev.materialfx.controls.*;
 import gui.nodes.*;
@@ -51,8 +51,8 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class AddDocumentController extends AddController<Document> implements Initializable, Observer<ImagePreview> {
@@ -195,23 +195,23 @@ public class AddDocumentController extends AddController<Document> implements In
         }
 
         SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
-        setUpSaveTask(task, documentController, txtCity.getScene().getWindow(), this);
+        setUpSaveTask(task, documentController, gridPanePdf, this);
         executorService.execute(task);
 
-        System.out.println(Arrays.toString(currentDocument.getTechnicians().toArray()));
-        System.out.println(Arrays.toString(UserModel.getLoggedInUser().getAssignedDocuments().values().toArray()));
         pdfTab.setDisable(false);
     }
 
     @FXML
     private void deleteAction(ActionEvent actionEvent) {
-        Optional<ButtonType> result = dialogueManager.showConfirmation("Delete document", "Are you sure you want to delete this document?", txtName.getScene().getWindow());
-        if (result.isPresent() && result.get().equals(ButtonType.OK)) {
-            Task<TaskState> deleteTask = new DeleteTask<>(documentToEdit.getDocumentID(), documentModel);
-            setUpDeleteTask(deleteTask, documentController, txtName.getScene().getWindow());
-            executorService.execute(deleteTask);
-        }
-        closeWindow(actionEvent);
+        CompletableFuture<ButtonType> result = dialogueManager.showConfirmation("Delete document", "Are you sure you want to delete this document?", gridPaneJob);
+        result.thenAccept(r -> {
+            if (r.equals(ButtonType.OK)) {
+                Task<ResultState> deleteTask = new DeleteTask<>(documentToEdit.getDocumentID(), documentModel);
+                setUpDeleteTask(deleteTask, documentController,gridPaneJob);
+                executorService.execute(deleteTask);
+                closeWindow(actionEvent);
+            }
+        });
     }
 
     @FXML
@@ -331,10 +331,12 @@ public class AddDocumentController extends AddController<Document> implements In
                 }
 
                 if (isInputChanged.get() && newValue.equals(pdfTab)) {
-                    Optional<ButtonType> result = dialogueManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", txtName.getScene().getWindow());
-                    if (result.isPresent() && result.get().equals(ButtonType.OK)) {
-                        saveAction(null);
-                    }
+                    CompletableFuture<ButtonType> result = dialogueManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", flowPanePictures);
+                    result.thenAccept(buttonType -> {
+                        if (buttonType.equals(ButtonType.OK)) {
+                            saveAction(null);
+                        }
+                    });
                 }
                 setUpPdfListView();
             }
@@ -734,4 +736,20 @@ public class AddDocumentController extends AddController<Document> implements In
             imagePreviews.forEach(ImagePreview::makeContextMenuNotEditable);
     }
     // endregion
+
+    //TODO add a confirmation dialog
+            /*
+            (Stage) btnAddDocument.getScene().getWindow().setOnCloseRequest(event -> {
+                if (documentModel.isModified()) {
+                    AlertManager.showConfirmationAlert("Are you sure you want to exit?", "You have unsaved changes. Are you sure you want to exit?", () -> {
+                        documentModel.save();
+                        Platform.exit();
+                    });
+                } else {
+                    Platform.exit();
+                }
+            });
+        });
+
+             */
 }

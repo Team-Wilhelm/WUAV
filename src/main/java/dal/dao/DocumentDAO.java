@@ -8,6 +8,7 @@ import dal.DocumentImageFactory;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
 import utils.ThreadPool;
+import utils.enums.ResultState;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,8 +28,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     }
 
     @Override
-    public String add(Document document) {
-        String result = "saved";
+    public ResultState add(Document document) {
+        ResultState result = ResultState.SUCCESSFUL;
 
         // Check, if the customer is already in the database, if not, add them
         CustomerDAO customerDAO = new CustomerDAO();
@@ -72,12 +73,11 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             }
             ps.executeBatch();
 
-
             //Save and link image filepaths to document
             saveImagesForDocument(connection, document);
         } catch (Exception e) {
             e.printStackTrace();
-            result = e.getMessage();
+            result = ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
@@ -85,8 +85,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     }
 
     @Override
-    public String update(Document document) {
-        String result = "updated";
+    public ResultState update(Document document) {
         String sql = "UPDATE Document SET JobTitle = ?, JobDescription = ?, Notes = ?, CustomerID = ?, DateOfCreation = ? " +
                 "WHERE DocumentID = ?";
         Connection connection = null;
@@ -109,18 +108,17 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
             //Save and link image filepaths to document
             saveImagesForDocument(connection, document);
-            return result;
+            return ResultState.SUCCESSFUL;
         } catch (Exception e) {
             e.printStackTrace();
-            result = e.getMessage();
-            return result;
+            return ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
     }
 
     @Override
-    public String delete(UUID id) {
+    public ResultState delete(UUID id) {
         String result = "deleted";
         String sql = "UPDATE Document SET Deleted = 1 WHERE DocumentID = ?;" +
                 "DELETE FROM Document_Image_Link WHERE DocumentID = ?";
@@ -131,13 +129,13 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             ps.setString(1, id.toString());
             ps.setString(2, id.toString());
             ps.executeUpdate();
+            return ResultState.SUCCESSFUL;
         } catch (SQLException e) {
             e.printStackTrace();
-            result = e.getMessage();
+            return ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        return result;
     }
 
     @Override
