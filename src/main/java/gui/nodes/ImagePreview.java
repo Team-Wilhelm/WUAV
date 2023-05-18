@@ -113,6 +113,7 @@ public class ImagePreview extends VBox {
 
     public void openSeeDescriptionDialogue() {
         //TODO change to a custom dialog, use dialogueManager
+        //TODO limit the size of the description to 256 characters
         Dialog<String> dialog = new Dialog<>();
         ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().add(type);

@@ -197,7 +197,6 @@ public class AddDocumentController extends AddController<Document> implements In
         SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
         setUpSaveTask(task, documentController, gridPanePdf, this);
         executorService.execute(task);
-
         pdfTab.setDisable(false);
     }
 

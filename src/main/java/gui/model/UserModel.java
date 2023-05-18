@@ -36,16 +36,9 @@ public class UserModel implements IModel<User> {
 
     @Override
     public ResultState add(User user) {
-        CompletableFuture<ResultState> future = new CompletableFuture<>();
-        future.complete(userManager.add(user));
-        ResultState resultState;
-        try {
-            resultState = future.get();
-            if (resultState.equals(ResultState.SUCCESSFUL)) {
-                allUsers.put(user.getUserID(), user);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+        ResultState resultState = userManager.add(user);
+        if (resultState.equals(ResultState.SUCCESSFUL)) {
+            allUsers.put(user.getUserID(), user);
         }
         return resultState;
     }
