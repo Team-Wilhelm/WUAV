@@ -2,7 +2,7 @@ package be;
 
 import utils.enums.UserRole;
 import be.interfaces.Observable;
-import dal.DocumentImageFactory;
+import dal.factories.DocumentImageFactory;
 import javafx.scene.image.Image;
 
 import java.util.*;

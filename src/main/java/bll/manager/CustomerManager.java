@@ -5,7 +5,7 @@ import utils.enums.ResultState;
 import utils.enums.UserRole;
 import bll.IManager;
 import dal.dao.CustomerDAO;
-import dal.DAOFactory;
+import dal.factories.DAOFactory;
 import utils.permissions.AccessChecker;
 import utils.permissions.RequiresPermission;
 

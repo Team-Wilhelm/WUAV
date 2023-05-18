@@ -4,7 +4,7 @@ import be.User;
 import utils.enums.ResultState;
 import utils.enums.UserRole;
 import bll.IManager;
-import dal.DAOFactory;
+import dal.factories.DAOFactory;
 import dal.dao.UserDAO;
 import gui.model.UserModel;
 import utils.permissions.AccessChecker;

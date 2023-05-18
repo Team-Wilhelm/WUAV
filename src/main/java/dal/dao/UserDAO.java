@@ -53,7 +53,6 @@ public class UserDAO extends DAO implements IDAO<User> {
 
     @Override
     public ResultState update(User user) {
-        String result = "updated";
         String sql = "UPDATE SystemUser SET FullName = ?, Username = ?, UserPassword = ?, " +
                 "UserRole = ?, PhoneNumber = ?, Salt = ?, ProfilePicture = ? " +
                 "WHERE UserID = ?";
@@ -81,6 +80,7 @@ public class UserDAO extends DAO implements IDAO<User> {
 
     @Override
     public Map<UUID, User> getAll() {
+        long startTime = System.currentTimeMillis();
         HashMap<UUID, User> users = new HashMap<>();
         // STUFF() is used to concatenate the document IDs into a single string
         // FOR XML PATH('') is used to remove the XML tags from the string
@@ -111,6 +111,7 @@ public class UserDAO extends DAO implements IDAO<User> {
                 User user = getUserFromResultSet(resultSet, documentIDs, true);
                 users.put(user.getUserID(), user);
             }
+            System.out.println("UserDAO.getAll() took " + (System.currentTimeMillis() - startTime) + "ms");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

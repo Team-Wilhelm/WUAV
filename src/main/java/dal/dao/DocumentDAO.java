@@ -3,17 +3,13 @@ package dal.dao;
 import be.Document;
 import be.ImageWrapper;
 import be.User;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import dal.DBConnection;
-import dal.DocumentImageFactory;
+import dal.factories.DocumentImageFactory;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
-import gui.util.drawing.MyShape;
 import utils.ThreadPool;
 import utils.enums.ResultState;
 
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class DocumentDAO extends DAO implements IDAO<Document> {
+    static int numberOfDocuments = 0;
     private final DBConnection dbConnection;
     private final DocumentImageFactory imageFactory = DocumentImageFactory.getInstance();
     private ThreadPool executorService = ThreadPool.getInstance();
@@ -123,7 +120,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     @Override
     public ResultState delete(UUID id) {
-        String result = "deleted";
         String sql = "UPDATE Document SET Deleted = 1 WHERE DocumentID = ?;" +
                 "DELETE FROM Document_Image_Link WHERE DocumentID = ?";
         Connection connection = null;
@@ -156,6 +152,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
                 Document document = createDocumentFromResultSet(rs);
                 documents.put(document.getDocumentID(), document);
             }
+            System.out.println("DocumentDAO.getAll() took " + (System.currentTimeMillis() - startTime) + "ms");
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -185,6 +182,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     }
 
     private Document createDocumentFromResultSet(ResultSet rs) throws SQLException {
+        numberOfDocuments++;
         Document document = new Document (
                 UUID.fromString(rs.getString("DocumentID")),
                 new CustomerDAO().getById(UUID.fromString(rs.getString("CustomerID"))),
@@ -340,5 +338,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         return "";
     }
 
+    public static int getNumberOfDocuments() {
+        return numberOfDocuments;
+    }
 }
 

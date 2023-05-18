@@ -1,4 +1,4 @@
-package dal;
+package dal.factories;
 
 import dal.dao.CustomerDAO;
 import dal.dao.DocumentDAO;

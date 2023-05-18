@@ -1,4 +1,4 @@
-package dal;
+package dal.factories;
 
 import javafx.scene.image.Image;
 

@@ -1,3 +1,4 @@
+import dal.dao.DocumentDAO;
 import gui.util.SceneManager;
 import gui.model.UserModel;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
@@ -20,6 +21,7 @@ public class Main extends Application {
     //TODO custom window frame
     @Override
     public void start(Stage primaryStage) throws Exception {
+        //TODO add splash screen
         long start = System.currentTimeMillis();
         Parent root;
         if (true)
@@ -53,8 +55,8 @@ public class Main extends Application {
 
         //TODO set this to a proper close request
         primaryStage.setOnCloseRequest(e -> {
-            e.consume();
             primaryStage.close();
+            stop();
             System.exit(0);
         });
         System.out.println("Time to load: " + (System.currentTimeMillis() - start) + "ms");
@@ -64,7 +66,9 @@ public class Main extends Application {
         launch(args);
     }
 
+    @Override
     public void stop() {
+        System.out.println(DocumentDAO.getNumberOfDocuments());
         ThreadPool.getInstance().shutdown();
     }
 }

@@ -113,7 +113,6 @@ public class UserModel implements IModel<User> {
         for (User user : allUsers.values()) {
             UserCard userCard = new UserCard(user);
             loadedCards.put(user, userCard);
-            //user.addObserver(userCard);
         }
     }
 
@@ -124,7 +123,6 @@ public class UserModel implements IModel<User> {
     public UserCard addUserCard(User user){
         UserCard userCard = new UserCard(user);
         loadedCards.put(user, userCard);
-        //user.addObserver(userCard);
         return userCard;
     }
 }
