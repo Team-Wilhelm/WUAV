@@ -4,12 +4,14 @@ import be.User;
 import gui.nodes.UserCard;
 import bll.ManagerFactory;
 import bll.manager.UserManager;
+import utils.enums.ResultState;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public class UserModel implements IModel<User> {
     private static UserModel instance;
@@ -33,23 +35,28 @@ public class UserModel implements IModel<User> {
     }
 
     @Override
-    public CompletableFuture<String> add(User user) {
-        String message = userManager.add(user);
-        CompletableFuture<Map<UUID, User>> future = CompletableFuture.supplyAsync(() -> userManager.getAll());
-        return future.thenApplyAsync(users -> {
-            allUsers.clear();
-            allUsers.putAll(users);
-            return message;
-        });
+    public ResultState add(User user) {
+        CompletableFuture<ResultState> future = new CompletableFuture<>();
+        future.complete(userManager.add(user));
+        ResultState resultState;
+        try {
+            resultState = future.get();
+            if (resultState.equals(ResultState.SUCCESSFUL)) {
+                allUsers.put(user.getUserID(), user);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        return resultState;
     }
 
     @Override
-    public String update(User user) {
+    public ResultState update(User user) {
         return userManager.update(user);
     }
 
     @Override
-    public String delete(UUID id) {
+    public ResultState delete(UUID id) {
         return userManager.delete(id);
     }
 
