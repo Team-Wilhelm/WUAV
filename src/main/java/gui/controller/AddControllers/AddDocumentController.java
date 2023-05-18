@@ -257,8 +257,7 @@ public class AddDocumentController extends AddController<Document> implements In
                 .toList();
         int numberOfPages = pdfGenerator.getNumberOfPages(documentToEdit, checkboxWrappers);
         pdfGenerator.generatePdf(documentToEdit, checkboxWrappers, numberOfPages);
-        //TODO show information without confirmation action
-        dialogueManager.showConfirmation("PDF created", "The PDF has been created successfully", gridPanePdf);
+        dialogueManager.showInformation("PDF created", "The PDF has been created successfully", gridPanePdf);
     }
 
     // region Listeners

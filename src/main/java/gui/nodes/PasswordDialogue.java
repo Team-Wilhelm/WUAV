@@ -54,14 +54,10 @@ public class PasswordDialogue extends MFXStageDialog {
         }
     }
 
-    public PasswordDialogue(Window owner, Pane ownerNode, User userToUpdate) {
+    public PasswordDialogue() {
         super();
-        dialogContent.getStylesheets().add("/css/style.css");
-        this.owner = owner;
-        this.ownerNode = ownerNode;
-        this.userToUpdate = userToUpdate;
-        hashPasswordHelper = new HashPasswordHelper();
         passwordFields = new HashMap<>();
+        hashPasswordHelper = new HashPasswordHelper();
 
         setUpGridPane();
         dialogContent = MFXGenericDialogBuilder.build()
@@ -70,8 +66,16 @@ public class PasswordDialogue extends MFXStageDialog {
                 .setOnClose(event -> this.close())
                 .setOnAlwaysOnTop(event -> this.setAlwaysOnTop(true))
                 .get();
+        dialogContent.getStylesheets().add("/css/style.css");
         setUpDialogueWindow();
         addButtons();
+    }
+
+    public PasswordDialogue(Window owner, Pane ownerNode, User userToUpdate) {
+        this();
+        this.owner = owner;
+        this.ownerNode = ownerNode;
+        this.userToUpdate = userToUpdate;
     }
 
     private void setUpDialogueWindow() {
@@ -142,6 +146,13 @@ public class PasswordDialogue extends MFXStageDialog {
         }
     };
 
+
+    public void clear() {
+        passwordFields.values().forEach(MFXPasswordField::clear);
+        userToUpdate = null;
+    }
+
+
     public byte[] getNewPassword() {
         return newPassword;
     }
@@ -152,5 +163,22 @@ public class PasswordDialogue extends MFXStageDialog {
 
     public boolean isPasswordChanged() {
         return passwordChanged;
+    }
+
+    public void setOwnerNode(Pane ownerNode) {
+        this.ownerNode = ownerNode;
+        super.setOwnerNode(ownerNode);
+    }
+
+    public PasswordDialogue setUserToUpdate(User userToUpdate) {
+        this.userToUpdate = userToUpdate;
+        return this;
+    }
+
+    public void setAdminEditing(boolean adminEditing) {
+        if (adminEditing) {
+            passwordFields.get(PasswordType.OLD).setVisible(false);
+            passwordFields.get(PasswordType.OLD).setManaged(false);
+        }
     }
 }

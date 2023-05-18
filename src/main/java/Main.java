@@ -21,7 +21,6 @@ public class Main extends Application {
     //TODO custom window frame
     @Override
     public void start(Stage primaryStage) throws Exception {
-        //TODO add splash screen
         long start = System.currentTimeMillis();
         Parent root;
         if (true)

@@ -157,7 +157,9 @@ public class AddUserController extends AddController<User> implements Initializa
 
     private void showPasswordDialogue() {
         comboOptions.getSelectionModel().clearSelection();
-        PasswordDialogue passwordDialogue = new PasswordDialogue(txtName.getScene().getWindow(), gridPane, userToUpdate);
+        PasswordDialogue passwordDialogue = DialogueManager.getInstance().getPasswordDialogue(gridPane);
+        passwordDialogue.setUserToUpdate(userToUpdate);
+        passwordDialogue.setAdminEditing(UserModel.getLoggedInUser().getUserRole() == UserRole.ADMINISTRATOR);
         passwordDialogue.showDialog();
         passwordDialogue.setOnHidden(event -> {
             if (passwordDialogue.isPasswordChanged()) {
