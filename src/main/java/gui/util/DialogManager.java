@@ -1,12 +1,15 @@
 package gui.util;
 
-import gui.nodes.dialogues.PasswordDialogue;
-import gui.nodes.dialogues.TextInputDialogue;
+import gui.nodes.dialogs.CustomDialog;
+import gui.nodes.dialogs.LoadingDialog;
+import gui.nodes.dialogs.PasswordDialog;
+import gui.nodes.dialogs.TextInputDialog;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
 import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
+import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Pane;
@@ -18,8 +21,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * A manager class for all the alerts and dialogues in the application
  */
-public class DialogueManager {
-    private static DialogueManager instance = null;
+public class DialogManager {
+    private static DialogManager instance = null;
 
     // Alerts
     private MFXStageDialog dialog; // reusing the same dialog for all alerts
@@ -29,10 +32,11 @@ public class DialogueManager {
     private CompletableFuture<ButtonType> result;
 
     // Dialogues
-    private PasswordDialogue passwordDialogue;
-    private TextInputDialogue textInputDialogue;
+    private PasswordDialog passwordDialog;
+    private TextInputDialog textInputDialog;
+    private LoadingDialog loadingDialog;
 
-    private DialogueManager() {
+    private DialogManager() {
         dialog = MFXGenericDialogBuilder.build()
                 .toStageDialogBuilder()
                 .setDraggable(true)
@@ -54,16 +58,16 @@ public class DialogueManager {
         btnCancel = new MFXButton("Cancel");
         result = new CompletableFuture<>();
 
-        passwordDialogue = new PasswordDialogue();
-        textInputDialogue = new TextInputDialogue();
+        passwordDialog = new PasswordDialog();
+        textInputDialog = new TextInputDialog();
     }
 
     /**
      * Makes DialogueManager a singleton class, in order to reuse the same alert and avoid code repetition
      */
-    public static DialogueManager getInstance() {
+    public static DialogManager getInstance() {
         if (instance == null) {
-            instance = new DialogueManager();
+            instance = new DialogManager();
         }
         return instance;
     }
@@ -100,36 +104,13 @@ public class DialogueManager {
     }
 
     public CompletableFuture<String> showTextInputDialogue(String header, String contentDescription, String contentValue,  Pane parent) {
-        textInputDialogue.clear();
-
-        if (textInputDialogue.getOwnerNode() != parent) {
-            textInputDialogue.setOwnerNode(parent);
-        }
-
-        if (textInputDialogue.getOwner() == null) {
-            textInputDialogue.initModality(Modality.APPLICATION_MODAL);
-            textInputDialogue.initOwner(parent.getScene().getWindow());
-        }
-
-        textInputDialogue.setHeaderText(header);
-        textInputDialogue.setContentDescription(contentDescription);
-        textInputDialogue.setContentText(contentValue);
-        return textInputDialogue.showAndReturnResult();
+        setUpCustomDialog(textInputDialog, parent);
+        return textInputDialog.showAndReturnResult();
     }
 
-    public PasswordDialogue getPasswordDialogue(Pane parent) {
-        passwordDialogue.clear();
-
-        if (passwordDialogue.getOwnerNode() != parent) {
-            passwordDialogue.setOwnerNode(parent);
-        }
-
-        if (passwordDialogue.getOwner() == null) {
-            passwordDialogue.initModality(Modality.APPLICATION_MODAL);
-            passwordDialogue.initOwner(parent.getScene().getWindow());
-        }
-
-        return passwordDialogue;
+    public PasswordDialog getPasswordDialogue(Pane parent) {
+        setUpCustomDialog(passwordDialog, parent);
+        return passwordDialog;
     }
 
 
@@ -195,5 +176,41 @@ public class DialogueManager {
                 s -> s.equals("mfx-info-dialog") || s.equals("mfx-warn-dialog") || s.equals("mfx-error-dialog"));
         if (styleClass != null)
             dialogContent.getStyleClass().add(styleClass);
+    }
+
+    public void showLoadingDialog(String creatingPdf, String s, Pane parent) {
+
+
+    }
+
+    public void showLoadingDialog(String creatingPdf, String s, Pane parent, Runnable onFinished) {
+
+    }
+
+    public void showLoadingDialog(String title, String content, Pane parent, Task<?> task) {
+        setUpCustomDialog(loadingDialog, parent, title, content);
+        loadingDialog.progressProperty().bind(task.progressProperty());
+        loadingDialog.setOnCloseRequest(event -> task.cancel());
+        task.setOnSucceeded(event -> loadingDialog.close());
+        loadingDialog.showDialog();
+    }
+
+    private void setUpCustomDialog(CustomDialog dialog, Pane parent) {
+        dialog.clear();
+
+        if (dialog.getOwnerNode() != parent) {
+            dialog.setOwnerNode(parent);
+        }
+
+        if (dialog.getOwner() == null) {
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initOwner(parent.getScene().getWindow());
+        }
+    }
+
+    private void setUpCustomDialog(CustomDialog dialog, Pane parent, String title, String content) {
+        setUpCustomDialog(dialog, parent);
+        dialog.setTitle(title);
+        dialog.setContentText(content);
     }
 }

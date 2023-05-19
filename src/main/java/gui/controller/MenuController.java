@@ -1,10 +1,8 @@
 package gui.controller;
 
-import be.User;
-import gui.controller.AddControllers.AddController;
 import gui.controller.AddControllers.AddUserController;
 import gui.model.UserModel;
-import gui.util.DialogueManager;
+import gui.util.DialogManager;
 import gui.util.SceneManager;
 import gui.controller.ViewControllers.DocumentController;
 import gui.controller.ViewControllers.UserController;
@@ -117,7 +115,7 @@ public class MenuController implements Initializable {
     }
 
     public void logOutAction(ActionEvent actionEvent) {
-        DialogueManager.getInstance().showConfirmation("Log out", "Are you sure you want to log out?", gridPane, () -> {
+        DialogManager.getInstance().showConfirmation("Log out", "Are you sure you want to log out?", gridPane, () -> {
             UserModel.getInstance().logOut();
             switchScene(SceneManager.LOGIN_SCENE);
         });

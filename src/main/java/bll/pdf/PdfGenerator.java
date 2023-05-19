@@ -16,6 +16,7 @@ import com.itextpdf.layout.property.*;
 import gui.nodes.DocumentPropertyCheckboxWrapper;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.List;
 
 public class PdfGenerator {
@@ -29,7 +30,7 @@ public class PdfGenerator {
     AreaBreak pageBreak = new AreaBreak(AreaBreakType.NEXT_AREA);
     float margin = 75;
 
-    public void generatePdf(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes, int numberOfPages) {
+    public Path generatePdf(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes, int numberOfPages) {
         try {
             FONT = PdfFontFactory.createFont(FontConstants.HELVETICA);
             // Open a new PDF document
@@ -76,6 +77,8 @@ public class PdfGenerator {
                 }
             }
             doc.close();
+            //TODO: Change to a more appropriate path if we decide to keep more than one version of the document
+            return Path.of(home + "/Downloads/" + document.getDocumentID() + ".pdf");
             } catch(IOException e){
                 throw new RuntimeException(e);
             }

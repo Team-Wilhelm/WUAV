@@ -3,7 +3,7 @@ package gui.controller;
 import be.User;
 import gui.util.SceneManager;
 import gui.model.UserModel;
-import gui.util.DialogueManager;
+import gui.util.DialogManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -58,7 +58,7 @@ public class LoginViewController implements Initializable {
     public Boolean loginUser(Event event){
         User user = userModel.getUserByUsername(usernameInput.getText());
         if(user == null){
-            DialogueManager.getInstance().showError(
+            DialogManager.getInstance().showError(
                     "Login failed!",
                     "Cannot find user with this username",
                     borderPane);
@@ -68,7 +68,7 @@ public class LoginViewController implements Initializable {
                 openMenuView();
                 return true;
             } else {
-                DialogueManager.getInstance().showError(
+                DialogManager.getInstance().showError(
                         "Login failed!",
                         "Incorrect password",
                         borderPane);

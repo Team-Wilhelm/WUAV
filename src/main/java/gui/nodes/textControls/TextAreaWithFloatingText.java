@@ -18,7 +18,6 @@ import javafx.scene.text.Font;
 
 
 public class TextAreaWithFloatingText extends StackPane {
-    //TODO textArea no longer resizes
     // Child nodes
     private TextArea textArea;
     private Label floatingLabel;

@@ -1,10 +1,10 @@
-package gui.nodes.dialogues;
+package gui.nodes.dialogs;
 
-import gui.nodes.textControls.TextAreaWithFloatingText;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
 import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
+import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 
 import java.util.Map;
@@ -14,38 +14,28 @@ import java.util.concurrent.CompletableFuture;
  * A dialogue that allows the user to input text
  * with the initial max length of 256 characters.
  */
-public class TextInputDialogue extends MFXStageDialog {
+public class TextInputDialog extends CustomDialog {
     private TextArea textArea;
-    private MFXGenericDialog dialogContent;
     private CompletableFuture<String> result = new CompletableFuture<>();
 
-    public TextInputDialogue() {
+    public TextInputDialog() {
         this("", "");
     }
 
-    public TextInputDialogue(String title, String content) {
+    public TextInputDialog(String title, String content) {
         super();
         textArea = new TextArea();
         //textArea.setMaxTextLength(256);
+        //TODO add max length
 
-        dialogContent = MFXGenericDialogBuilder.build()
-                .setContent(textArea)
-                .setOnMinimize(event -> this.setIconified(true))
-                .setOnAlwaysOnTop(event -> this.setAlwaysOnTop(true))
-                .setOnClose(event -> this.close())
-                .setHeaderText(title)
-                .setContentText(content)
-                .get();
-
-        dialogContent.addActions(
+        this.setContent(super.getDialogContent());
+        super.getDialogContent().addActions(
                 Map.entry(new MFXButton("Confirm"), event -> {
                     result.complete(textArea.getText());
                     this.close();
                 }),
                 Map.entry(new MFXButton("Cancel"), event -> this.close())
         );
-        dialogContent.getStylesheets().add("/css/style.css");
-        this.setContent(dialogContent);
     }
 
    /* public void setMaxTextLength(int length) {
@@ -77,14 +67,6 @@ public class TextInputDialogue extends MFXStageDialog {
 
     public void setContentText(String text) {
         textArea.setText(text);
-    }
-
-    public void setContentDescription(String text) {
-        dialogContent.setContentText(text);
-    }
-
-    public void setHeaderText(String text) {
-        dialogContent.setHeaderText(text);
     }
 
     public CompletableFuture<String> getResult() {
