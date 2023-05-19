@@ -49,6 +49,7 @@ public class LoginViewController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneManager.MENU_SCENE));
             root = loader.load();
             menuController = loader.getController();
+            usernameInput.requestFocus();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -59,17 +60,21 @@ public class LoginViewController implements Initializable {
         if(user == null){
             DialogueManager.getInstance().showError(
                     "Login failed!",
-                    "Check that username and password are correct",
+                    "Cannot find user with this username",
                     borderPane);
-            return false;
         } else {
             if (userModel.logIn(usernameInput.getText(), hashPasswordHelper.hashPassword(passwordInput.getText(), user.getSalt()))) {
                 userModel.setLoggedInUser(user);
                 openMenuView();
                 return true;
+            } else {
+                DialogueManager.getInstance().showError(
+                        "Login failed!",
+                        "Incorrect password",
+                        borderPane);
             }
-            return false;
         }
+        return false;
     }
 
     private void openMenuView(){

@@ -1,26 +1,18 @@
 @import "TextAreaWithFloatingText.css";
 @import "DatePickerStyle.css";
 @import "TableView.css";
-
-* {
-    base-color: #dedede;
-    base-color-dark: #d3d3d3;
-    base-color-darker: #c0c0c0;
-    dark-grey: #3e3e3e;
-    light-grey: #c0c0c0;
-    accent-yellow: #ffcc00;
-}
+@import "Colors.css";
 
 .root {
     -fx-font-size: 18;
 }
 
 .background {
-    -fx-background-color: base-color;
+    -fx-background-color: -fx-base-color;
 }
 
 .menu{
-    -fx-background-color: dark-grey;
+    -fx-background-color: -fx-dark-grey;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 4, 0, 0, 4);
     -fx-text-fill: black;
 }
@@ -31,15 +23,15 @@
 
 .mfx-button{
     -fx-background-color: transparent;
-    -fx-border-color: dark-grey;
+    -fx-border-color: -fx-dark-grey;
     -fx-text-fill: black;
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
 }
 
 .addButton {
-    -fx-background-color: dark-grey;
-    -fx-border-color: dark-grey;
+    -fx-background-color: -fx-dark-grey;
+    -fx-border-color: -fx-dark-grey;
     -fx-text-fill: white;
 }
 
@@ -48,11 +40,11 @@
     -fx-background-radius: 5px;
 }
 .hbox.input .anchor-pane {
-    -fx-background-color: base-color-darker;
+    -fx-background-color: -fx-base-color-darker;
     -fx-border-color: transparent;
 }
 .loginVbox{
-    -fx-background-color: base-colorfadfadsfadfa;
+    -fx-background-color: -fx-base-color;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 2, 0, 0, 1);
 }
 
@@ -62,15 +54,15 @@
 .input .floating-text,
 .input:selected .floating-text,
 .input:focused .floating-text {
-    -fx-background-color: base-color-dark;
+    -fx-background-color: -fx-base-color-dark;
     -fx-border-color: transparent;
 }
 .vboxLeft{
-    -fx-background-color: base-color;
+    -fx-background-color: -fx-base-color;
 }
 
 .document-view {
-    -fx-background-color: base-color;
+    -fx-background-color: -fx-base-color;
     -fx-border-radius: 10px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 1);
 }
@@ -82,7 +74,7 @@
 }
 
 .user-card {
-    -fx-background-color: base-color;
+    -fx-background-color: -fx-base-color;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 1);
@@ -100,7 +92,7 @@
 }
 
 .loginHalf{
-    -fx-background-image: url("/img/bright-1851267_1920.jpg");
+    -fx-background-image: url("/img/backgroundImages/bright-1851267_1920.jpg");
     -fx-background-size: cover;
 }
 
@@ -120,7 +112,7 @@
 }
 
 .mfx-rectangle-toggle-node:selected {
-    -fx-background-color: accent-yellow;
+    -fx-background-color: -fx-accent-yellow;
     -fx-background-radius: 5;
     -fx-border-width: 0;
     -fx-border-radius: 5;
@@ -134,24 +126,24 @@
 
 /*Removal of default materialFX purple colour*/
 .mfx-text-field {
-    -mfx-main: base-color-dark;
+    -mfx-main: -fx-base-color-dark;
 }
 
 .mfx-toggle-button {
-    -mfx-main: dark-grey;
-    -mfx-secondary: dark-grey;
+    -mfx-main: -fx-dark-grey;
+    -mfx-secondary: -fx-dark-grey;
 }
 
 .mfx-text-field .text-field {
-    -fx-highlight-fill: dark-grey; /* Selected text highlight */
+    -fx-highlight-fill: -fx-dark-grey; /* Selected text highlight */
 }
 
 .mfx-checkbox {
-    -mfx-main: dark-grey;
+    -mfx-main: -fx-dark-grey;
 }
 
 #imgBackground {
-    -fx-background-image: url("/img/electrical-equipment-wooden-workplace.jpg");
+    -fx-background-image: url("/img/backgroundImages/electrical-equipment-wooden-workplace.jpg");
     -fx-background-size: cover;
     -fx-background-position-x: center;
 }

@@ -11,8 +11,8 @@ private HashMap<Icon, Image> iconCache = new HashMap<>();
     private static IconFactory instance;
 
     private IconFactory() {
-        iconPathCache.put(Icon.CALENDAR, "/img/material-symbols_calendar-month-outline-rounded.png");
-        iconPathCache.put(Icon.NAMETAG, "/img/mdi_clipboard-account-outline.png");
+        iconPathCache.put(Icon.CALENDAR, "/img/icons/material-symbols_calendar-month-outline-rounded.png");
+        iconPathCache.put(Icon.NAMETAG, "/img/icons/mdi_clipboard-account-outline.png");
     }
 
     public static IconFactory getInstance() {

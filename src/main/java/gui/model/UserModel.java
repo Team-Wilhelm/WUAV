@@ -125,4 +125,7 @@ public class UserModel implements IModel<User> {
         loadedCards.put(user, userCard);
         return userCard;
     }
+
+    public void logOut() {
+    }
 }

@@ -27,7 +27,7 @@ public class User extends Observable<User> {
         this.userRole = userRole;
         this.assignedDocuments = new HashMap<>();
 
-        this.profilePicturePath = Objects.requireNonNullElse(profilePicturePath, "/img/userIcon.png");
+        this.profilePicturePath = Objects.requireNonNullElse(profilePicturePath, "/img/icons/userIcon.png");
         this.profilePicture = DocumentImageFactory.getInstance().create(profilePicturePath);
         notifyObservers(this);
     }

@@ -4,9 +4,13 @@ import be.User;
 import gui.controller.AddControllers.AddController;
 import gui.controller.AddControllers.AddUserController;
 import gui.model.UserModel;
+import gui.util.DialogueManager;
 import gui.util.SceneManager;
 import gui.controller.ViewControllers.DocumentController;
 import gui.controller.ViewControllers.UserController;
+import io.github.palexdev.materialfx.controls.MFXButton;
+import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
+import io.github.palexdev.materialfx.css.themes.Themes;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +18,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -26,6 +31,7 @@ public class MenuController implements Initializable {
     private DocumentController documentController;
     private UserController userController;
     private AddUserController myProfileController;
+    private MFXButton logOutButton;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -63,6 +69,25 @@ public class MenuController implements Initializable {
        }
     }
 
+    private void switchScene(String fxmlPath) {
+        if (fxmlPath.equals(SceneManager.LOGIN_SCENE)) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                Stage stage = (Stage) gridPane.getScene().getWindow();
+                Scene scene = new Scene(loader.load());
+                MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
+                stage.setScene(scene);
+                stage.setMaximized(false);
+                stage.setWidth(Screen.getPrimary().getBounds().getWidth() - 200);
+                stage.setHeight(Screen.getPrimary().getBounds().getHeight() - 200);
+                stage.centerOnScreen();
+                stage.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void btnDocumentAction() {
         switchScene(documentView);
     }
@@ -89,5 +114,16 @@ public class MenuController implements Initializable {
     private void setVisibilityForUserRole() {
         documentController.setVisibilityForUserRole();
         userController.setVisibilityForUserRole();
+    }
+
+    public void logOutAction(ActionEvent actionEvent) {
+        DialogueManager.getInstance().showConfirmation("Log out", "Are you sure you want to log out?", gridPane, () -> {
+            UserModel.getInstance().logOut();
+            switchScene(SceneManager.LOGIN_SCENE);
+        });
+    }
+
+    public void btnCustomersAction(ActionEvent actionEvent) {
+        //TODO switchScene(customerView);
     }
 }

@@ -1,6 +1,8 @@
+@import "Colors.css";
+
 .mfx-tableview {
-    -fx-background-color: base-colour;
-    -fx-border-color: dark-grey;
+    -fx-background-color: -fx-base-color;
+    -fx-border-color: -fx-dark-grey;
     -fx-text-fill: black;
 }
 

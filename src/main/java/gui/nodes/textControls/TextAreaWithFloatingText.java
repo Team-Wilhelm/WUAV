@@ -27,8 +27,8 @@ public class TextAreaWithFloatingText extends StackPane {
     // Properties
     private final StringProperty floatingTextProperty = new SimpleStringProperty();
     private final BooleanProperty isFloatingProperty = new SimpleBooleanProperty(false);
-    /*private IntegerProperty fontSizeProperty = new SimpleIntegerProperty(16);
-    private IntegerProperty maxTextLengthProperty = new SimpleIntegerProperty(Integer.MAX_VALUE);*/
+    private IntegerProperty fontSizeProperty = new SimpleIntegerProperty(16);
+    private IntegerProperty maxTextLengthProperty = new SimpleIntegerProperty(Integer.MAX_VALUE);
 
     public TextAreaWithFloatingText() {
         this("");
@@ -36,8 +36,7 @@ public class TextAreaWithFloatingText extends StackPane {
 
     public TextAreaWithFloatingText(String floatingText) {
         super();
-        System.out.println("TextAreaWithFloatingText constructor");
-        //getStylesheets().add("/css/TextAreaWithFloatingText.css");
+        getStylesheets().add("/css/TextAreaWithFloatingText.css");
         getStyleClass().setAll("text-area-with-floating-text");
 
         // StackPane, textArea and floatingLabel
@@ -53,11 +52,11 @@ public class TextAreaWithFloatingText extends StackPane {
             }
         });
 
-       /* this.textProperty().addListener((observable, oldValue, newValue) -> {
+       this.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.length() > maxTextLengthProperty.get()) {
                 textArea.setText(oldValue);
             }
-        });*/
+        });
 
         createBindings();
         defaultContextMenu();
@@ -76,7 +75,7 @@ public class TextAreaWithFloatingText extends StackPane {
         }
 
         // TextArea
-        textArea = new TextArea();
+        textArea = new TextArea("");
         textArea.setWrapText(true);
 
         // Label
@@ -95,8 +94,8 @@ public class TextAreaWithFloatingText extends StackPane {
         });
 
         // When the text area is focused or empty, the label should become larger
-        isFloatingProperty.bind(Bindings.createBooleanBinding(() -> textArea.isFocused()
-                        || textArea.getText() != null || !textArea.getText().isEmpty(),
+        isFloatingProperty.bind(Bindings.createBooleanBinding(() -> textArea.isFocused() ||
+                        !textArea.getText().isEmpty(),
                 textArea.focusedProperty(),
                 textArea.textProperty()));
 
@@ -251,7 +250,7 @@ public class TextAreaWithFloatingText extends StackPane {
         return textArea.promptTextProperty();
     }
 
-/*    public IntegerProperty fontSizeProperty() {
+    public IntegerProperty fontSizeProperty() {
         return fontSizeProperty;
     }
 
@@ -273,6 +272,6 @@ public class TextAreaWithFloatingText extends StackPane {
 
     public int getMaxTextLength() {
         return maxTextLengthProperty.get();
-    }*/
+    }
     // endregion
 }

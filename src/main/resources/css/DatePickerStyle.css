@@ -1,42 +1,44 @@
+@import "Colors.css";
+
 .mfx-date-picker {
-    -fx-background-color: base-colour;
-    -fx-border-color: dark-grey;
+    -fx-background-color: -fx-base-color;
+    -fx-border-color: -fx-dark-grey;
     -fx-text-fill: black;
 }
 
 .mfx-date-picker .mfx-icon-wrapper .mfx-ripple-generator {
-    -mfx-ripple-color: light-grey;
+    -mfx-ripple-color: -fx-light-grey;
 }
 
 .mfx-date-picker:focus-within .icon {
-    -mfx-color: dark-grey;
+    -mfx-color: -fx-dark-grey;
 }
 
 .mfx-date-picker .date-picker-popup .left-arrow .mfx-ripple-generator,
 .mfx-date-picker .date-picker-popup .right-arrow .mfx-ripple-generator {
-    -mfx-ripple-color: light-grey;
+    -mfx-ripple-color: -fx-light-grey;
 }
 
 .mfx-date-picker .date-picker-popup .months-combo:focus-within,
 .mfx-date-picker .date-picker-popup .years-combo:focus-within {
-    -fx-background-color: light-grey;
+    -fx-background-color: -fx-light-grey;
     -fx-text-fill: black;
 }
 
 .mfx-date-picker .date-picker-popup .months-combo .mfx-icon-wrapper .mfx-ripple-generator,
 .mfx-date-picker .date-picker-popup .years-combo .mfx-icon-wrapper .mfx-ripple-generator {
-    -mfx-ripple-color: light-grey;
+    -mfx-ripple-color: -fx-light-grey;
 }
 
 
 .mfx-date-picker .date-picker-popup .months-combo .virtual-flow .mfx-combo-box-cell:hover,
 .mfx-date-picker .date-picker-popup .years-combo .virtual-flow .mfx-combo-box-cell:hover {
-    -fx-background-color: light-grey;
+    -fx-background-color: -fx-light-grey;
 }
 
 .mfx-date-picker .date-picker-popup .months-combo .virtual-flow .mfx-combo-box-cell:selected,
 .mfx-date-picker .date-picker-popup .years-combo .virtual-flow .mfx-combo-box-cell:selected {
-    -fx-background-color: light-grey;
+    -fx-background-color: -fx-light-grey;
 }
 
 .mfx-date-picker .date-picker-popup .months-combo .virtual-flow .mfx-combo-box-cell:selected .label,
@@ -46,10 +48,10 @@
 
 .mfx-date-cell:current {
     -fx-text-fill: black;
-    -fx-background-color: light-grey;
+    -fx-background-color: -fx-light-grey;
 }
 
 .mfx-date-cell:selected {
     -fx-text-fill: white;
-    -fx-background-color: dark-grey;
+    -fx-background-color: -fx-dark-grey;
 }
