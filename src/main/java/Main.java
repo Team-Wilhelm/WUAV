@@ -51,8 +51,8 @@ public class Main extends Application {
                 primaryStage.setMaximized(true);
         });
 
-        //TODO set this to a proper close request
         primaryStage.setOnCloseRequest(e -> {
+            //TODO show confirmation dialogue
             primaryStage.close();
             stop();
             System.exit(0);

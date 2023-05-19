@@ -5,9 +5,9 @@ import be.interfaces.Observable;
 import be.interfaces.Observer;
 import gui.nodes.textControls.MFXTextFieldWithAutofill;
 import gui.nodes.textControls.TextAreaWithFloatingText;
+import gui.tasks.GeneratePdfTask;
 import utils.enums.CustomerType;
 import utils.enums.UserRole;
-import bll.pdf.PdfGenerator;
 import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
@@ -15,7 +15,7 @@ import gui.model.UserModel;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import utils.enums.ResultState;
-import gui.util.DialogueManager;
+import gui.util.DialogManager;
 import io.github.palexdev.materialfx.controls.*;
 import gui.nodes.*;
 import javafx.beans.binding.Bindings;
@@ -87,12 +87,11 @@ public class AddDocumentController extends AddController<Document> implements In
 
     private DocumentModel documentModel;
     private CustomerModel customerModel;
-    private PdfGenerator pdfGenerator;
     private Document documentToEdit, currentDocument;
     private DocumentController documentController;
     private final ObservableList<ImageWrapper> pictures;
     private final ObservableList<ImagePreview> imagePreviews = FXCollections.observableArrayList();
-    private DialogueManager dialogueManager;
+    private DialogManager dialogManager;
     private ObservableList<User> allTechnicians;
     private final ThreadPool executorService;
     private boolean hasAccess = false;
@@ -112,8 +111,7 @@ public class AddDocumentController extends AddController<Document> implements In
         documentModel = DocumentModel.getInstance();
         customerModel = CustomerModel.getInstance();
         executorService = ThreadPool.getInstance();
-        dialogueManager = DialogueManager.getInstance();
-        pdfGenerator = new PdfGenerator();
+        dialogManager = DialogManager.getInstance();
         technicians = new ArrayList<>();
 
         temporaryId = UUID.randomUUID();
@@ -188,6 +186,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
+        //TODO customers/addresses
         assignInputToVariables();
 
         Address address = new Address(streetName, houseNumber, postcode, city, country);
@@ -220,7 +219,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @FXML
     private void deleteAction(ActionEvent actionEvent) {
-        CompletableFuture<ButtonType> result = dialogueManager.showConfirmation("Delete document", "Are you sure you want to delete this document?", gridPaneJob);
+        CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Delete document", "Are you sure you want to delete this document?", gridPaneJob);
         result.thenAccept(r -> {
             if (r.equals(ButtonType.OK)) {
                 Task<ResultState> deleteTask = new DeleteTask<>(documentToEdit.getDocumentID(), documentModel);
@@ -255,9 +254,9 @@ public class AddDocumentController extends AddController<Document> implements In
         List<DocumentPropertyCheckboxWrapper> checkboxWrappers = propertiesList.getCheckBoxes().stream()
                 .filter(DocumentPropertyCheckboxWrapper::isSelected)
                 .toList();
-        int numberOfPages = pdfGenerator.getNumberOfPages(documentToEdit, checkboxWrappers);
-        pdfGenerator.generatePdf(documentToEdit, checkboxWrappers, numberOfPages);
-        dialogueManager.showInformation("PDF created", "The PDF has been created successfully", gridPanePdf);
+
+        GeneratePdfTask task = new GeneratePdfTask(documentToEdit, checkboxWrappers);
+        setUpPdfTask(task, documentToEdit, gridPanePdf);
     }
 
     // region Listeners
@@ -350,7 +349,7 @@ public class AddDocumentController extends AddController<Document> implements In
                 }
 
                 if (isInputChanged.get() && newValue.equals(pdfTab)) {
-                    CompletableFuture<ButtonType> result = dialogueManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", flowPanePictures);
+                    CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Unsaved changes", "You have unsaved changes. Do you want to save them?", flowPanePictures);
                     result.thenAccept(buttonType -> {
                         if (buttonType.equals(ButtonType.OK)) {
                             saveAction(null);

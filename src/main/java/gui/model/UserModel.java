@@ -127,5 +127,6 @@ public class UserModel implements IModel<User> {
     }
 
     public void logOut() {
+        loggedInUser = null;
     }
 }

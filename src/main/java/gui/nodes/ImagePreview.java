@@ -2,8 +2,7 @@ package gui.nodes;
 
 import be.ImageWrapper;
 import be.interfaces.Observer;
-import gui.nodes.dialogues.TextInputDialogue;
-import gui.util.DialogueManager;
+import gui.util.DialogManager;
 import io.github.palexdev.materialfx.controls.MFXContextMenu;
 import io.github.palexdev.materialfx.controls.MFXContextMenuItem;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
@@ -21,7 +20,6 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class ImagePreview extends VBox {
@@ -104,7 +102,7 @@ public class ImagePreview extends VBox {
     }
 
     public void openAddDescriptionDialogue() {
-        CompletableFuture<String> result = DialogueManager.getInstance().showTextInputDialogue("Add description",
+        CompletableFuture<String> result = DialogManager.getInstance().showTextInputDialogue("Add description",
                 "Add a description to the image", imageWrapper.getDescription(), this);
         result.thenAccept(s -> {
             imageWrapper.setDescription(s);

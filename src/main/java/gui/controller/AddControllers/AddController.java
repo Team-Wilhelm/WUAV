@@ -1,6 +1,8 @@
 package gui.controller.AddControllers;
 
+import be.Document;
 import gui.controller.ViewControllers.ViewController;
+import gui.tasks.GeneratePdfTask;
 import gui.tasks.SaveTask;
 import utils.enums.ResultState;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -9,8 +11,11 @@ import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
-import gui.util.DialogueManager;
+import gui.util.DialogManager;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Timer;
 
 public abstract class AddController<T> {
@@ -18,7 +23,7 @@ public abstract class AddController<T> {
     protected abstract void assignInputToVariables();
     protected abstract void assignListenersToTextFields();
     protected abstract void setIsEditing(T objectToEdit);
-    private final DialogueManager dialogueManager = DialogueManager.getInstance();
+    private final DialogManager dialogManager = DialogManager.getInstance();
 
     protected void setUpSaveTask(SaveTask<T> task, ViewController<T> controller, Pane owner, AddController<T> addController) {
         setUpTask(task, controller, owner);
@@ -35,13 +40,13 @@ public abstract class AddController<T> {
                         ((AddDocumentController) addController).setUpPdfListView();
                     }
                 } else if (task.getValue() == ResultState.DUPLICATE_DATA) {
-                    dialogueManager.showError("Username already exists!", "Username already exists!", owner);
+                    dialogManager.showError("Username already exists!", "Username already exists!", owner);
                 }
                 else if (task.getValue() == ResultState.NO_PERMISSION){
-                    dialogueManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
+                    dialogManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
                 }
                 else {
-                    dialogueManager.showError("Oops...", "Something went wrong!", owner);
+                    dialogManager.showError("Oops...", "Something went wrong!", owner);
                 }
             });
 
@@ -61,7 +66,7 @@ public abstract class AddController<T> {
 
         task.setOnFailed(event -> {
             hideMessageAfterTimeout(controller);
-            dialogueManager.showError("Oops...", "Something went wrong!", owner);
+            dialogManager.showError("Oops...", "Something went wrong!", owner);
         });
     }
 
@@ -76,11 +81,25 @@ public abstract class AddController<T> {
             }
 
             else if (task.getValue() == ResultState.NO_PERMISSION){
-                dialogueManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
+                dialogManager.showError("Insufficient permission" , "You do not have permission to do this", owner);
             }
 
             else {
-                dialogueManager.showError("Oops...", "Something went wrong!", owner);
+                dialogManager.showError("Oops...", "Something went wrong!", owner);
+            }
+        });
+    }
+
+    protected void setUpPdfTask(GeneratePdfTask task, Document document, Pane owner) {
+        task.setOnRunning(event -> {
+            dialogManager.showLoadingDialog("Creating PDF...", "Please wait while the PDF is being created", owner, task);
+        });
+
+        task.setOnSucceeded(event -> {
+            try {
+                Desktop.getDesktop().open(new File(task.getPdfPath().toUri()));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
     }
