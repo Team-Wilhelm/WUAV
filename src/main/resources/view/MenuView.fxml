@@ -32,7 +32,7 @@
         </padding>
         <HBox alignment="CENTER">
             <ImageView fitHeight="150" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
-                <Image url="@../img/Doc.png" />
+                <Image url="@../img/icons/Doc.png" />
             </ImageView>
         </HBox>
         <Region prefHeight="100.0" VBox.vgrow="NEVER" />
@@ -42,7 +42,7 @@
                        prefWidth="200.0" text="Employees" HBox.hgrow="ALWAYS" graphicTextGap="20">
                 <graphic>
                     <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="/img/mdi_account-circle-outline.png" />
+                        <Image url="/img/icons/mdi_account-circle-outline.png" />
                     </ImageView>
                 </graphic>
             </MFXButton>
@@ -53,21 +53,44 @@
                        prefWidth="200.0" text="Documents" HBox.hgrow="ALWAYS" graphicTextGap="20">
                 <graphic>
                     <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="/img/mdi_paper-outline.png" />
+                        <Image url="/img/icons/mdi_paper-outline.png" />
+                    </ImageView>
+                </graphic>
+            </MFXButton>
+        </HBox>
+
+        <HBox>
+            <MFXButton fx:id="btnCustomers" onAction="#btnCustomersAction" alignment="CENTER_LEFT" styleClass="menu-button"
+                       prefWidth="200" text="Customers" HBox.hgrow="ALWAYS" graphicTextGap="20">
+                <graphic>
+                    <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="/img/icons/mdi_customers.png" />
                     </ImageView>
                 </graphic>
             </MFXButton>
         </HBox>
 
         <Region prefHeight="200.0" VBox.vgrow="ALWAYS" />
+
         <HBox>
             <MFXButton fx:id="btnMyProfile" onAction="#btnMyProfileAction" alignment="CENTER_LEFT" styleClass="menu-button"
                        prefWidth="200.0" text="My profile" HBox.hgrow="ALWAYS" graphicTextGap="20">
                 <graphic>
                     <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="/img/mdi_card-account-details-outline.png" />
+                        <Image url="/img/icons/mdi_worker.png" />
                     </ImageView>
                 </graphic>
+            </MFXButton>
+        </HBox>
+
+        <HBox>
+            <MFXButton fx:id="btnLogOut" onAction="#logOutAction" styleClass="menu-button" alignment="CENTER_LEFT"
+                       prefWidth="200" text="Log out" HBox.hgrow="ALWAYS" graphicTextGap="20">
+                    <graphic>
+                        <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="/img/icons/logout-variant 1.png" />
+                        </ImageView>
+                    </graphic>
             </MFXButton>
         </HBox>
     </VBox>

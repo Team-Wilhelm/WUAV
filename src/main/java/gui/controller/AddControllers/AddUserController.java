@@ -84,7 +84,7 @@ public class AddUserController extends AddController<User> implements Initializa
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         isEditing = false;
-        profilePicturePath = "/img/userIcon.png";
+        profilePicturePath = "/img/icons/userIcon.png";
         imgProfilePicture.setImage(CropImageToCircle.getRoundedImage(new Image(profilePicturePath)));
 
         btnSave.setDisable(true);

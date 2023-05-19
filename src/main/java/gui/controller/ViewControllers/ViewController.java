@@ -35,7 +35,7 @@ public abstract class ViewController<T> {
         MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
         stage.setScene(scene);
         stage.setTitle("WUAV Documentation Management System");
-        stage.getIcons().add(new Image("/img/WUAV.png"));
+        stage.getIcons().add(new Image("/img/icons/WUAV.png"));
         stage.centerOnScreen();
         stage.initModality(modalityType);
         stage.show();

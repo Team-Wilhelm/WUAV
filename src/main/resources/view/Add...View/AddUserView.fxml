@@ -57,7 +57,7 @@
        <ImageViewPane fx:id="profilePicturePane" GridPane.columnSpan="4" GridPane.rowIndex="1" GridPane.rowSpan="3">
            <imageView>
                <ImageView fx:id="imgProfilePicture" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.rowIndex="2">
-                   <Image url="@../../img/userIcon.png" />
+                   <Image url="@../../img/icons/userIcon.png" />
                </ImageView>
            </imageView>
        </ImageViewPane>

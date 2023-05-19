@@ -35,7 +35,7 @@
                 </GridPane.margin>
                 <graphic>
                     <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="/img/ic_round-plus.png" />
+                        <Image url="/img/icons/ic_round-plus.png" />
                     </ImageView>
                 </graphic>
             </MFXButton>

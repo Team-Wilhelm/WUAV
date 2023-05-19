@@ -1,4 +1,3 @@
-import dal.dao.DocumentDAO;
 import gui.util.SceneManager;
 import gui.model.UserModel;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
@@ -23,7 +22,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         long start = System.currentTimeMillis();
         Parent root;
-        if (!true)
+        if (true)
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
         else {
             //TODO change back
@@ -33,7 +32,7 @@ public class Main extends Application {
         }
 
         primaryStage.setTitle("WUAV Documentation Management System");
-        primaryStage.getIcons().add(new Image("/img/WUAV.png"));
+        primaryStage.getIcons().add(new Image("/img/icons/WUAV.png"));
 
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
