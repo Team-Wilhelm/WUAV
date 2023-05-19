@@ -89,6 +89,16 @@ public class DialogueManager {
         return result;
     }
 
+    public void showConfirmation(String header, String content, Pane parent, Runnable onConfirm) {
+        convertDialogTo(Alert.AlertType.CONFIRMATION, header, content, parent);
+        dialog.showDialog();
+        result.thenAccept(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                onConfirm.run();
+            }
+        });
+    }
+
     public CompletableFuture<String> showTextInputDialogue(String header, String contentDescription, String contentValue,  Pane parent) {
         textInputDialogue.clear();
 
@@ -124,18 +134,17 @@ public class DialogueManager {
 
 
     private void convertDialogTo(Alert.AlertType alertType, String header, String content, Pane parent) {
+        result = new CompletableFuture<>();
         String styleClass = null;
 
         dialogContent.setContentText(content);
         dialogContent.setHeaderText(header);
 
-        if (alertType != Alert.AlertType.CONFIRMATION) {
-            dialogContent.clearActions();
-            dialogContent.addActions(
-                    Map.entry(btnConfirm, event -> dialog.close()),
-                    Map.entry(btnCancel, event -> dialog.close())
-            );
-        }
+        dialogContent.clearActions();
+        dialogContent.addActions(
+                Map.entry(btnConfirm, event -> dialog.close()),
+                Map.entry(btnCancel, event -> dialog.close())
+        );
 
         if (dialog.getOwnerNode() != parent) {
             dialog.setOwnerNode(parent);
