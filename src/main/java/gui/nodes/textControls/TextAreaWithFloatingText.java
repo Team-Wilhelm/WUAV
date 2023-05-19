@@ -76,7 +76,7 @@ public class TextAreaWithFloatingText extends StackPane {
         }
 
         // TextArea
-        textArea = new TextArea();
+        textArea = new TextArea("");
         textArea.setWrapText(true);
 
         // Label
@@ -95,8 +95,8 @@ public class TextAreaWithFloatingText extends StackPane {
         });
 
         // When the text area is focused or empty, the label should become larger
-        isFloatingProperty.bind(Bindings.createBooleanBinding(() -> textArea.isFocused()
-                        || textArea.getText() != null || !textArea.getText().isEmpty(),
+        isFloatingProperty.bind(Bindings.createBooleanBinding(() -> textArea.isFocused() ||
+                        !textArea.getText().isEmpty(),
                 textArea.focusedProperty(),
                 textArea.textProperty()));
 

@@ -5,6 +5,7 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
 import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
+import javafx.scene.control.TextArea;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -14,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
  * with the initial max length of 256 characters.
  */
 public class TextInputDialogue extends MFXStageDialog {
-    private TextAreaWithFloatingText textArea;
+    private TextArea textArea;
     private MFXGenericDialog dialogContent;
     private CompletableFuture<String> result = new CompletableFuture<>();
 
@@ -24,7 +25,7 @@ public class TextInputDialogue extends MFXStageDialog {
 
     public TextInputDialogue(String title, String content) {
         super();
-        textArea = new TextAreaWithFloatingText();
+        textArea = new TextArea();
         //textArea.setMaxTextLength(256);
 
         dialogContent = MFXGenericDialogBuilder.build()
@@ -51,9 +52,6 @@ public class TextInputDialogue extends MFXStageDialog {
         textArea.setMaxTextLength(length);
     }*/
 
-    public void setFloatingText(String text) {
-        textArea.setFloatingText(text);
-    }
 
     public void setEditorText(String text) {
         textArea.setText(text);
@@ -74,7 +72,7 @@ public class TextInputDialogue extends MFXStageDialog {
     }
 
     public void clear() {
-        textArea.getTextArea().clear();
+        textArea.clear();
     }
 
     public void setContentText(String text) {

@@ -3,42 +3,42 @@
 }
 
 .text-area-with-floating-text {
-    -mfx-background-color: base-colour;
-    -mfx-background-radius: 5;
-    -mfx-border-radius: 5;
-    -mfx-padding: 5;
-    -mfx-border-color: light-gray;
-    -mfx-border-width: 1;
+    -fx-background-color: base-colour;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-padding: 5;
+    -fx-border-color: light-gray;
+    -fx-border-width: 1;
 }
 
 .text-area-with-floating-text:focused {
-    -mfx-background-insets: 2;
-    -mfx-border-insets: -0.5;
-    -mfx-border-width: 1.5;
-    -mfx-border-color: dark-grey;
+    -fx-background-insets: 2;
+    -fx-border-insets: -0.5;
+    -fx-border-width: 1.5;
+    -fx-border-color: dark-grey;
 }
 
 .text-area-with-floating-text .text-area {
-    -mfx-focus-color: transparent;
-    -mfx-faint-focus-color: transparent;
-    -mfx-border-style: none;
-    -mfx-background-radius: 0;
-    -mfx-border-radius: 0;
-    -mfx-background-color: -fx-control-inner-background;
-    -mfx-highlight-fill: light-grey; /* Selected text highlight */
-    -mfx-highlight-text-fill: black; /* Selected text color */
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-border-style: none;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-background-color: -fx-control-inner-background;
+    -fx-highlight-fill: light-grey; /* Selected text highlight */
+    -fx-highlight-text-fill: black; /* Selected text color */
 }
 
 .text-area-with-floating-text .text-area .content {
-    -mfx-border-style: none;
-    -mfx-background-radius: 0;
-    -mfx-border-radius: 0;
-    -mfx-font-family: "Open Sans Regular";
-    -mfx-background-color: -fx-control-inner-background;
+    -fx-border-style: none;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-font-family: "Open Sans Regular";
+    -fx-background-color: -fx-control-inner-background;
 }
 
 .text-area-with-floating-text .floating-label .label {
-    -mfx-font-family: "Open Sans Regular";
+    -fx-font-family: "Open Sans Regular";
 }
 
 /*TODO change scroll bar */
