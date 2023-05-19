@@ -157,7 +157,6 @@ public class AddDocumentController extends AddController<Document> implements In
         });
 
         addTooltips();
-        System.out.println(Arrays.toString(txtJobDescription.getStylesheets().toArray()));
     }
 
     @FXML

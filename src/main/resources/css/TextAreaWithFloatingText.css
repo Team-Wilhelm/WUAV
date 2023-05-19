@@ -1,13 +1,11 @@
-* {
-    dark-grey: #3e3e3e;
-}
+@import "Colors.css";
 
 .text-area-with-floating-text {
-    -fx-background-color: base-colour;
+    -fx-background-color: -fx-base-color;
     -fx-background-radius: 5;
     -fx-border-radius: 5;
     -fx-padding: 5;
-    -fx-border-color: light-gray;
+    -fx-border-color: -fx-light-grey;
     -fx-border-width: 1;
 }
 
@@ -15,7 +13,7 @@
     -fx-background-insets: 2;
     -fx-border-insets: -0.5;
     -fx-border-width: 1.5;
-    -fx-border-color: dark-grey;
+    -fx-border-color: -fx-dark-grey;
 }
 
 .text-area-with-floating-text .text-area {
@@ -25,7 +23,7 @@
     -fx-background-radius: 0;
     -fx-border-radius: 0;
     -fx-background-color: -fx-control-inner-background;
-    -fx-highlight-fill: light-grey; /* Selected text highlight */
+    -fx-highlight-fill: -fx-light-grey; /* Selected text highlight */
     -fx-highlight-text-fill: black; /* Selected text color */
 }
 
@@ -40,5 +38,3 @@
 .text-area-with-floating-text .floating-label .label {
     -fx-font-family: "Open Sans Regular";
 }
-
-/*TODO change scroll bar */
