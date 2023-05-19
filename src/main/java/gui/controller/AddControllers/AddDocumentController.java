@@ -257,6 +257,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
         GeneratePdfTask task = new GeneratePdfTask(documentToEdit, checkboxWrappers);
         setUpPdfTask(task, documentToEdit, gridPanePdf);
+        ThreadPool.getInstance().execute(task);
     }
 
     // region Listeners

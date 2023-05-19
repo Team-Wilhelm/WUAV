@@ -54,6 +54,7 @@ public class PasswordDialog extends CustomDialog {
 
         setUpGridPane();
         super.setContent(passwordGridPane);
+        this.setContent(super.getDialogContent());
         setUpDialogueWindow();
         addButtons();
     }

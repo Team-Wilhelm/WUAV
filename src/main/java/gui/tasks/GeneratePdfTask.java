@@ -25,6 +25,7 @@ public class GeneratePdfTask extends Task<ResultState> implements TaskCallback {
     @Override
     protected ResultState call() throws Exception {
         try {
+            updateProgress(25, 100); // Starting
             /* Pre-generate the first pdf so we know the final number of pages and can use it in place for
              * ordering the final pdf's pages
              */

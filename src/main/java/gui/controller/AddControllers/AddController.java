@@ -90,9 +90,16 @@ public abstract class AddController<T> {
         });
     }
 
+
+    /**
+     * Opens a loading dialog while the PDF is being created and opens the PDF when it is done
+     * @param task
+     * @param document
+     * @param owner
+     */
     protected void setUpPdfTask(GeneratePdfTask task, Document document, Pane owner) {
         task.setOnRunning(event -> {
-            dialogManager.showLoadingDialog("Creating PDF...", "Please wait while the PDF is being created", owner, task);
+            dialogManager.showLoadingDialog("Creating PDF...", "Creating pdf...", owner, task);
         });
 
         task.setOnSucceeded(event -> {

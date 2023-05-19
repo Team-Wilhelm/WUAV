@@ -4,7 +4,7 @@ import be.Address;
 import be.Customer;
 import gui.model.CustomerModel;
 import gui.model.UserModel;
-import gui.util.DialogueManager;
+import gui.util.DialogManager;
 import gui.util.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import io.github.palexdev.materialfx.controls.MFXTableColumn;
@@ -155,7 +155,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
                 //TODO: Open edit customer window/popup
             }
             else {
-                DialogueManager.getInstance().showError("No customer selected", "Please select a customer", gridPane);
+                DialogManager.getInstance().showError("No customer selected", "Please select a customer", gridPane);
             }
         }
     }

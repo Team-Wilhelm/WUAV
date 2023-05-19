@@ -60,6 +60,7 @@ public class DialogManager {
 
         passwordDialog = new PasswordDialog();
         textInputDialog = new TextInputDialog();
+        loadingDialog = new LoadingDialog();
     }
 
     /**
@@ -189,6 +190,7 @@ public class DialogManager {
 
     public void showLoadingDialog(String title, String content, Pane parent, Task<?> task) {
         setUpCustomDialog(loadingDialog, parent, title, content);
+        loadingDialog.setProgressLabel(content);
         loadingDialog.progressProperty().bind(task.progressProperty());
         loadingDialog.setOnCloseRequest(event -> task.cancel());
         task.setOnSucceeded(event -> loadingDialog.close());
@@ -210,7 +212,7 @@ public class DialogManager {
 
     private void setUpCustomDialog(CustomDialog dialog, Pane parent, String title, String content) {
         setUpCustomDialog(dialog, parent);
-        dialog.setTitle(title);
+        dialog.setTitleText(title);
         dialog.setContentText(content);
     }
 }

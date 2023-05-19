@@ -28,6 +28,7 @@ public class TextInputDialog extends CustomDialog {
         //textArea.setMaxTextLength(256);
         //TODO add max length
 
+        super.setContent(textArea);
         this.setContent(super.getDialogContent());
         super.getDialogContent().addActions(
                 Map.entry(new MFXButton("Confirm"), event -> {
