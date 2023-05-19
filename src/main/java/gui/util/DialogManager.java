@@ -9,6 +9,7 @@ import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
 import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -16,6 +17,8 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -188,12 +191,26 @@ public class DialogManager {
 
     }
 
-    public void showLoadingDialog(String title, String content, Pane parent, Task<?> task) {
+    public void showLoadingDialog(String title, String content, Pane parent, Task<?> task, Runnable onFinished) {
         setUpCustomDialog(loadingDialog, parent, title, content);
         loadingDialog.setProgressLabel(content);
         loadingDialog.progressProperty().bind(task.progressProperty());
         loadingDialog.setOnCloseRequest(event -> task.cancel());
-        task.setOnSucceeded(event -> loadingDialog.close());
+
+        task.setOnSucceeded(event -> {
+            loadingDialog.progressProperty().unbind();
+            loadingDialog.setProgress(100);
+            loadingDialog.setProgressLabel("Done!");
+            onFinished.run();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    Platform.runLater(() -> {
+                        loadingDialog.close();
+                    });
+                }
+            }, 1000);
+        });
         loadingDialog.showDialog();
     }
 

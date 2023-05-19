@@ -99,15 +99,13 @@ public abstract class AddController<T> {
      */
     protected void setUpPdfTask(GeneratePdfTask task, Document document, Pane owner) {
         task.setOnRunning(event -> {
-            dialogManager.showLoadingDialog("Creating PDF...", "Creating pdf...", owner, task);
-        });
-
-        task.setOnSucceeded(event -> {
-            try {
-                Desktop.getDesktop().open(new File(task.getPdfPath().toUri()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            dialogManager.showLoadingDialog("Creating PDF...", "Creating pdf...", owner, task, () -> {
+                try {
+                    Desktop.getDesktop().open(new File(task.getPdfPath().toUri()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         });
     }
 
