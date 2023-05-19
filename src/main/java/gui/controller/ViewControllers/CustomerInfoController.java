@@ -115,6 +115,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     //region progress methods
     @Override
     public void setProgressVisibility(boolean visible) {
+        progressSpinner.progressProperty().unbind();
         progressSpinner.setVisible(visible);
         progressLabel.setVisible(visible);
     }

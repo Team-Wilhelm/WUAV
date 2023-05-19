@@ -76,6 +76,7 @@ public class DocumentController extends ViewController<Document> implements Init
     //region progress methods
     @Override
     public void setProgressVisibility(boolean visible) {
+        progressSpinner.progressProperty().unbind();
         progressSpinner.setVisible(visible);
         progressLabel.setVisible(visible);
     }
@@ -143,17 +144,17 @@ public class DocumentController extends ViewController<Document> implements Init
             return row;
         });
 
-        customerName.setRowCellFactory(document -> {
-            MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(d -> d.getCustomer().getCustomerName());
-            row.setOnMouseClicked(this::tableViewDoubleClickAction);
-            return row;
-        });
+            customerName.setRowCellFactory(document -> {
+                MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(d -> d.getCustomer() != null ? d.getCustomer().getCustomerName() : "");
+                row.setOnMouseClicked(this::tableViewDoubleClickAction);
+                return row;
+            });
 
-        customerEmail.setRowCellFactory(document -> {
-            MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(d -> d.getCustomer().getCustomerEmail());
-            row.setOnMouseClicked(this::tableViewDoubleClickAction);
-            return row;
-        });
+            customerEmail.setRowCellFactory(document -> {
+                MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(d -> d.getCustomer() != null ? d.getCustomer().getCustomerEmail() : "");
+                row.setOnMouseClicked(this::tableViewDoubleClickAction);
+                return row;
+            });
 
         myDocument.setRowCellFactory(document -> {
             MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(d -> UserModel.getLoggedInUser().getAssignedDocuments().containsValue(d) ? "✔" : "");
