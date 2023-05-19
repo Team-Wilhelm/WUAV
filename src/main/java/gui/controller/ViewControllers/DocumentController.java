@@ -77,6 +77,7 @@ public class DocumentController extends ViewController<Document> implements Init
     @Override
     public void setProgressVisibility(boolean visible) {
         progressSpinner.progressProperty().unbind();
+        progressSpinner.visibleProperty().unbind();
         progressSpinner.setVisible(visible);
         progressLabel.setVisible(visible);
     }
@@ -216,7 +217,7 @@ public class DocumentController extends ViewController<Document> implements Init
             } else {
                 progressSpinner.setProgress(100);
                 progressLabel.setText("Images loaded");
-                progressSpinner.visibleProperty().unbind();
+                progressSpinner.visibleProperty().unbind(); //TODO check why it's not unbound
 
                 new Timer().schedule(new TimerTask() {
                     @Override

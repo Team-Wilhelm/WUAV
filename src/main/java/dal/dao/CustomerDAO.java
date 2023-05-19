@@ -24,7 +24,6 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
 
     @Override
     public ResultState add(Customer customer) {
-        String result = "saved";
         String sql = "SELECT AddressId from CustomerAddress WHERE StreetName = ? AND StreetNumber = ? AND Postcode = ? AND Town = ? AND Country = ?";
 
         Connection connection = null;
@@ -39,15 +38,13 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
                 customer.getCustomerAddress().setAddressID(rs.getInt("AddressID"));
             }
             else {
-                sql = "DECLARE @AddressID INT;" +
-                        "INSERT INTO CustomerAddress (StreetName, StreetNumber, Postcode, Town, Country) " +
+                sql =   "INSERT INTO CustomerAddress (StreetName, StreetNumber, Postcode, Town, Country) " +
                         "VALUES (?,?,?,?,?);" +
-                        "SET @AddressID = SCOPE_IDENTITY();" +
                         "INSERT INTO Customer (CustomerName, CustomerEmail, CustomerPhoneNumber, LastContract, CustomerType) " +
                         "VALUES (?,?,?,?,?) ";
 
                 // Execute the SQL statement to insert the new address and customer
-                ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+                ps = connection.prepareStatement(sql);
                 fillAddressStatement(ps, customer.getCustomerAddress());
                 ps.setString(6, customer.getCustomerName());
                 ps.setString(7, customer.getCustomerEmail());
@@ -55,10 +52,14 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
                 ps.setDate(9, customer.getLastContract());
                 ps.setString(10, customer.getCustomerType().toString());
                 ps.executeUpdate();
-                ResultSet generatedKeys = ps.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int generatedKey = generatedKeys.getInt(1);
-                    customer.getCustomerAddress().setAddressID(generatedKey);
+
+                // Get the generated addressID from the database and set it as the customer's address ID
+                sql = "SELECT AddressId from CustomerAddress WHERE StreetName = ? AND StreetNumber = ? AND Postcode = ? AND Town = ? AND Country = ?";
+                ps = connection.prepareStatement(sql);
+                fillAddressStatement(ps, customer.getCustomerAddress());
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    customer.getCustomerAddress().setAddressID(rs.getInt("AddressID"));
                 }
             }
 
@@ -147,7 +148,8 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
     @Override
     public Map<UUID, Customer> getAll() {
         HashMap<UUID, Customer> customers = new HashMap<>();
-        String sql = "SELECT * FROM Customer " + "INNER JOIN Customer_Address_Link ON Customer.CustomerID = Customer_Address_Link.CustomerID " +
+        String sql = "SELECT * FROM Customer " +
+                "INNER JOIN Customer_Address_Link ON Customer.CustomerID = Customer_Address_Link.CustomerID " +
                 "INNER JOIN CustomerAddress ON Customer_Address_Link.AddressID = CustomerAddress.AddressID " +
                 "WHERE Deleted = 0";
         Connection connection = null;
@@ -169,7 +171,8 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
 
     @Override
     public Customer getById(UUID id) {
-        String sql = "SELECT * FROM Customer " + "INNER JOIN Customer_Address_Link ON Customer.CustomerID = Customer_Address_Link.CustomerID " +
+        String sql = "SELECT * FROM Customer " +
+                "INNER JOIN Customer_Address_Link ON Customer.CustomerID = Customer_Address_Link.CustomerID " +
                 "INNER JOIN CustomerAddress ON Customer_Address_Link.AddressID = CustomerAddress.AddressID " +
                 "WHERE Deleted = 0 AND Customer.CustomerID = ?";
         Connection connection = null;
