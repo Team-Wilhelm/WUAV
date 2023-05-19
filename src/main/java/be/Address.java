@@ -68,11 +68,20 @@ public class Address {
     }
 
     @Override
+    public String toString() {
+        return streetName + " " + streetNumber + ", " + postcode + " " + town + ", " + country;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Address address = (Address) o;
-        return Objects.equals(streetName, address.streetName) && Objects.equals(streetNumber, address.streetNumber) && Objects.equals(postcode, address.postcode) && Objects.equals(town, address.town) && Objects.equals(country, address.country);
+        return Objects.equals(streetName, address.streetName)
+                && Objects.equals(streetNumber, address.streetNumber)
+                && Objects.equals(postcode, address.postcode)
+                && Objects.equals(town, address.town)
+                && Objects.equals(country, address.country);
     }
 
     @Override

@@ -52,6 +52,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
 
         searchBar.textProperty().addListener((observable, oldValue, newValue) ->
                 tblCustomers.getItems().setAll(customerModel.searchCustomers(searchBar.getText().toLowerCase().trim())));
+        refreshItems();
         populateTableView();
         progressLabel.visibleProperty().bind(progressSpinner.visibleProperty()); // show label when spinner is visible
 
@@ -106,7 +107,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         });
 
 
-        tblCustomers.getTableColumns().addAll(name, email, phoneNumber, type, lastContract);
+        tblCustomers.getTableColumns().addAll(name, email, phoneNumber, address, type, lastContract);
         tblCustomers.autosizeColumnsOnInitialization();
         tblCustomers.setFooterVisible(false);
     }

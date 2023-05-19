@@ -70,7 +70,7 @@ public class CustomerModel implements IModel<Customer> {
         List<Customer> filteredCustomers = new ArrayList<>();
         allCustomers.values().stream().filter(customer ->
                 customer.getCustomerName().toLowerCase().contains(query) ||
-                        customer.getCustomerEmail().toLowerCase().contains(query)).findFirst().orElse(null);
+                        customer.getCustomerEmail().toLowerCase().contains(query)).forEach(filteredCustomers::add);
         return filteredCustomers;
     }
 }

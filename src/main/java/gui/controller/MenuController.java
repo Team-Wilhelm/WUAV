@@ -3,6 +3,7 @@ package gui.controller;
 import be.User;
 import gui.controller.AddControllers.AddController;
 import gui.controller.AddControllers.AddUserController;
+import gui.controller.ViewControllers.CustomerInfoController;
 import gui.model.UserModel;
 import gui.util.DialogueManager;
 import gui.util.SceneManager;
@@ -27,10 +28,11 @@ import java.util.ResourceBundle;
 public class MenuController implements Initializable {
     @FXML
     private GridPane gridPane;
-    private Node documentView, employeeView, myProfileView, currentScene;
+    private Node documentView, employeeView, myProfileView, currentScene, customerView;
     private DocumentController documentController;
     private UserController userController;
     private AddUserController myProfileController;
+    private CustomerInfoController customerController;
     private MFXButton logOutButton;
 
     @Override
@@ -38,17 +40,20 @@ public class MenuController implements Initializable {
         FXMLLoader documentLoader = new FXMLLoader(getClass().getResource(SceneManager.DOCUMENT_SCENE));
         FXMLLoader employeeLoader = new FXMLLoader(getClass().getResource(SceneManager.EMPLOYEE_SCENE));
         FXMLLoader myProfileLoader = new FXMLLoader(getClass().getResource(SceneManager.ADD_EMPLOYEE_SCENE));
+        FXMLLoader customerLoader = new FXMLLoader(getClass().getResource(SceneManager.CUSTOMER_SCENE));
         try {
             // Load the scenes
             documentView = documentLoader.load();
             employeeView = employeeLoader.load();
             myProfileView = myProfileLoader.load();
+            customerView = customerLoader.load();
 
             // Get the controllers
             documentController = documentLoader.getController();
             userController = employeeLoader.getController();
             myProfileController = myProfileLoader.getController();
             myProfileController.setUserController(userController);
+            customerController = customerLoader.getController();
 
             // Set the default scene
             currentScene = documentView;
@@ -100,6 +105,10 @@ public class MenuController implements Initializable {
         switchScene(myProfileView);
     }
 
+    public void btnCustomersAction() {
+        switchScene(customerView);
+    }
+
     /**
      * To perform these actions, the scene must be loaded first, therefore this method is called from the LoginViewController when the user logs in .
      * Also, the user must be logged in to be able to set them as the user to edit in MyProfileView.
@@ -114,6 +123,7 @@ public class MenuController implements Initializable {
     private void setVisibilityForUserRole() {
         documentController.setVisibilityForUserRole();
         userController.setVisibilityForUserRole();
+        customerController.setVisibilityForUserRole();
     }
 
     public void logOutAction(ActionEvent actionEvent) {
@@ -121,9 +131,5 @@ public class MenuController implements Initializable {
             UserModel.getInstance().logOut();
             switchScene(SceneManager.LOGIN_SCENE);
         });
-    }
-
-    public void btnCustomersAction(ActionEvent actionEvent) {
-        //TODO switchScene(customerView);
     }
 }
