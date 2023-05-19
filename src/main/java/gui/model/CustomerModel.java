@@ -5,9 +5,7 @@ import bll.IManager;
 import bll.ManagerFactory;
 import utils.enums.ResultState;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -66,5 +64,13 @@ public class CustomerModel implements IModel<Customer> {
     public Customer getByEmail(String email) {
         return allCustomers.values().stream().filter(customer ->
                 customer.getCustomerEmail().equalsIgnoreCase(email)).findFirst().orElse(null);
+    }
+
+    public List<Customer> searchCustomers(String query) {
+        List<Customer> filteredCustomers = new ArrayList<>();
+        allCustomers.values().stream().filter(customer ->
+                customer.getCustomerName().toLowerCase().contains(query) ||
+                        customer.getCustomerEmail().toLowerCase().contains(query)).findFirst().orElse(null);
+        return filteredCustomers;
     }
 }
