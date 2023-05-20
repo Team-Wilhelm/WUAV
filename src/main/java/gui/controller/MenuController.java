@@ -31,6 +31,7 @@ public class MenuController implements Initializable {
     private UserController userController;
     private AddUserController myProfileController;
     private CustomerInfoController customerController;
+    private LoginViewController loginViewController;
     private MFXButton logOutButton;
 
     @Override
@@ -128,6 +129,11 @@ public class MenuController implements Initializable {
         DialogManager.getInstance().showConfirmation("Log out", "Are you sure you want to log out?", gridPane, () -> {
             UserModel.getInstance().logOut();
             switchScene(SceneManager.LOGIN_SCENE);
+            loginViewController.unfocusAll();
         });
+    }
+
+    public void setLoginViewController(LoginViewController loginViewController) {
+        this.loginViewController = loginViewController;
     }
 }

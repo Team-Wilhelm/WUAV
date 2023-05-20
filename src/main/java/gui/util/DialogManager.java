@@ -11,6 +11,8 @@ import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Pane;
@@ -99,10 +101,20 @@ public class DialogManager {
 
     public void showConfirmation(String header, String content, Pane parent, Runnable onConfirm) {
         convertDialogTo(Alert.AlertType.CONFIRMATION, header, content, parent);
-        dialog.showDialog();
+        dialog.showAndWait();
         result.thenAccept(buttonType -> {
             if (buttonType == ButtonType.OK) {
                 onConfirm.run();
+            }
+        });
+    }
+
+    public void showConfirmation(String header, String content, Pane parent, EventHandler<?> eventHandler) {
+        convertDialogTo(Alert.AlertType.CONFIRMATION, header, content, parent);
+        dialog.showDialog();
+        result.thenAccept(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                eventHandler.handle(null);
             }
         });
     }
@@ -135,7 +147,12 @@ public class DialogManager {
             dialog.setOwnerNode(parent);
         }
 
-        if (dialog.getOwner() == null) {
+        if (dialog.getOwner() != null && dialog.getOwner() != parent.getScene().getWindow()) {
+            dialog = MFXGenericDialogBuilder.build()
+                    .toStageDialogBuilder()
+                    .setDraggable(true)
+                    .get();
+            dialog.setContent(dialogContent);
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.initOwner(parent.getScene().getWindow());
         }

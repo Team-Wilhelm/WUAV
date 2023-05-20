@@ -19,7 +19,6 @@ import java.util.Map;
 
 public class PasswordDialog extends CustomDialog {
     //TODO generify this class
-    //TODO style
     private HBox columns;
     private VBox rows;
     private HashMap<PasswordType, MFXPasswordField> passwordFields;
