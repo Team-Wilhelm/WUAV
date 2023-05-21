@@ -118,9 +118,10 @@ public class DialogManager {
         });
     }
 
-    public CompletableFuture<String> showTextInputDialog(String header, String contentDescription, String contentValue, Pane parent) {
+    public CompletableFuture<String> showTextInputDialog(String header, String contentDescription, String contentValue, Pane parent, boolean editable) {
         setUpCustomDialog(textInputDialog, parent, header, contentDescription);
         textInputDialog.setContentText(contentValue);
+        textInputDialog.setEditable(editable);
         return textInputDialog.showAndReturnResult();
     }
 
@@ -128,7 +129,6 @@ public class DialogManager {
         setUpCustomDialog(passwordDialog, parent);
         return passwordDialog;
     }
-
 
     private void convertDialogTo(Alert.AlertType alertType, String header, String content, Pane parent) {
         result = new CompletableFuture<>();

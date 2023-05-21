@@ -39,8 +39,6 @@ public class TextInputDialog extends CustomDialog {
         super.getDialogContent().addActions(
                 Map.entry(new MFXButton("Confirm"), event -> {
                     result.complete(textArea.getText());
-                    System.out.println("Text: " + textArea.getText());
-                    System.out.println("Result: " + result.getNow(null));
                     this.close();
                 }),
                 Map.entry(new MFXButton("Cancel"), event -> this.close())
