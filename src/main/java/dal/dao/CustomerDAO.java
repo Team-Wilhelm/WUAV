@@ -38,30 +38,35 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
                 customer.getCustomerAddress().setAddressID(rs.getInt("AddressID"));
             }
             else {
-                sql =   "INSERT INTO CustomerAddress (StreetName, StreetNumber, Postcode, Town, Country) " +
-                        "VALUES (?,?,?,?,?);" +
-                        "INSERT INTO Customer (CustomerName, CustomerEmail, CustomerPhoneNumber, LastContract, CustomerType) " +
-                        "VALUES (?,?,?,?,?) ";
+                sql = "INSERT INTO CustomerAddress (StreetName, StreetNumber, Postcode, Town, Country) " +
+                        "VALUES (?,?,?,?,?);";
 
                 // Execute the SQL statement to insert the new address and customer
                 ps = connection.prepareStatement(sql);
                 fillAddressStatement(ps, customer.getCustomerAddress());
-                ps.setString(6, customer.getCustomerName());
-                ps.setString(7, customer.getCustomerEmail());
-                ps.setString(8, customer.getCustomerPhoneNumber());
-                ps.setDate(9, customer.getLastContract());
-                ps.setString(10, customer.getCustomerType().toString());
                 ps.executeUpdate();
-
-                // Get the generated addressID from the database and set it as the customer's address ID
-                sql = "SELECT AddressId from CustomerAddress WHERE StreetName = ? AND StreetNumber = ? AND Postcode = ? AND Town = ? AND Country = ?";
-                ps = connection.prepareStatement(sql);
-                fillAddressStatement(ps, customer.getCustomerAddress());
-                rs = ps.executeQuery();
-                if (rs.next()) {
-                    customer.getCustomerAddress().setAddressID(rs.getInt("AddressID"));
-                }
             }
+
+            sql= "INSERT INTO Customer (CustomerName, CustomerEmail, CustomerPhoneNumber, LastContract, CustomerType) " +
+                    "VALUES (?,?,?,?,?) ";
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, customer.getCustomerName());
+            ps.setString(2, customer.getCustomerEmail());
+            ps.setString(3, customer.getCustomerPhoneNumber());
+            ps.setDate(4, customer.getLastContract());
+            ps.setString(5, customer.getCustomerType().toString());
+            ps.executeUpdate();
+
+
+            // Get the generated addressID from the database and set it as the customer's address ID
+            sql = "SELECT AddressId from CustomerAddress WHERE StreetName = ? AND StreetNumber = ? AND Postcode = ? AND Town = ? AND Country = ?";
+            ps = connection.prepareStatement(sql);
+            fillAddressStatement(ps, customer.getCustomerAddress());
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                customer.getCustomerAddress().setAddressID(rs.getInt("AddressID"));
+            }
+
 
             // Get the generated customerID from the database and set it as the customer's ID
             sql = "SELECT CustomerID FROM Customer WHERE CustomerName = ? AND CustomerEmail = ? AND CustomerPhoneNumber = ?";
@@ -73,6 +78,7 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
             if (rs.next()) {
                 customer.setCustomerID(UUID.fromString(rs.getString("CustomerID")));
             }
+
             sql = "INSERT INTO Customer_Address_Link (CustomerID, AddressId) VALUES (?,?)";
             ps = connection.prepareStatement(sql);
             ps.setString(1, customer.getCustomerID().toString());
