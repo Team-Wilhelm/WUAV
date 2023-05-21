@@ -7,7 +7,7 @@ import gui.util.SceneManager;
 import gui.controller.AddControllers.AddUserController;
 import gui.model.UserModel;
 import utils.enums.ResultState;
-import gui.util.DialogueManager;
+import gui.util.DialogManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -54,7 +54,6 @@ public class UserController extends ViewController<User> implements Initializabl
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //TODO disable edit button while saving
         setProgressVisibility(false);
 
         Bindings.bindContent(flowPane.getChildren(), userCards);
@@ -139,7 +138,7 @@ public class UserController extends ViewController<User> implements Initializabl
             controller.setVisibilityForUserRole();
             controller.setShortcutsAndAccelerators();
         } else {
-            DialogueManager.getInstance().showWarning("No user selected", "Please select a user to edit", flowPane);
+            DialogManager.getInstance().showWarning("No user selected", "Please select a user to edit", flowPane);
         }
     }
 

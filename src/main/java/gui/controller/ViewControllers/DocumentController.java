@@ -2,7 +2,6 @@ package gui.controller.ViewControllers;
 
 import be.Document;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.value.ChangeListener;
 import javafx.scene.layout.GridPane;
 import utils.enums.UserRole;
 import gui.model.UserModel;
@@ -25,10 +24,9 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
-import gui.util.DialogueManager;
+import gui.util.DialogManager;
 import javafx.stage.Window;
-import utils.permissions.AccessChecker;
-import java.io.IOException;
+
 import java.net.URL;
 import java.sql.Date;
 import java.util.*;
@@ -178,7 +176,7 @@ public class DocumentController extends ViewController<Document> implements Init
                 controller.setVisibilityForUserRole();
             }
             else {
-                DialogueManager.getInstance().showError("No document selected", "Please select a document", gridPane);
+                DialogManager.getInstance().showError("No document selected", "Please select a document", gridPane);
             }
         }
     }

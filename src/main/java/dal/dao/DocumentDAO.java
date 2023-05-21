@@ -315,6 +315,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     }
 
     public void addDrawingToDocument(Document document, String canvasImage) {
+        //TODO throws an exception
         String sql = "MERGE INTO Document_Drawing_Link AS target " +
                 "USING (VALUES (?, ?)) AS source (DocumentID, Drawing) " +
                 "ON (target.DocumentID = source.DocumentID) " +

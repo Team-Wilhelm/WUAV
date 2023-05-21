@@ -1,7 +1,7 @@
 package gui.controller.AddControllers;
 
 import be.User;
-import gui.nodes.dialogues.PasswordDialogue;
+import gui.nodes.dialogs.PasswordDialog;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -14,7 +14,7 @@ import gui.model.UserModel;
 import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import utils.enums.ResultState;
-import gui.util.DialogueManager;
+import gui.util.DialogManager;
 import gui.util.CropImageToCircle;
 import gui.util.ImageCropper;
 import io.github.palexdev.materialfx.controls.*;
@@ -56,7 +56,7 @@ public class AddUserController extends AddController<User> implements Initializa
     private MFXButton btnSave;
 
     private final UserModel userModel;
-    private final DialogueManager dialogueManager;
+    private final DialogManager dialogManager;
     private HashPasswordHelper hashPasswordHelper;
     private User userToUpdate;
     private UserController userController;
@@ -70,7 +70,7 @@ public class AddUserController extends AddController<User> implements Initializa
 
     public AddUserController() {
         userModel = UserModel.getInstance();
-        dialogueManager = DialogueManager.getInstance();
+        dialogManager = DialogManager.getInstance();
         hashPasswordHelper = new HashPasswordHelper();
         executorService = ThreadPool.getInstance();
 
@@ -134,7 +134,7 @@ public class AddUserController extends AddController<User> implements Initializa
 
     @FXML
     private void deleteUserAction(ActionEvent actionEvent) {
-        CompletableFuture<ButtonType> result = dialogueManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", gridPane);
+        CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Delete user", "Are you sure you want to delete this user?", gridPane);
         result.thenAccept(r -> {
             if (r.equals(ButtonType.OK)) {
                 Task<ResultState> deleteTask = new DeleteTask<>(userToUpdate.getUserID(), userModel);
@@ -156,15 +156,15 @@ public class AddUserController extends AddController<User> implements Initializa
 
     private void showPasswordDialogue() {
         comboOptions.getSelectionModel().clearSelection();
-        PasswordDialogue passwordDialogue = DialogueManager.getInstance().getPasswordDialogue(gridPane);
-        passwordDialogue.setUserToUpdate(userToUpdate);
-        passwordDialogue.setAdminEditing(UserModel.getLoggedInUser().getUserRole() == UserRole.ADMINISTRATOR);
-        passwordDialogue.showDialog();
-        passwordDialogue.setOnHidden(event -> {
-            if (passwordDialogue.isPasswordChanged()) {
+        PasswordDialog passwordDialog = DialogManager.getInstance().getPasswordDialogue(gridPane);
+        passwordDialog.setUserToUpdate(userToUpdate);
+        passwordDialog.setAdminEditing(UserModel.getLoggedInUser().getUserRole() == UserRole.ADMINISTRATOR);
+        passwordDialog.showDialog();
+        passwordDialog.setOnHidden(event -> {
+            if (passwordDialog.isPasswordChanged()) {
                 isUpdating.set(true);
-                userToUpdate.setPassword(passwordDialogue.getNewPassword());
-                userToUpdate.setSalt(passwordDialogue.getNewSalt());
+                userToUpdate.setPassword(passwordDialog.getNewPassword());
+                userToUpdate.setSalt(passwordDialog.getNewSalt());
                 btnSaveAction(null);
             }
         });
@@ -236,7 +236,7 @@ public class AddUserController extends AddController<User> implements Initializa
     private boolean checkInput() {
         if (userModel.getAll().values().stream().anyMatch(user -> user.getUsername().equals(username))
                 && !Objects.equals(userToUpdate.getUsername(), username)) {
-            dialogueManager.showError("Username already exists", "Please choose another username", gridPane);
+            dialogManager.showError("Username already exists", "Please choose another username", gridPane);
             return false;
         }
         return true;

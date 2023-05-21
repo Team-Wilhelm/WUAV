@@ -6,11 +6,11 @@ import utils.enums.ResultState;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SaveTask<T> extends Task<ResultState> {
+public class SaveTask<T> extends Task<ResultState>  implements TaskCallback {
     private final T objectToSave;
     private final boolean isEditing;
     private final IModel<T> model;
-    private Callback callback;
+    private TaskCallback callback;
 
     public SaveTask(T objectToSave, boolean isEditing, IModel<T> model) {
         this.objectToSave = objectToSave;
@@ -60,15 +60,18 @@ public class SaveTask<T> extends Task<ResultState> {
         return objectToSave;
     }
 
-    public Callback getCallback() {
+    public TaskCallback getCallback() {
         return callback;
     }
 
-    public void setCallback(Callback callback) {
+    public void setCallback(TaskCallback callback) {
         this.callback = callback;
     }
 
-    public interface Callback {
-        void onTaskCompleted(ResultState resultState);
+    @Override
+    public void onTaskCompleted(ResultState resultState) {
+        if (callback != null) {
+            callback.onTaskCompleted(resultState);
+        }
     }
 }

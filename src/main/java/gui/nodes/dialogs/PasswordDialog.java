@@ -1,4 +1,4 @@
-package gui.nodes.dialogues;
+package gui.nodes.dialogs;
 
 import be.User;
 import gui.model.UserModel;
@@ -6,7 +6,6 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
-import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
 import io.github.palexdev.materialfx.enums.ScrimPriority;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.layout.GridPane;
@@ -19,10 +18,9 @@ import utils.enums.UserRole;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PasswordDialogue extends MFXStageDialog {
+public class PasswordDialog extends CustomDialog {
     //TODO generify this class
     private GridPane passwordGridPane;
-    private MFXGenericDialog dialogContent;
     private HashMap<PasswordType, MFXPasswordField> passwordFields;
     private MFXButton btnConfirm, btnCancel;
     private byte[] newPassword, newSalt;
@@ -49,24 +47,19 @@ public class PasswordDialogue extends MFXStageDialog {
         }
     }
 
-    public PasswordDialogue() {
+    public PasswordDialog() {
         super();
         passwordFields = new HashMap<>();
         hashPasswordHelper = new HashPasswordHelper();
 
         setUpGridPane();
-        dialogContent = MFXGenericDialogBuilder.build()
-                .setContent(passwordGridPane)
-                .setOnMinimize(event -> this.setIconified(true))
-                .setOnClose(event -> this.close())
-                .setOnAlwaysOnTop(event -> this.setAlwaysOnTop(true))
-                .get();
-        dialogContent.getStylesheets().add("/css/style.css");
+        super.setContent(passwordGridPane);
+        this.setContent(super.getDialogContent());
         setUpDialogueWindow();
         addButtons();
     }
 
-    public PasswordDialogue(Window owner, Pane ownerNode, User userToUpdate) {
+    public PasswordDialog(Window owner, Pane ownerNode, User userToUpdate) {
         this();
         this.owner = owner;
         this.ownerNode = ownerNode;
@@ -74,7 +67,7 @@ public class PasswordDialogue extends MFXStageDialog {
     }
 
     private void setUpDialogueWindow() {
-        setContent(dialogContent);
+        this.setContent(super.getDialogContent());
         initOwner(owner);
         initModality(Modality.APPLICATION_MODAL);
         setDraggable(true);
@@ -88,7 +81,7 @@ public class PasswordDialogue extends MFXStageDialog {
         btnConfirm = new MFXButton("Confirm");
         btnConfirm.setDisable(true);
         btnCancel = new MFXButton("Cancel");
-        dialogContent.addActions(
+        super.getDialogContent().addActions(
                 Map.entry(btnConfirm, event -> {
                     passwordChanged = true;
                     byte[][] passwordHashAndSalt = hashPasswordHelper.hashPassword(passwordFields.get(PasswordType.NEW).getText());
@@ -147,6 +140,11 @@ public class PasswordDialogue extends MFXStageDialog {
         userToUpdate = null;
     }
 
+    @Override
+    public void setContentText(String contentText) {
+        super.getDialogContent().setContentText(contentText);
+    }
+
 
     public byte[] getNewPassword() {
         return newPassword;
@@ -165,9 +163,8 @@ public class PasswordDialogue extends MFXStageDialog {
         super.setOwnerNode(ownerNode);
     }
 
-    public PasswordDialogue setUserToUpdate(User userToUpdate) {
+    public void setUserToUpdate(User userToUpdate) {
         this.userToUpdate = userToUpdate;
-        return this;
     }
 
     public void setAdminEditing(boolean adminEditing) {
