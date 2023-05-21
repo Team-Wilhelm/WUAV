@@ -1,8 +1,8 @@
 @import "Colors.css";
 
 .mfx-date-picker {
-    -fx-background-color: -fx-base-color;
-    -fx-border-color: -fx-dark-grey;
+    -fx-background-color: white;
+    -fx-border-color: TRANSPARENT;
     -fx-text-fill: black;
 }
 

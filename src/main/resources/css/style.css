@@ -120,14 +120,20 @@
 }
 
 .mfx-rectangle-toggle-node:selected {
-    -fx-background-color: -fx-accent-yellow;
+    -fx-background-color: -fx-base-color-darker;
     -fx-background-radius: 5;
     -fx-border-width: 0;
     -fx-border-radius: 5;
 }
 
+.toolBox{
+    -fx-background-color: -fx-base-color;
+}
+
 .toolBox .label{
+    -fx-padding: 0 0 0 10;
     -fx-font-weight: bold;
+    -fx-text-fill: -fx-dark-grey;
     -fx-font-size: 18;
 }
 
@@ -198,4 +204,9 @@
     -fx-border-insets: -0.5;
     -fx-border-width: 1.5;
     -fx-border-color: -fx-dark-grey;
+}
+
+/* Tab pane style */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-opacity: 0;
 }

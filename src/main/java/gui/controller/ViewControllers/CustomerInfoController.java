@@ -71,7 +71,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
 
 
         name.setRowCellFactory(customer -> {
-            MFXTableRowCell<Customer, String> row = new MFXTableRowCell<>(Customer::getCustomerName);
+            MFXTableRowCell<Customer, String> row = new MFXTableRowCell<>(c -> truncateStringWithEllipsis(c.getCustomerName(), 15));
             row.setOnMouseClicked(this::editCustomerAction);
             return row;
         });
@@ -89,7 +89,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         });
 
         address.setRowCellFactory(customer -> {
-            MFXTableRowCell<Customer, Address> row = new MFXTableRowCell<>(Customer::getCustomerAddress);
+            MFXTableRowCell<Customer, String> row = new MFXTableRowCell<>(c -> truncateStringWithEllipsis(c.getCustomerAddress().toString(), 20));
             row.setOnMouseClicked(this::editCustomerAction);
             return row;
         });
@@ -163,6 +163,15 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     public void setVisibilityForUserRole() {
         UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
         hasAccess = loggedInUserRole == UserRole.ADMINISTRATOR || loggedInUserRole == UserRole.PROJECT_MANAGER;
+    }
+
+    // Truncate the string to the specified length and add ellipsis
+    private String truncateStringWithEllipsis(String str, int length) {
+        if (str.length() > length) {
+            return str.substring(0, length) + "...";
+        } else {
+            return str;
+        }
     }
 }
 

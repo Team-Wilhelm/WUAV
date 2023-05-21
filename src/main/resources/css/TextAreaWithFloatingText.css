@@ -1,7 +1,7 @@
 @import "Colors.css";
 
 .text-area-with-floating-text {
-    -fx-background-color: -fx-base-color;
+    -fx-background-color: white;
     -fx-background-radius: 5;
     -fx-border-radius: 5;
     -fx-padding: 5;
