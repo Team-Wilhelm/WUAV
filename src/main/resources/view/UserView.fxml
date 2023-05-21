@@ -46,7 +46,7 @@
                 </GridPane.margin>
             </MFXProgressSpinner>
 
-            <MFXButton fx:id="btnAddEmployee" onAction="#addEmployeeAction" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="addButton, rounded" text=" Add employee">
+            <MFXButton fx:id="btnAddEmployee" onAction="#addEmployeeAction" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="addButton, rounded" text="">
                 <graphic>
                     <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                         <Image url="/img/icons/ic_round-plus.png" />
