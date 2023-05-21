@@ -3,11 +3,13 @@ package gui.model;
 import be.Customer;
 import bll.IManager;
 import bll.ManagerFactory;
+import gui.util.DialogManager;
+import javafx.scene.layout.Pane;
 import utils.enums.ResultState;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class CustomerModel implements IModel<Customer> {
     private static CustomerModel instance;
@@ -17,7 +19,7 @@ public class CustomerModel implements IModel<Customer> {
     private CustomerModel() {
         customerManager = ManagerFactory.createManager(ManagerFactory.ManagerType.CUSTOMER);
         allCustomers = new HashMap<>();
-        allCustomers.putAll(customerManager.getAll());
+        reloadCustomers();
     }
 
     public static CustomerModel getInstance() {
@@ -54,6 +56,37 @@ public class CustomerModel implements IModel<Customer> {
     @Override
     public Customer getById(UUID id) {
         return customerManager.getById(id);
+    }
+
+    public void reloadCustomers() {
+        allCustomers.clear();
+        allCustomers.putAll(customerManager.getAll());
+    }
+
+    public void deleteExpiredCustomers(){
+        allCustomers.values().stream().filter(customer ->
+                customer.getLastContract().before((Date.valueOf(LocalDate.now().minusMonths(48)))))
+                .forEach(customer -> delete(customer.getCustomerID()));
+    }
+
+    public void getAlmostExpiredCustomers(Pane pane){
+        List<Customer> almostExpiredCustomers = new ArrayList<>();
+        allCustomers.values().stream().filter(customer ->
+                customer.getLastContract().before((Date.valueOf(LocalDate.now().minusMonths(47)))))
+                .forEach(almostExpiredCustomers::add);
+
+        StringBuilder sb = new StringBuilder();
+        int expiredCustomers = almostExpiredCustomers.size();
+        for (int i = 0; i < expiredCustomers; i++) {
+            if (i != expiredCustomers - 1) {
+                sb.append(almostExpiredCustomers.get(i).getCustomerName()).append(", ");
+            } else sb.append(almostExpiredCustomers.get(i).getCustomerName());
+        }
+        if(almostExpiredCustomers.size() > 0) {
+            DialogManager.getInstance().showInformation(
+                    "Customer(s) will be deleted soon!",
+                    "Update customer(s) within one month if you wish to avoid deletion:\n" + sb, pane);
+        }
     }
 
     public Customer getByName(String name) {

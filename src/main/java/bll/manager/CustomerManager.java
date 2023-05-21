@@ -9,8 +9,9 @@ import dal.factories.DAOFactory;
 import utils.permissions.AccessChecker;
 import utils.permissions.RequiresPermission;
 
-import java.util.Map;
-import java.util.UUID;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.*;
 
 public class CustomerManager implements IManager<Customer> {
     private CustomerDAO dao;
@@ -62,4 +63,5 @@ public class CustomerManager implements IManager<Customer> {
     public Customer getById(UUID id) {
         return dao.getById(id);
     }
+
 }

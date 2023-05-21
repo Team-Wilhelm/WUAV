@@ -20,15 +20,16 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.stage.Window;
 import utils.enums.CustomerType;
 import utils.enums.ResultState;
 import utils.enums.UserRole;
 
 import java.net.URL;
 import java.sql.Date;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.time.LocalDate;
+import java.util.*;
 
 public class CustomerInfoController extends ViewController<Customer> implements Initializable {
 
@@ -43,6 +44,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     @FXML
     private MFXTextField searchBar;
     private ObservableList<Customer> customerList = FXCollections.observableArrayList();
+    private List<Customer> almostExpiredCustomers = new ArrayList<>();
     private final CustomerModel customerModel = CustomerModel.getInstance();
     private boolean hasAccess = false;
 
@@ -55,7 +57,6 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         refreshItems();
         populateTableView();
         progressLabel.visibleProperty().bind(progressSpinner.visibleProperty()); // show label when spinner is visible
-
     }
 
     private void populateTableView() {
@@ -73,36 +74,42 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         name.setRowCellFactory(customer -> {
             MFXTableRowCell<Customer, String> row = new MFXTableRowCell<>(Customer::getCustomerName);
             row.setOnMouseClicked(this::editCustomerAction);
+            setRowColour(customer, row);
             return row;
         });
 
         email.setRowCellFactory(customer -> {
             MFXTableRowCell<Customer, String> row = new MFXTableRowCell<>(Customer::getCustomerEmail);
             row.setOnMouseClicked(this::editCustomerAction);
+            setRowColour(customer, row);
             return row;
         });
 
         phoneNumber.setRowCellFactory(customer -> {
             MFXTableRowCell<Customer, String> row = new MFXTableRowCell<>(Customer::getCustomerPhoneNumber);
             row.setOnMouseClicked(this::editCustomerAction);
+            setRowColour(customer, row);
             return row;
         });
 
         address.setRowCellFactory(customer -> {
             MFXTableRowCell<Customer, Address> row = new MFXTableRowCell<>(Customer::getCustomerAddress);
             row.setOnMouseClicked(this::editCustomerAction);
+            setRowColour(customer, row);
             return row;
         });
 
         type.setRowCellFactory(customer -> {
             MFXTableRowCell<Customer, CustomerType> row = new MFXTableRowCell<>(Customer::getCustomerType);
             row.setOnMouseClicked(this::editCustomerAction);
+            setRowColour(customer, row);
             return row;
         });
 
         lastContract.setRowCellFactory(customer -> {
             MFXTableRowCell<Customer, Date> row = new MFXTableRowCell<>(Customer::getLastContract);
             row.setOnMouseClicked(this::editCustomerAction);
+            setRowColour(customer, row);
             return row;
         });
 
@@ -110,6 +117,12 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         tblCustomers.getTableColumns().addAll(name, email, phoneNumber, address, type, lastContract);
         tblCustomers.autosizeColumnsOnInitialization();
         tblCustomers.setFooterVisible(false);
+    }
+
+    private void setRowColour(Customer customer, MFXTableRowCell<Customer, ?> row){
+        if(customer.getLastContract().before(Date.valueOf(LocalDate.now().minusMonths(47)))){
+            row.setTextFill(javafx.scene.paint.Color.RED);
+        }
     }
 
     //region progress methods
@@ -146,6 +159,20 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     @Override
     public void refreshItems() {
         refreshItems(List.copyOf(customerModel.getAll().values()));
+    }
+
+    public void reloadCustomers() {
+        customerModel.reloadCustomers();
+        refreshItems();
+    }
+
+    public void deleteExpiredCustomers() {
+        customerModel.deleteExpiredCustomers();
+        refreshItems();
+    }
+
+    public void getAlmostExpiredCustomers(Pane pane) {
+        customerModel.getAlmostExpiredCustomers(pane);
     }
 
     @FXML

@@ -1,5 +1,6 @@
 package gui.controller;
 
+import be.Customer;
 import gui.controller.AddControllers.AddUserController;
 import gui.controller.ViewControllers.CustomerInfoController;
 import gui.model.UserModel;
@@ -21,6 +22,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MenuController implements Initializable {
@@ -56,6 +58,7 @@ public class MenuController implements Initializable {
             // Set the default scene
             currentScene = documentView;
             gridPane.add(currentScene, 2, 0, 1, gridPane.getRowCount());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,6 +107,8 @@ public class MenuController implements Initializable {
     }
 
     public void btnCustomersAction() {
+        customerController.deleteExpiredCustomers();
+        customerController.reloadCustomers();
         switchScene(customerView);
     }
 
@@ -116,6 +121,7 @@ public class MenuController implements Initializable {
         //TODO may cause issues with other views (as they are not really scenes)
         myProfileController.setShortcutsAndAccelerators(scene);   // Because the scene already exists, we can add the shortcuts here
         myProfileController.setIsEditing(UserModel.getLoggedInUser());
+        customerController.getAlmostExpiredCustomers(gridPane);
     }
 
     private void setVisibilityForUserRole() {
