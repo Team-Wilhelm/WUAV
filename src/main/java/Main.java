@@ -41,6 +41,9 @@ public class Main extends Application {
         primaryStage.centerOnScreen();
         primaryStage.show();
 
+        // All tables always visible
+        primaryStage.setMinWidth(1600);
+
         primaryStage.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             if (e.getClickCount() == 2 && primaryStage.isMaximized() && e.getScreenY() < 30) {
                 primaryStage.setMaximized(false);

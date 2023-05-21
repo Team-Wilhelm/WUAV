@@ -20,11 +20,16 @@
 .menu-button {
     -fx-border-color: transparent;
 }
+.menu-button:focused{
+    -fx-background-color: transparent;
+}
 
 .mfx-button{
-    -fx-background-color: transparent;
+    -fx-background-color: -fx-dark-grey;
     -fx-border-color: -fx-dark-grey;
-    -fx-text-fill: black;
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
 }
@@ -44,7 +49,7 @@
     -fx-border-color: transparent;
 }
 .loginVbox{
-    -fx-background-color: -fx-base-color;
+    -fx-background-color: TRANSPARENT;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 2, 0, 0, 1);
 }
 
@@ -56,6 +61,9 @@
 .input:focused .floating-text {
     -fx-background-color: -fx-base-color-dark;
     -fx-border-color: transparent;
+}
+.mfx-text-field:floating .floating-text {
+    -fx-text-fill: -fx-dark-grey;
 }
 .vboxLeft{
     -fx-background-color: -fx-base-color;
@@ -135,7 +143,7 @@
 }
 
 .mfx-text-field .text-field {
-    -fx-highlight-fill: -fx-dark-grey; /* Selected text highlight */
+    -fx-highlight-fill: #C0C0C0; /* Selected text highlight */
 }
 
 .mfx-checkbox {
