@@ -26,38 +26,36 @@
     <VBox GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
         <HBox spacing="15">
             <padding>
-                <Insets right="15" bottom="10" top="5"/>
+                <Insets bottom="20" top="5"/>
             </padding>
 
-            <MFXButton fx:id="btnAddEmployee" onAction="#addEmployeeAction" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="addButton, rounded" text=" Add employee">
-                <GridPane.margin>
-                    <Insets left="15.0" right="15.0" />
-                </GridPane.margin>
-                <graphic>
-                    <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="/img/icons/ic_round-plus.png" />
-                    </ImageView>
-                </graphic>
-            </MFXButton>
+            <MFXTextField fx:id="searchBar" floatingText="Search for employees" maxWidth="600" prefWidth="500" HBox.hgrow="ALWAYS">
+            </MFXTextField>
 
-            <MFXProgressSpinner fx:id="progressSpinner" prefHeight="30.0" prefWidth="30.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
-                <GridPane.margin>
-                    <Insets bottom="15.0" right="15.0" />
-                </GridPane.margin>
-            </MFXProgressSpinner>
-            <Label fx:id="progressLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Label fx:id="progressLabel" text="Label">
                 <GridPane.margin>
                     <Insets bottom="15.0" right="15.0" />
                 </GridPane.margin>
             </Label>
 
-            <Region HBox.hgrow="ALWAYS" />
-
-            <MFXTextField fx:id="searchBar" floatingText="Search for employees" maxWidth="1.7976931348623157E308" prefWidth="300" GridPane.columnIndex="1" GridPane.columnSpan="2147483647">
+            <MFXProgressSpinner fx:id="progressSpinner" prefHeight="30.0" prefWidth="30.0">
                 <GridPane.margin>
-                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    <Insets bottom="15.0" right="15.0" />
                 </GridPane.margin>
-            </MFXTextField>
+            </MFXProgressSpinner>
+
+            <MFXButton fx:id="btnAddEmployee" onAction="#addEmployeeAction" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="addButton, rounded" text=" Add employee">
+                <graphic>
+                    <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="/img/icons/ic_round-plus.png" />
+                    </ImageView>
+                </graphic>
+                <padding>
+                    <Insets left="15" right="15" />
+                </padding>
+            </MFXButton>
         </HBox>
 
         <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" style="-fx-background-color: transparent;"
@@ -68,6 +66,9 @@
                 </padding>
             </FlowPane>
         </ScrollPane>
+        <padding>
+            <Insets bottom="10.0" right="15.0" top="10.0" />
+        </padding>
     </VBox>
     <padding>
         <Insets bottom="10.0" top="10.0" />
