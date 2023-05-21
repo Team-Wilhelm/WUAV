@@ -6,6 +6,8 @@ import be.interfaces.Observer;
 import gui.nodes.textControls.MFXTextFieldWithAutofill;
 import gui.nodes.textControls.TextAreaWithFloatingText;
 import gui.tasks.GeneratePdfTask;
+import javafx.application.Platform;
+import javafx.stage.Stage;
 import utils.enums.CustomerType;
 import utils.enums.UserRole;
 import gui.controller.ViewControllers.DocumentController;
@@ -104,7 +106,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private CustomerType customerType;
     private Date lastContract;
     private List<User> technicians;
-    private BooleanProperty isInputChanged, isEditing;
+    private BooleanProperty isInputChanged, isEditing; // IsEditing is used to determine if the user is editing an existing document or creating a new one
     private Customer customer;
 
     public AddDocumentController() {
@@ -756,19 +758,17 @@ public class AddDocumentController extends AddController<Document> implements In
     }
     // endregion
 
-    //TODO add a confirmation dialog
-            /*
-            (Stage) btnAddDocument.getScene().getWindow().setOnCloseRequest(event -> {
-                if (documentModel.isModified()) {
-                    AlertManager.showConfirmationAlert("Are you sure you want to exit?", "You have unsaved changes. Are you sure you want to exit?", () -> {
-                        documentModel.save();
-                        Platform.exit();
-                    });
-                } else {
-                    Platform.exit();
-                }
-            });
+    public void setOnCloseRequest() {
+        btnSave.getScene().getWindow().setOnCloseRequest(event -> {
+            // TODO why doesn't the dialog get displayed ?
+            if (isInputChanged.get() || !isEditing.get()) {
+                DialogManager.getInstance().showConfirmation("Close this window?",
+                        "You have unsaved changes. Are you sure you want to close this window?", gridPaneJob, () -> {
+                    ((Stage) btnSave.getScene().getWindow()).close();
+                });
+            } else {
+                ((Stage) btnSave.getScene().getWindow()).close();
+            }
         });
-
-             */
+    }
 }

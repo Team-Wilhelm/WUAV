@@ -114,6 +114,7 @@ public class DocumentController extends ViewController<Document> implements Init
         controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
         controller.setDocumentController(this);
         controller.setVisibilityForUserRole();
+        controller.setOnCloseRequest();
     }
 
     private Window getWindow() {
@@ -174,6 +175,7 @@ public class DocumentController extends ViewController<Document> implements Init
                 controller.setDocumentController(this);
                 controller.setIsEditing(tblDocument.getSelectionModel().getSelection().get(0));
                 controller.setVisibilityForUserRole();
+                controller.setOnCloseRequest();
             }
             else {
                 DialogManager.getInstance().showError("No document selected", "Please select a document", gridPane);
