@@ -24,7 +24,9 @@
 .mfx-button{
     -fx-background-color: transparent;
     -fx-border-color: -fx-dark-grey;
-    -fx-text-fill: black;
+    -fx-text-fill: -fx-base-color;
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
 }
@@ -44,7 +46,7 @@
     -fx-border-color: transparent;
 }
 .loginVbox{
-    -fx-background-color: -fx-base-color;
+    -fx-background-color: TRANSPARENT;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 2, 0, 0, 1);
 }
 

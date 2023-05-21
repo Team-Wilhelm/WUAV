@@ -15,12 +15,12 @@
                         <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS" />
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="100.0">
                             <children>
-                                <VBox alignment="CENTER" prefHeight="123.0" prefWidth="320.0" spacing="10.0" styleClass="loginVbox">
+                                <VBox alignment="CENTER" prefHeight="123.0" prefWidth="350.0" spacing="10.0" styleClass="loginVbox">
                                     <padding>
                                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                                     </padding>
                                     <children>
-                                        <HBox minHeight="64.0" prefHeight="100.0" prefWidth="200.0" styleClass="input">
+                                        <HBox minHeight="64.0" prefHeight="100.0" prefWidth="300.0" styleClass="input">
                                             <children>
                                                 <AnchorPane minWidth="64.0" prefHeight="64.0" prefWidth="64.0">
                                                     <children>
@@ -48,7 +48,7 @@
                                                 <MFXPasswordField fx:id="passwordInput" floatMode="DISABLED" minHeight="62.0" prefHeight="40.0" prefWidth="300.0" promptText="Password" styleClass="input" />
                                             </children>
                                         </HBox>
-                                        <MFXButton fx:id="btnLogin" onAction="#loginUser" prefWidth="300.0" text="Log In">
+                                        <MFXButton fx:id="btnLogin" onAction="#loginUser" prefWidth="320.0" text="Log In">
                                             <padding>
                                                 <Insets bottom="15.0" left="10.0" right="10.0" top="15.0" />
                                             </padding>
