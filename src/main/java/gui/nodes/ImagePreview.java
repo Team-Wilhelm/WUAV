@@ -21,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class ImagePreview extends VBox {
     private Observer<ImagePreview> observer;
@@ -102,11 +103,16 @@ public class ImagePreview extends VBox {
     }
 
     public void openAddDescriptionDialogue() {
-        CompletableFuture<String> result = DialogManager.getInstance().showTextInputDialogue("Add description",
+        //TODO
+        System.out.println(imageWrapper.getDescription());
+        CompletableFuture<String> result = DialogManager.getInstance().showTextInputDialog("Add description",
                 "Add a description to the image", imageWrapper.getDescription(), this);
+        // Get the result of the dialogue and set the description of the image
         result.thenAccept(s -> {
-            imageWrapper.setDescription(s);
-            notifyObservers(observable, this);
+            if (s != null) {
+                imageWrapper.setDescription(s);
+                notifyObservers(observable, this);
+            }
         });
     }
 

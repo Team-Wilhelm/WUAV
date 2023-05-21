@@ -171,3 +171,29 @@
 .mfx-combo-box.not-editable .caret .mfx-font-icon {
     -mfx-color: transparent;
 }
+
+.text-area {
+    -fx-focus-color: -fx-dark-grey;
+    -fx-faint-focus-color: -fx-dark-grey;
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-padding: 5;
+    -fx-border-color: -fx-light-grey;
+    -fx-border-width: 1;
+}
+
+.text-area .content {
+    -fx-border-style: none;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-font-family: "Open Sans Regular";
+    -fx-background-color: white;
+}
+
+.text-area:focused {
+    -fx-background-insets: 2;
+    -fx-border-insets: -0.5;
+    -fx-border-width: 1.5;
+    -fx-border-color: -fx-dark-grey;
+}
