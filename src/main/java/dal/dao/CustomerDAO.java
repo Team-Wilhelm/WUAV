@@ -194,7 +194,7 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
 
     private Customer createCustomerFromResultSet(ResultSet rs) throws SQLException {
         Address a = new Address(
-                rs.getInt("CustomerAddress.AddressID"),
+                rs.getInt("AddressID"),
                 rs.getString("StreetName"),
                 rs.getString("StreetNumber"),
                 rs.getString("Postcode"),
