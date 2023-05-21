@@ -3,6 +3,7 @@ package gui.controller.AddControllers;
 import be.*;
 import be.interfaces.Observable;
 import be.interfaces.Observer;
+import gui.controller.CanvasController;
 import gui.nodes.textControls.MFXTextFieldWithAutofill;
 import gui.nodes.textControls.TextAreaWithFloatingText;
 import gui.tasks.GeneratePdfTask;
@@ -149,8 +150,11 @@ public class AddDocumentController extends AddController<Document> implements In
 
                 canvasHolder.getChildren().clear();
                 try {
-                    Parent canvasRoot = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/view/CanvasView.fxml")));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CanvasView.fxml"));
+                    Parent canvasRoot = loader.load();
                     canvasHolder.getChildren().add(canvasRoot);
+                    CanvasController canvasController = loader.getController();
+                    canvasController.myToolBar.setDocumentUUID(documentToEdit.getDocumentID());
                 } catch (IOException e) {}
                 catch (NullPointerException e) { }
             }
