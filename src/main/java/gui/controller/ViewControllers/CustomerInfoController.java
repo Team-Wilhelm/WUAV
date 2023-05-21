@@ -17,6 +17,9 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -179,7 +182,37 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     private void editCustomerAction(MouseEvent event) {
         if (event.getClickCount() == 2) {
             if (!tblCustomers.getSelectionModel().getSelection().isEmpty()) {
-                //TODO: Open edit customer window/popup
+                //TODO: Change to materialfx dialog
+                //TODO refresh documents after editing
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Update Customer");
+                alert.setHeaderText("Edit or delete a customer");
+                alert.setContentText("What would you like to do?");
+
+                // Create the buttons
+                ButtonType deleteButton = new ButtonType("Delete Customer");
+                ButtonType extendButton = new ButtonType("Extend by 48 months");
+                ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                // Set the buttons to the alert
+                alert.getButtonTypes().setAll(deleteButton, extendButton, cancelButton);
+
+                // Show the alert and wait for a response
+                Optional<ButtonType> result = alert.showAndWait();
+
+                if (result.isPresent()) {
+                    if (result.get() == deleteButton) {
+                        customerModel.delete(tblCustomers.getSelectionModel().getSelectedValue().getCustomerID());
+                        reloadCustomers();
+                        //TODO delete document associated with customer too or replace data with something else?
+                    } else if (result.get() == extendButton) {
+                        // Extend dateOfLastContract by 48 months
+                        tblCustomers.getSelectionModel().getSelectedValue().setLastContract(Date.valueOf(LocalDate.now()));
+                        reloadCustomers();
+                    } else {
+                        alert.close();
+                    }
+                }
             }
             else {
                 DialogManager.getInstance().showError("No customer selected", "Please select a customer", gridPane);

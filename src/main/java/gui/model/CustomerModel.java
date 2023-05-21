@@ -64,6 +64,7 @@ public class CustomerModel implements IModel<Customer> {
     }
 
     public void deleteExpiredCustomers(){
+        //TODO also delete documents or replace customer values
         allCustomers.values().stream().filter(customer ->
                 customer.getLastContract().before((Date.valueOf(LocalDate.now().minusMonths(48)))))
                 .forEach(customer -> delete(customer.getCustomerID()));
@@ -85,7 +86,7 @@ public class CustomerModel implements IModel<Customer> {
         if(almostExpiredCustomers.size() > 0) {
             DialogManager.getInstance().showInformation(
                     "Customer(s) will be deleted soon!",
-                    "Update customer(s) within one month if you wish to avoid deletion:\n" + sb, pane);
+                    "Update following customer(s) within one month if you wish to avoid deletion:\n" + sb, pane);
         }
     }
 
