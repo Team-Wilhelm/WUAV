@@ -210,12 +210,14 @@ public class AddDocumentController extends AddController<Document> implements In
         } else {
             /* If the customer has been changed and belongs to more than this document,
             ask the user if they want to update the customer in all documents or create a new customer */
-
+            //TODO i don't understand this
             if (customer.getContracts().size() > 0 && !tempCustomer.equals(customer)) {  // Check if any values have been changed
+               /*
                 CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Editing an existing customer",
                         "You are editing a customer with " + customer.getContracts().size() + " other contract(s) belonging to them.\n" +
                                 "Updating this customer will update them in all pertaining documents.\nAre you sure you want to continue?", flowPanePictures);
-                result.thenAccept(buttonType -> { // Wait for the user to confirm the dialog
+                result.thenRun(() -> {
+                    ButtonType buttonType = result.join(); // Wait for the user to confirm the dialog
                     if (buttonType.equals(ButtonType.OK)) {
                         tempCustomer.setCustomerID(customer.getCustomerID());
                         tempCustomer.getCustomerAddress().setAddressID(customer.getCustomerAddress().getAddressID());
@@ -225,24 +227,40 @@ public class AddDocumentController extends AddController<Document> implements In
                         customer = null;
                     }
                 });
+
+                */
+
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Editing an existing customer");
+                alert.setHeaderText("You are editing a customer with " + customer.getContracts().size() + " other contract(s) belonging to them.");
+                alert.setContentText("Updating this customer will update them in all pertaining documents. Are you sure you want to continue?");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    tempCustomer.setCustomerID(customer.getCustomerID());
+                    tempCustomer.getCustomerAddress().setAddressID(customer.getCustomerAddress().getAddressID());
+                    tempCustomer.setContracts(customer.getContracts());
+                    customer = tempCustomer;
+                } else {
+                    customer = null;
+                }
             }
+            if (customer == null) return; // If the user has cancelled the dialog, return without saving
+
+            currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
+            currentDocument.setTechnicians(technicians);
+            currentDocument.setDocumentImages(pictures);
+            technicians.forEach(technician -> technician.addDocument(currentDocument));
+
+            if (isEditing.get()) {
+                currentDocument.setDocumentID(documentToEdit.getDocumentID());
+                currentDocument.setDateOfCreation(documentToEdit.getDateOfCreation());
+            }
+
+            SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
+            setUpSaveTask(task, documentController, gridPanePdf, this);
+            executorService.execute(task);
+            pdfTab.setDisable(false);
         }
-        if (customer == null) return; // If the user has cancelled the dialog, return without saving
-
-        currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
-        currentDocument.setTechnicians(technicians);
-        currentDocument.setDocumentImages(pictures);
-        technicians.forEach(technician -> technician.addDocument(currentDocument));
-
-        if (isEditing.get()) {
-            currentDocument.setDocumentID(documentToEdit.getDocumentID());
-            currentDocument.setDateOfCreation(documentToEdit.getDateOfCreation());
-        }
-
-        SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
-        setUpSaveTask(task, documentController, gridPanePdf, this);
-        executorService.execute(task);
-        pdfTab.setDisable(false);
     }
 
     @FXML
