@@ -64,22 +64,15 @@ public class CustomerManager implements IManager<Customer> {
         return dao.getById(id);
     }
 
-    public void getAlmostExpiredCustomers(HashMap<UUID, Customer> customers){
-        List<Customer> almostExpiredCustomers = new ArrayList<>();
-        customers.values().stream().filter(customer ->
-                        customer.getLastContract().before((Date.valueOf(LocalDate.now().minusMonths(47)))))
-                .forEach(almostExpiredCustomers::add);
-
-        StringBuilder sb = new StringBuilder();
-        int expiredCustomers = almostExpiredCustomers.size();
-        for (int i = 0; i < expiredCustomers; i++) {
-            if (i != expiredCustomers - 1) {
-                sb.append(almostExpiredCustomers.get(i).getCustomerName()).append(", ");
-            } else sb.append(almostExpiredCustomers.get(i).getCustomerName());
+    @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER})
+    public int getAlmostExpiredCustomers(HashMap<UUID, Customer> customers){
+        if (checker.hasAccess(this.getClass())) {
+            List<Customer> almostExpiredCustomers = new ArrayList<>();
+            customers.values().stream().filter(customer ->
+                            customer.getLastContract().before((Date.valueOf(LocalDate.now().minusMonths(47)))))
+                    .forEach(almostExpiredCustomers::add);
+            return almostExpiredCustomers.size();
         }
-        if(almostExpiredCustomers.size() > 0) {
-            //TODO
-        }
+        return 0;
     }
-
 }

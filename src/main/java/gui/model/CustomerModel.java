@@ -71,8 +71,8 @@ public class CustomerModel implements IModel<Customer> {
                 .forEach(customer -> delete(customer.getCustomerID()));
     }
 
-    public void getAlmostExpiredCustomers(){
-        customerManager.getAlmostExpiredCustomers(allCustomers);
+    public int getAlmostExpiredCustomers(){
+        return customerManager.getAlmostExpiredCustomers(allCustomers);
     }
 
     public Customer getByName(String name) {

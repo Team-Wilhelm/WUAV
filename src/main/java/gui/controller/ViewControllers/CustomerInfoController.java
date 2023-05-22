@@ -23,6 +23,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Window;
 import utils.enums.CustomerType;
@@ -36,6 +37,8 @@ import java.util.*;
 
 public class CustomerInfoController extends ViewController<Customer> implements Initializable {
 
+    @FXML
+    private HBox expiredCustomersHBox;
     @FXML
     private MFXProgressSpinner progressSpinner;
     @FXML
@@ -174,9 +177,13 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         refreshItems();
     }
 
-    public void getAlmostExpiredCustomers() {
-        customerModel.getAlmostExpiredCustomers();
+    public void showAlmostExpiredCustomers() {
+        if(customerModel.getAlmostExpiredCustomers() >0) {
+            Label label = new Label("You have " + customerModel.getAlmostExpiredCustomers() + " customer(s) with an almost expired contract");
+            expiredCustomersHBox.getChildren().add(label);
+        }
     }
+
 
     @FXML
     private void editCustomerAction(MouseEvent event) {
