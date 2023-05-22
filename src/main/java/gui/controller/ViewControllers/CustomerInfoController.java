@@ -174,8 +174,8 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         refreshItems();
     }
 
-    public void getAlmostExpiredCustomers(Pane pane) {
-        customerModel.getAlmostExpiredCustomers(pane);
+    public void getAlmostExpiredCustomers() {
+        customerModel.getAlmostExpiredCustomers();
     }
 
     @FXML
