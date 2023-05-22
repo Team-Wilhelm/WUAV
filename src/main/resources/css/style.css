@@ -82,7 +82,7 @@
 }
 
 .user-card {
-    -fx-background-color: -fx-base-color;
+    -fx-background-color: white;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 1);
