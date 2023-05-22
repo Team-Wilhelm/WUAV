@@ -45,8 +45,9 @@ public class DocumentManager implements IManager<Document> {
     }
 
     @Override
+    @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER})
     public ResultState delete(UUID id) {
-        if (getById(id).getTechnicians().contains(UserModel.getLoggedInUser()) || checker.hasAccess(this.getClass())) {
+        if (checker.hasAccess(this.getClass())) {
             return dao.delete(id);
         }
         else {
