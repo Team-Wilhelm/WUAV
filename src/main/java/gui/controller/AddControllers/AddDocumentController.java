@@ -763,7 +763,7 @@ public class AddDocumentController extends AddController<Document> implements In
     // endregion
 
     public void setOnCloseRequest() {
-        btnSave.getScene().getWindow().setOnCloseRequest(event -> {
+        /*btnSave.getScene().getWindow().setOnCloseRequest(event -> {
             // TODO why doesn't the dialog get displayed ?
             if (isInputChanged.get() || !isEditing.get()) {
                 DialogManager.getInstance().showConfirmation("Close this window?",
@@ -774,5 +774,7 @@ public class AddDocumentController extends AddController<Document> implements In
                 ((Stage) btnSave.getScene().getWindow()).close();
             }
         });
+
+         */
     }
 }
