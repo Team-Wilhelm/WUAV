@@ -97,7 +97,7 @@ public class DialogManager {
 
     public CompletableFuture<ButtonType> showConfirmation(String header, String content, Pane parent) {
         convertDialogTo(Alert.AlertType.CONFIRMATION, header, content, parent);
-        dialog.showDialog();
+        dialog.showAndWait();
         return result;
     }
 
@@ -169,19 +169,9 @@ public class DialogManager {
         result = new CompletableFuture<>();
         String styleClass = null;
 
-        dialogContent.setContentText(content);
-        dialogContent.setHeaderText(header);
-
-        dialogContent.clearActions();
-        dialogContent.addActions(
-                Map.entry(btnConfirm, event -> dialog.close()),
-                Map.entry(btnCancel, event -> dialog.close())
-        );
-
         if (dialog.getOwnerNode() != parent) {
             dialog.setOwnerNode(parent);
         }
-
         if (dialog.getOwner() == null) {
             dialog.initOwner(parent.getScene().getWindow());
         } else if (dialog.getOwner() != parent.getScene().getWindow()) {
@@ -197,7 +187,17 @@ public class DialogManager {
             dialog.setContent(dialogContent);
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.initOwner(parent.getScene().getWindow());
+            dialog.setOwnerNode(parent);
         }
+
+        dialogContent.setContentText(content);
+        dialogContent.setHeaderText(header);
+
+        dialogContent.clearActions();
+        dialogContent.addActions(
+                Map.entry(btnConfirm, event -> dialog.close()),
+                Map.entry(btnCancel, event -> dialog.close())
+        );
 
         switch (alertType) {
             case ERROR -> {
