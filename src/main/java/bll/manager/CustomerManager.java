@@ -44,7 +44,7 @@ public class CustomerManager implements IManager<Customer> {
     }
 
     @Override
-    @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER, UserRole.TECHNICIAN})
+    @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER})
     public ResultState delete(UUID id) {
         if (checker.hasAccess(this.getClass())) {
             return dao.delete(id);
@@ -62,6 +62,24 @@ public class CustomerManager implements IManager<Customer> {
     @Override
     public Customer getById(UUID id) {
         return dao.getById(id);
+    }
+
+    public void getAlmostExpiredCustomers(HashMap<UUID, Customer> customers){
+        List<Customer> almostExpiredCustomers = new ArrayList<>();
+        customers.values().stream().filter(customer ->
+                        customer.getLastContract().before((Date.valueOf(LocalDate.now().minusMonths(47)))))
+                .forEach(almostExpiredCustomers::add);
+
+        StringBuilder sb = new StringBuilder();
+        int expiredCustomers = almostExpiredCustomers.size();
+        for (int i = 0; i < expiredCustomers; i++) {
+            if (i != expiredCustomers - 1) {
+                sb.append(almostExpiredCustomers.get(i).getCustomerName()).append(", ");
+            } else sb.append(almostExpiredCustomers.get(i).getCustomerName());
+        }
+        if(almostExpiredCustomers.size() > 0) {
+            //TODO
+        }
     }
 
 }
