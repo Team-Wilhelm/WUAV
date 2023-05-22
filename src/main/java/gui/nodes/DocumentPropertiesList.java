@@ -81,13 +81,17 @@ public class DocumentPropertiesList extends GridPane {
         addProperty(DocumentPropertyType.JOB_DESCRIPTION.toString(), jobDescription, row++);
 
         // Optional properties
-        addProperty(DocumentPropertyType.NOTES.toString(), document.getOptionalNotes(), row++);
+        if (document.getOptionalNotes() != null && !document.getOptionalNotes().isEmpty())
+            addProperty(DocumentPropertyType.NOTES.toString(), document.getOptionalNotes(), row++);
+
         for (ImageWrapper imageWrapper : document.getDocumentImages()) {
             addProperty(DocumentPropertyType.IMAGE.toString(), imageWrapper, row++);
         }
 
         String technicianNames = document.getTechnicianNames().substring(document.getTechnicianNames().indexOf(":") + 1); // (Technicians:) Name 1, Name 2, Name 3
-        addProperty(DocumentPropertyType.TECHNICIANS.toString(), technicianNames, row++);
+        if (!technicianNames.isEmpty()) {
+            addProperty(DocumentPropertyType.TECHNICIANS.toString(), document.getTechnicianNames(), row++);
+        }
     }
 
     private void addProperty(String label, String value, int row) {
