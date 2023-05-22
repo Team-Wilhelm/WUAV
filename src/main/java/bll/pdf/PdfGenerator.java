@@ -73,7 +73,7 @@ public class PdfGenerator {
             if (!imageCheckboxes.isEmpty()) {
                 doc.add(pageBreak);
                  for (DocumentPropertyCheckboxWrapper image: imageCheckboxes) {
-                    doc.add(createImageTable(image));
+                    doc.add(createImageTable(image)).setHeight((doc.getPdfDocument().getDefaultPageSize().getHeight()/2)-margin);
                 }
             }
             doc.close();
