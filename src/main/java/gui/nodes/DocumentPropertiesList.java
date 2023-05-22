@@ -74,7 +74,6 @@ public class DocumentPropertiesList extends GridPane {
         addProperty(DocumentPropertyType.DATE_OF_CREATION.toString(), date.toString(), row++);
         addProperty(DocumentPropertyType.JOB_TITLE.toString(), document.getJobTitle(), row++);
 
-        //TODO allow number of characters to be displayed to be changed depending on the size of the window
         int characters = Math.min(document.getJobDescription().length(), 50);
         String jobDescription = document.getJobDescription().length() > 50 ?
                 document.getJobDescription().substring(0, characters) + "..." : document.getJobDescription();

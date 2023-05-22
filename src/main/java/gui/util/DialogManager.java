@@ -100,20 +100,10 @@ public class DialogManager {
 
     public void showConfirmation(String header, String content, Pane parent, Runnable onConfirm) {
         convertDialogTo(Alert.AlertType.CONFIRMATION, header, content, parent);
-        dialog.showAndWait();
-        result.thenAccept(buttonType -> {
-            if (buttonType == ButtonType.OK) {
-                onConfirm.run();
-            }
-        });
-    }
-
-    public void showConfirmation(String header, String content, Pane parent, EventHandler<?> eventHandler) {
-        convertDialogTo(Alert.AlertType.CONFIRMATION, header, content, parent);
         dialog.showDialog();
         result.thenAccept(buttonType -> {
             if (buttonType == ButtonType.OK) {
-                eventHandler.handle(null);
+                onConfirm.run();
             }
         });
     }

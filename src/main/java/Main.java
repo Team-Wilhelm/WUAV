@@ -16,7 +16,6 @@ import java.util.Objects;
 
 
 public class Main extends Application {
-    //TODO check for customers who have been in the system for over 48 months and delete them
     //TODO custom window frame
     @Override
     public void start(Stage primaryStage) throws Exception {

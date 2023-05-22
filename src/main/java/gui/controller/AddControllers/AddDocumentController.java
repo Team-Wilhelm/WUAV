@@ -92,7 +92,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private CustomerModel customerModel;
     private Document documentToEdit, currentDocument;
     private DocumentController documentController;
-    private final ObservableList<ImageWrapper> pictures;
+    private ObservableList<ImageWrapper> pictures;
     private final ObservableList<ImagePreview> imagePreviews = FXCollections.observableArrayList();
     private DialogManager dialogManager;
     private ObservableList<User> allTechnicians;
@@ -185,7 +185,7 @@ public class AddDocumentController extends AddController<Document> implements In
             ImageWrapper image = new ImageWrapper(path, selectedFile.getName());
             pictures.add(image);
             if (isEditing.get())
-                isInputChanged(documentToEdit);
+                isInputChanged();
         }
         refreshItems();
     }
@@ -350,9 +350,9 @@ public class AddDocumentController extends AddController<Document> implements In
         public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
             if (newValue.equals(pdfTab) || newValue.equals(picturesTab)) {
                 if (isEditing.get()) {
-                    isInputChanged(documentToEdit);
+                    isInputChanged();
                 } else if (currentDocument != null && !isEditing.get()) {
-                    isInputChanged(currentDocument);
+                    isInputChanged();
                 }
 
                 if (isInputChanged.get() && newValue.equals(pdfTab)) {
@@ -396,8 +396,7 @@ public class AddDocumentController extends AddController<Document> implements In
         txtNotes.setText(document.getOptionalNotes());
 
         // Pictures
-        List<ImageWrapper> documentImages = new ArrayList<>(document.getDocumentImages());
-        pictures.setAll(documentImages);
+        pictures = FXCollections.observableArrayList(document.getDocumentImages());
 
         // Technicians
         technicians.clear();
@@ -507,6 +506,7 @@ public class AddDocumentController extends AddController<Document> implements In
             });
 
             imagePreviews.add(imagePreview);
+            isInputChanged();
         });
     }
 
@@ -575,8 +575,7 @@ public class AddDocumentController extends AddController<Document> implements In
                     pictures.addAll(imagePreviews.stream().map(ImagePreview::getImageWrapper).toList());
 
                     success = true;
-                    if (isEditing.get())
-                        isInputChanged(documentToEdit);
+                    isInputChanged();
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
@@ -615,7 +614,8 @@ public class AddDocumentController extends AddController<Document> implements In
         this.documentController = documentController;
     }
 
-    private void isInputChanged(Document document){
+    private void isInputChanged(){
+        Document document = isEditing.get() ? documentToEdit : currentDocument;
         // Check if job information has changed
         if (!txtJobTitle.getText().trim().equals(document.getJobTitle())) {
             isInputChanged.setValue(true);
@@ -774,7 +774,6 @@ public class AddDocumentController extends AddController<Document> implements In
                 ((Stage) btnSave.getScene().getWindow()).close();
             }
         });
-
          */
     }
 }
