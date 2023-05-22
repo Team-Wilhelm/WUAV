@@ -121,7 +121,7 @@ public class MyToolBar extends VBox {
             var wifiImage = new ImageView("file:src/main/resources/icons/bi_router-fill.png");
             wifiImage.setFitHeight(40); wifiImage.setFitWidth(40); btnWifi.setGraphic(wifiImage);
         final MFXRectangleToggleNode btnMicrophone = new MFXRectangleToggleNode();
-            var microphoneImage = new ImageView("file:src/main/resources/icons/bi_router-fill.png");
+            var microphoneImage = new ImageView("file:src/main/resources/icons/bi_hdd-network-fill.png");
             microphoneImage.setFitHeight(40); microphoneImage.setFitWidth(40); btnMicrophone.setGraphic(microphoneImage);
 
         btnCamera.setToggleGroup(group);

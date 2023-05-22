@@ -147,7 +147,9 @@ public class DialogManager {
             dialog.setOwnerNode(parent);
         }
 
-        if (dialog.getOwner() != null && dialog.getOwner() != parent.getScene().getWindow()) {
+        if (dialog.getOwner() == null) {
+            dialog.initOwner(parent.getScene().getWindow());
+        } else if (dialog.getOwner() != parent.getScene().getWindow()) {
             dialog = MFXGenericDialogBuilder.build()
                     .toStageDialogBuilder()
                     .setDraggable(true)
