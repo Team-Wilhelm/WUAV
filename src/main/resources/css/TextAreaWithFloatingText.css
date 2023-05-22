@@ -20,14 +20,15 @@
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
     -fx-border-style: none;
+    -fx-border-color: transparent;
     -fx-background-radius: 0;
     -fx-border-radius: 0;
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: white;
     -fx-highlight-fill: -fx-light-grey; /* Selected text highlight */
     -fx-highlight-text-fill: black; /* Selected text color */
 }
 
-.text-area-with-floating-text .text-area .content {
+.text-area-with-floating-text.text-area .content {
     -fx-border-style: none;
     -fx-background-radius: 0;
     -fx-border-radius: 0;
@@ -35,6 +36,6 @@
     -fx-background-color: -fx-control-inner-background;
 }
 
-.text-area-with-floating-text .floating-label .label {
+.text-area-with-floating-text floating-label.label {
     -fx-font-family: "Open Sans Regular";
 }

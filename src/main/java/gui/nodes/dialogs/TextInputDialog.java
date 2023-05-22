@@ -4,8 +4,10 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
 import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -24,11 +26,15 @@ public class TextInputDialog extends CustomDialog {
 
     public TextInputDialog(String title, String content) {
         super();
+        VBox contentBox = new VBox();
+        contentBox.setPadding(new Insets(10));
         textArea = new TextArea();
+        textArea.setWrapText(true);
+        contentBox.getChildren().add(textArea);
         //textArea.setMaxTextLength(256);
         //TODO add max length
 
-        super.setContent(textArea);
+        super.setContent(contentBox);
         this.setContent(super.getDialogContent());
         super.getDialogContent().addActions(
                 Map.entry(new MFXButton("Confirm"), event -> {
@@ -53,7 +59,6 @@ public class TextInputDialog extends CustomDialog {
     }
 
     public CompletableFuture<String> showAndReturnResult() {
-        CompletableFuture<String> result = new CompletableFuture<>();
         this.show();
         return result;
     }
@@ -64,6 +69,7 @@ public class TextInputDialog extends CustomDialog {
 
     public void clear() {
         textArea.clear();
+        result = new CompletableFuture<>();
     }
 
     public void setContentText(String text) {

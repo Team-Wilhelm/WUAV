@@ -11,7 +11,6 @@ import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -119,16 +118,17 @@ public class DialogManager {
         });
     }
 
-    public CompletableFuture<String> showTextInputDialogue(String header, String contentDescription, String contentValue,  Pane parent) {
-        setUpCustomDialog(textInputDialog, parent);
+    public CompletableFuture<String> showTextInputDialog(String header, String contentDescription, String contentValue, Pane parent, boolean editable) {
+        setUpCustomDialog(textInputDialog, parent, header, contentDescription);
+        textInputDialog.setContentText(contentValue);
+        textInputDialog.setEditable(editable);
         return textInputDialog.showAndReturnResult();
     }
 
-    public PasswordDialog getPasswordDialogue(Pane parent) {
+    public PasswordDialog getPasswordDialog(Pane parent) {
         setUpCustomDialog(passwordDialog, parent);
         return passwordDialog;
     }
-
 
     private void convertDialogTo(Alert.AlertType alertType, String header, String content, Pane parent) {
         result = new CompletableFuture<>();
