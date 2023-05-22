@@ -15,12 +15,14 @@ import java.util.concurrent.ExecutionException;
 
 public class DocumentModel implements IModel<Document> {
     private static DocumentModel instance;
+    private CustomerModel customerModel;
     private DocumentManager documentManager;
     private HashMap<UUID, Document> allDocuments;
 
     private DocumentModel() {
         documentManager = (DocumentManager) ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
         allDocuments = new HashMap<>();
+        customerModel = CustomerModel.getInstance();
         setAllDocuments();
     }
 
@@ -36,8 +38,8 @@ public class DocumentModel implements IModel<Document> {
         ResultState resultState = documentManager.add(document);
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allDocuments.put(document.getDocumentID(), document);
-            //TODO
-            CustomerModel.getInstance().put(document.getCustomer());
+            addOrUpdateCustomer(document);
+            customerModel.put(document.getCustomer());
         }
         return resultState;
     }
@@ -47,6 +49,8 @@ public class DocumentModel implements IModel<Document> {
         ResultState resultState = documentManager.update(document);
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allDocuments.put(document.getDocumentID(), document);
+            addOrUpdateCustomer(document);
+            customerModel.put(document.getCustomer());
         }
         return resultState;
     }
@@ -68,7 +72,7 @@ public class DocumentModel implements IModel<Document> {
 
     @Override
     public Document getById(UUID id) {
-        return documentManager.getById(id);
+        return allDocuments.get(id);
     }
 
     public void setAllDocuments() {
@@ -107,5 +111,13 @@ public class DocumentModel implements IModel<Document> {
     }
     public String getDrawingFromDocument(Document document){
         return documentManager.getDrawingFromDocument(document);
+    }
+
+    public void addOrUpdateCustomer(Document document) {
+        if (document.getCustomer().getCustomerID() == null) {
+            customerModel.add(document.getCustomer());
+        } else {
+            customerModel.update(document.getCustomer());
+        }
     }
 }

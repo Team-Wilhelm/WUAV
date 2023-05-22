@@ -189,6 +189,11 @@ public class DialogManager {
                     .toStageDialogBuilder()
                     .setDraggable(true)
                     .get();
+            dialogContent = MFXGenericDialogBuilder.build()
+                    .setOnMinimize(event -> dialog.setIconified(true))
+                    .setOnClose(event -> dialog.close())
+                    .setOnAlwaysOnTop(event -> dialog.setAlwaysOnTop(true))
+                    .get();
             dialog.setContent(dialogContent);
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.initOwner(parent.getScene().getWindow());

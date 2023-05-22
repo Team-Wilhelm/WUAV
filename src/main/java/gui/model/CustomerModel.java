@@ -44,6 +44,9 @@ public class CustomerModel implements IModel<Customer> {
         ResultState resultState = customerManager.update(customer);
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allCustomers.put(customer.getCustomerID(), customer);
+            customer.getContracts().values().forEach(document -> {
+                DocumentModel.getInstance().getById(document.getDocumentID()).setCustomer(customer);
+            });
         }
         return resultState;
     }

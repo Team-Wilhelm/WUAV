@@ -218,12 +218,4 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
                 rs.getDate("LastContract")
         );
     }
-
-    public void addOrUpdateCustomer(Customer customer) {
-        if (customer.getCustomerID() == null) {
-            add(customer);
-        } else {
-            update(customer);
-        }
-    }
 }

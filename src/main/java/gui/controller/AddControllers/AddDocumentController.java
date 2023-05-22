@@ -58,6 +58,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.ResourceBundle;
 
@@ -191,10 +192,6 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
-
-        //.values().forEach(customer -> {
-          //  System.out.println(customer.getCustomerName() + " " + customer.getContracts().size());
-        //});
         //TODO customers/addresses
         assignInputToVariables();
 
@@ -215,25 +212,41 @@ public class AddDocumentController extends AddController<Document> implements In
             ask the user if they want to update the customer in all documents or create a new customer */
 
             if (customer.getContracts().size() > 0 && !tempCustomer.equals(customer)) {  // Check if any values have been changed
-                // Define the choices for the choice dialog and their actions
-                choices.put("Update the customer in all documents", () -> {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Editing an existing customer");
+                alert.setHeaderText("You are editing a customer with " + customer.getContracts().size() + " other contract(s) belonging to them.");
+                alert.setContentText("Updating this customer will update them in all pertaining documents. Are you sure you want to continue?");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
                     tempCustomer.setCustomerID(customer.getCustomerID());
-                    tempCustomer.getCustomerAddress().setAddressID(customerByEmail.getCustomerAddress().getAddressID());
+                    tempCustomer.getCustomerAddress().setAddressID(customer.getCustomerAddress().getAddressID());
                     tempCustomer.setContracts(customer.getContracts());
                     customer = tempCustomer;
-                    //TODO update customer in all documents
-                });
-                choices.put("Create a new customer", () -> {
-                    customer = tempCustomer;
-                });
+                } else {
+                    customer = null;
+                }
 
-                // Show the choice dialog
-                DialogManager.getInstance().showChoiceDialog("Editing an existing customer",
+
+                /*
+                CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Editing an existing customer",
                         "You are editing a customer with " + customer.getContracts().size() + " other contract(s) belonging to them.\n" +
-                                "Would you like to create a new customer with these changes or update this customer in all pertaining documents?",
-                        gridPaneJob, choices);
+                                "Updating this customer will update them in all pertaining documents. Are you sure you want to continue?", flowPanePictures);
+                result.thenAccept(buttonType -> {
+                    if (buttonType.equals(ButtonType.OK)) {
+                        tempCustomer.setCustomerID(customer.getCustomerID());
+                        tempCustomer.getCustomerAddress().setAddressID(customer.getCustomerAddress().getAddressID());
+                        tempCustomer.setContracts(customer.getContracts());
+                        customer = tempCustomer;
+                    } else {
+                        customer = null;
+                    }
+                    // Wait for the user to confirm the dialog
+                }).join();
+
+                 */
             }
         }
+        if (customer == null) return;
 
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         currentDocument.setTechnicians(technicians);

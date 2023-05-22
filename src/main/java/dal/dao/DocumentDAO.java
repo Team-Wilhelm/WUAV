@@ -33,16 +33,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     @Override
     public ResultState add(Document document) {
-        ResultState result = ResultState.SUCCESSFUL;
-
-        // Check, if the customer is already in the database, if not, add them
-        CustomerDAO customerDAO = new CustomerDAO();
-        if (document.getCustomer().getCustomerID() == null) {
-            customerDAO.add(document.getCustomer());
-        } else {
-            customerDAO.update(document.getCustomer());
-        }
-
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
@@ -80,13 +70,13 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             //Save and link image filepaths to document
             saveImagesForDocument(connection, document);
             documents.put(document.getDocumentID(), document);
+            return ResultState.SUCCESSFUL;
         } catch (Exception e) {
             e.printStackTrace();
-            result = ResultState.FAILED;
+            return ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        return result;
     }
 
     @Override
@@ -96,7 +86,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         Connection connection = null;
         try {
             // Check, if the customer is already in the database and update them, if not, add them
-            new CustomerDAO().addOrUpdateCustomer(document.getCustomer());
             connection = dbConnection.getConnection();
 
             // Update the document
