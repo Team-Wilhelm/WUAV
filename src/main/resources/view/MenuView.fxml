@@ -59,7 +59,7 @@
             </MFXButton>
         </HBox>
 
-        <HBox>
+        <HBox fx:id="btnCustomersBox">
             <MFXButton fx:id="btnCustomers" onAction="#btnCustomersAction" alignment="CENTER_LEFT" styleClass="menu-button"
                        prefWidth="200" text="Customers" HBox.hgrow="ALWAYS" graphicTextGap="20">
                 <graphic>

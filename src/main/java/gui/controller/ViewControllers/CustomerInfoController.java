@@ -6,10 +6,7 @@ import gui.model.CustomerModel;
 import gui.model.UserModel;
 import gui.util.DialogManager;
 import gui.util.SceneManager;
-import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
-import io.github.palexdev.materialfx.controls.MFXTableColumn;
-import io.github.palexdev.materialfx.controls.MFXTableView;
-import io.github.palexdev.materialfx.controls.MFXTextField;
+import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -17,6 +14,8 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -25,6 +24,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Window;
 import utils.enums.CustomerType;
 import utils.enums.ResultState;
@@ -177,11 +179,25 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         refreshItems();
     }
 
-    public void showAlmostExpiredCustomers() {
+    public void showAlmostExpiredCustomers(HBox hbox) {
         if(customerModel.getAlmostExpiredCustomers() >0) {
             Label label = new Label("You have " + customerModel.getAlmostExpiredCustomers() + " customer(s) with an almost expired contract");
             expiredCustomersHBox.getChildren().add(label);
+            createNotificationBubble(hbox);
         }
+    }
+
+    private void createNotificationBubble(HBox hbox) {
+        Circle bubble = new Circle(7);
+        bubble.setFill(Color.RED);
+        bubble.setStroke(Color.WHITE);
+
+        StackPane bubblePane = new StackPane();
+        bubblePane.getChildren().add(bubble);
+        StackPane.setMargin(bubble, new Insets(0, 0, 0, 0));
+        StackPane.setAlignment(bubble, Pos.CENTER_RIGHT);
+
+        hbox.getChildren().add(bubblePane);
     }
 
 

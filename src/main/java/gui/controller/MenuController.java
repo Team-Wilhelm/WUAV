@@ -18,6 +18,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import utils.enums.UserRole;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class MenuController implements Initializable {
+    @FXML
+    private HBox btnCustomersBox;
     @FXML
     private GridPane gridPane;
     private Node documentView, employeeView, myProfileView, currentScene, customerView;
@@ -123,7 +126,7 @@ public class MenuController implements Initializable {
         //TODO may cause issues with other views (as they are not really scenes)
         //myProfileController.setShortcutsAndAccelerators(scene);   // Because the scene already exists, we can add the shortcuts here
         myProfileController.setIsEditing(UserModel.getLoggedInUser());
-        customerController.showAlmostExpiredCustomers();
+        customerController.showAlmostExpiredCustomers(btnCustomersBox);
     }
 
     private void setVisibilityForUserRole() {
