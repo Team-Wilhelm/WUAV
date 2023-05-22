@@ -165,7 +165,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     }
 
     public void reloadCustomers() {
-        customerModel.reloadCustomers();
+        //customerModel.reloadCustomers();
         refreshItems();
     }
 

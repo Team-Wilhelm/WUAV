@@ -99,7 +99,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private final ThreadPool executorService;
     private boolean hasAccess = false;
     private ImagePreview lastFocused;
-    private HashMap<String, EventHandler<MouseEvent>> choices = new HashMap<>();
+    private HashMap<String, Runnable> choices = new HashMap<>();
 
     // Document and customer information
     private UUID temporaryId;
@@ -191,36 +191,45 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
+
+        //.values().forEach(customer -> {
+          //  System.out.println(customer.getCustomerName() + " " + customer.getContracts().size());
+        //});
         //TODO customers/addresses
         assignInputToVariables();
 
         //TODO move the check to bll
-        Customer tempCustomer = customerModel.getByEmail(email);  // Try to find a customer with the same name
+        Customer customerByEmail = customerModel.getByEmail(email);  // Try to find a customer with the same name
+
         Address address = new Address(streetName, houseNumber, postcode, city, country);
+        Customer tempCustomer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
+
         if (customer == null) { // If no customer has been selected in autocomplete
-            customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
-            if (customer.equals(tempCustomer)) { // If a customer with exactly the same data exists, use them
-                customer.setCustomerID(tempCustomer.getCustomerID());
+            customer = tempCustomer;
+            if (customer.equals(customerByEmail)) { // If a customer with exactly the same data exists, use them
+                customer.setCustomerID(customerByEmail.getCustomerID());
+                address.setAddressID(customerByEmail.getCustomerAddress().getAddressID());
             }
         } else {
-            /* If the customer has been changed and is a part of more than one document,
+            /* If the customer has been changed and belongs to more than this document,
             ask the user if they want to update the customer in all documents or create a new customer */
 
-            if (tempCustomer.getContracts().size() > 1 && !customer.equals(tempCustomer)) {  // If a customer has been selected, check if any values have been changed
+            if (customer.getContracts().size() > 0 && !tempCustomer.equals(customer)) {  // Check if any values have been changed
                 // Define the choices for the choice dialog and their actions
-                choices.put("Create a new customer", event -> {
-                    customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
-                });
-                choices.put("Update the customer in all documents", event -> {
+                choices.put("Update the customer in all documents", () -> {
+                    tempCustomer.setCustomerID(customer.getCustomerID());
+                    tempCustomer.getCustomerAddress().setAddressID(customerByEmail.getCustomerAddress().getAddressID());
+                    tempCustomer.setContracts(customer.getContracts());
                     customer = tempCustomer;
-                    customer.setCustomerID(tempCustomer.getCustomerID());
-                    CustomerModel.getInstance().getAll().put(customer.getCustomerID(), customer);
                     //TODO update customer in all documents
+                });
+                choices.put("Create a new customer", () -> {
+                    customer = tempCustomer;
                 });
 
                 // Show the choice dialog
                 DialogManager.getInstance().showChoiceDialog("Editing an existing customer",
-                        "You are editing a customer with " + customer.getContracts().size() + " contracts that belong to them. " +
+                        "You are editing a customer with " + customer.getContracts().size() + " other contract(s) belonging to them.\n" +
                                 "Would you like to create a new customer with these changes or update this customer in all pertaining documents?",
                         gridPaneJob, choices);
             }

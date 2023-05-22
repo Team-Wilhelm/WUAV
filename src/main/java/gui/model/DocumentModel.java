@@ -8,6 +8,7 @@ import bll.ManagerFactory;
 import utils.enums.ResultState;
 import gui.util.drawing.MyShape;
 
+import javax.print.Doc;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -36,7 +37,7 @@ public class DocumentModel implements IModel<Document> {
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allDocuments.put(document.getDocumentID(), document);
             //TODO
-            CustomerModel.getInstance().put(document.getCustomer().getCustomerID(), document.getCustomer());
+            CustomerModel.getInstance().put(document.getCustomer());
         }
         return resultState;
     }
@@ -47,13 +48,17 @@ public class DocumentModel implements IModel<Document> {
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allDocuments.put(document.getDocumentID(), document);
         }
-        return documentManager.update(document);
+        return resultState;
     }
 
     @Override
     public ResultState delete(UUID id) {
-        allDocuments.remove(id);
-        return documentManager.delete(id);
+        ResultState resultState = documentManager.delete(id);
+        if (resultState.equals(ResultState.SUCCESSFUL)) {
+            Document d = allDocuments.remove(id);
+            CustomerModel.getInstance().getById(d.getCustomer().getCustomerID()).getContracts().remove(id);
+        }
+        return resultState;
     }
 
     @Override
@@ -69,6 +74,15 @@ public class DocumentModel implements IModel<Document> {
     public void setAllDocuments() {
         this.allDocuments.clear();
         this.allDocuments.putAll(documentManager.getAll());
+
+        CustomerModel customerModel = CustomerModel.getInstance();
+        for (Document document : allDocuments.values()) {
+            if (customerModel.getById(document.getCustomer().getCustomerID()) == null) {
+                customerModel.put(document.getCustomer());
+            } else {
+                customerModel.getById(document.getCustomer().getCustomerID()).addContract(document);
+            }
+        }
     }
 
     public void assignUserToDocument(User user, Document document, boolean isAssigning){

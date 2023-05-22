@@ -1,5 +1,6 @@
 package dal.dao;
 
+import be.Customer;
 import be.Document;
 import be.ImageWrapper;
 import be.User;
@@ -179,14 +180,18 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             return documents.get(documentID);
         }
 
+        CustomerDAO customerDAO = new CustomerDAO();
+        Customer customer = customerDAO.getById(UUID.fromString(rs.getString("CustomerID")));
+
         Document document = new Document (
                 documentID,
-                new CustomerDAO().getById(UUID.fromString(rs.getString("CustomerID"))),
+                customer,
                 rs.getString("JobDescription"),
                 rs.getString("Notes"),
                 rs.getString("JobTitle"),
                 rs.getDate("DateOfCreation")
             );
+        customer.addContract(document);
         document.setLoadingImages(true);
         CompletableFuture.runAsync(() -> assignImagesToDocument(document), ThreadPool.getInstance().getExecutorService());
         return document;

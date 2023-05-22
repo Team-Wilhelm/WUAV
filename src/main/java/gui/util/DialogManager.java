@@ -148,7 +148,7 @@ public class DialogManager {
         loadingDialog.showDialog();
     }
 
-    public void showChoiceDialog(String title, String content, Pane parent, HashMap<String, EventHandler<MouseEvent>> choices) {
+    public void showChoiceDialog(String title, String content, Pane parent, HashMap<String, Runnable> choices) {
         setUpCustomDialog(choiceDialog, parent, title, content);
         choiceDialog.setChoices(choices);
         choiceDialog.showDialog();

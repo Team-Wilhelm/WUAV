@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChoiceDialog extends CustomDialog {
-    private HashMap<MFXButton, EventHandler<MouseEvent>> choices = new HashMap<>();
 
     public ChoiceDialog() {
         this("", "", new HashMap<>());
@@ -28,17 +27,23 @@ public class ChoiceDialog extends CustomDialog {
 
     @Override
     public void clear() {
-        choices.clear();
+        super.getDialogContent().clearActions();
     }
 
     public void addChoice(String text, EventHandler<MouseEvent> action) {
-        choices.put(new MFXButton(text), action);
+        super.getDialogContent().addActions(Map.entry(new MFXButton(text), action));
     }
 
-    public void setChoices(HashMap<String, EventHandler<MouseEvent>> actions) {
-        this.choices.clear();
-        for (Map.Entry<String, EventHandler<MouseEvent>> entry : actions.entrySet()) {
-            this.choices.put(new MFXButton(entry.getKey()), entry.getValue());
+    public void setChoices(HashMap<String, Runnable> actions) {
+        super.getDialogContent().clearActions();
+        for (Map.Entry<String, Runnable> entry : actions.entrySet()) {
+            super.getDialogContent().addActions(
+                    Map.entry(new MFXButton(entry.getKey()),
+                    event -> {
+                        entry.getValue().run();
+                        close();
+                    }
+            ));
         }
     }
 }
