@@ -173,7 +173,7 @@ public class DocumentController extends ViewController<Document> implements Init
             if (!tblDocument.getSelectionModel().getSelection().isEmpty()) {
                 AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
                 controller.setDocumentController(this);
-                controller.setIsEditing(tblDocument.getSelectionModel().getSelection().get(0));
+                controller.setIsEditing(tblDocument.getSelectionModel().getSelectedValue());
                 controller.setVisibilityForUserRole();
                 controller.setOnCloseRequest();
             }

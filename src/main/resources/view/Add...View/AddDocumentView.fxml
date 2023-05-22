@@ -124,7 +124,7 @@
             </GridPane>
         </content>
       </Tab>
-      <Tab fx:id="canvasTab" text="Installation drawing.">
+      <Tab fx:id="canvasTab" text="Installation drawing">
          <content>
             <GridPane hgap="15.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                <columnConstraints>
