@@ -2,6 +2,7 @@ package gui.controller.ViewControllers;
 
 import be.Address;
 import be.Customer;
+import be.User;
 import gui.model.CustomerModel;
 import gui.model.UserModel;
 import gui.util.DialogManager;
@@ -203,8 +204,11 @@ public class CustomerInfoController extends ViewController<Customer> implements 
 
     @FXML
     private void editCustomerAction(MouseEvent event) {
+        UserRole userRole = UserModel.getLoggedInUser().getUserRole();
+        boolean hasAccess = (userRole == UserRole.ADMINISTRATOR || userRole == UserRole.PROJECT_MANAGER);
         if (event.getClickCount() == 2) {
-            if (!tblCustomers.getSelectionModel().getSelection().isEmpty()) {
+            if (!tblCustomers.getSelectionModel().getSelection().isEmpty()
+                    && hasAccess) {
                 //TODO: Change to materialfx dialog
                 //TODO refresh documents after editing
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -237,7 +241,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
                     }
                 }
             }
-            else {
+            else if (hasAccess){
                 DialogManager.getInstance().showError("No customer selected", "Please select a customer", gridPane);
             }
         }
