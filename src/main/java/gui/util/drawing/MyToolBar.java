@@ -55,6 +55,8 @@ public class MyToolBar extends VBox {
      */
     private Tool selectedTool;
 
+    private UUID documentUUID;
+
     /**
      * Constructs a toolbar.
      * @param canvas the canvas to draw
@@ -176,7 +178,7 @@ public class MyToolBar extends VBox {
         saveButtonBox.setAlignment(Pos.CENTER);
 
         saveButton.setOnAction(e -> {
-            var doc = new Document(UUID.fromString("CC9BAE95-BDE9-45BD-815F-045DCB4ACDFD"), new Customer(), "test", "test", "test", java.sql.Date.valueOf(LocalDate.now()));
+            var doc = new Document(documentUUID, new Customer(), "test", "test", "test", java.sql.Date.valueOf(LocalDate.now()));
             WritableImage wi = new WritableImage(550, 650);
             Image snapshot = canvas.snapshot(null, wi);
             File output = new File("snapshot" + new Date().getTime() + ".png");
@@ -184,6 +186,8 @@ public class MyToolBar extends VBox {
                 ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", output);
                 var url = BlobService.getInstance().UploadFile(output.getAbsolutePath(), doc.getDocumentID());
                 output.delete();
+                // Add this field to PDF generation
+                System.out.println(url);
                 DocumentModel.getInstance().addDrawingToDocument(doc, url);
             } catch (IOException eex) {
                 throw new RuntimeException(eex);
@@ -268,5 +272,9 @@ public class MyToolBar extends VBox {
                 return null;
             }
         }
+    }
+
+    public void setDocumentUUID(UUID documentUUID) {
+        this.documentUUID = documentUUID;
     }
 }

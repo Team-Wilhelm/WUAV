@@ -114,6 +114,7 @@ public class DocumentController extends ViewController<Document> implements Init
         controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
         controller.setDocumentController(this);
         controller.setVisibilityForUserRole();
+        controller.setOnCloseRequest();
     }
 
     private Window getWindow() {
@@ -131,7 +132,7 @@ public class DocumentController extends ViewController<Document> implements Init
         MFXTableColumn<Document> myDocument = new MFXTableColumn<>("My Document", false, Comparator.comparing(d -> UserModel.getLoggedInUser().getAssignedDocuments().containsValue(d)));
 
         jobTitle.setRowCellFactory(document -> {
-            MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(Document::getJobTitle);
+            MFXTableRowCell<Document, String> row = new MFXTableRowCell<>(d -> truncateStringWithEllipsis(d.getJobTitle(), 20));
             row.setOnMouseClicked(this::tableViewDoubleClickAction);
             return row;
         });
@@ -172,8 +173,9 @@ public class DocumentController extends ViewController<Document> implements Init
             if (!tblDocument.getSelectionModel().getSelection().isEmpty()) {
                 AddDocumentController controller = openWindow(SceneManager.ADD_DOCUMENT_SCENE, Modality.APPLICATION_MODAL).getController();
                 controller.setDocumentController(this);
-                controller.setIsEditing(tblDocument.getSelectionModel().getSelectedValue());
+                controller.setIsEditing(tblDocument.getSelectionModel().getSelection().get(0));
                 controller.setVisibilityForUserRole();
+                controller.setOnCloseRequest();
             }
             else {
                 DialogManager.getInstance().showError("No document selected", "Please select a document", gridPane);
@@ -225,5 +227,14 @@ public class DocumentController extends ViewController<Document> implements Init
                 }, 3000);
             }
         }));
+    }
+
+    // Truncate the string to the specified length and add ellipsis
+    private String truncateStringWithEllipsis(String str, int length) {
+        if (str.length() > length) {
+            return str.substring(0, length) + "...";
+        } else {
+            return str;
+        }
     }
 }

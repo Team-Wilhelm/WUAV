@@ -86,6 +86,7 @@ public class LoginViewController implements Initializable {
         stage.setWidth(Screen.getPrimary().getBounds().getWidth() - 200);
         stage.setHeight(Screen.getPrimary().getBounds().getHeight() - 200);
 
+        menuController.setLoginViewController(this);
         menuController.userLogInAction(scene); // Needs to be called after the scene is set
         stage.centerOnScreen();
         stage.setMaximized(true);
@@ -99,5 +100,9 @@ public class LoginViewController implements Initializable {
                 loginUser(new Event(passwordInput, passwordInput, Event.ANY));
             }
         });
+    }
+
+    public void unfocusAll() {
+        borderPane.requestFocus();
     }
 }

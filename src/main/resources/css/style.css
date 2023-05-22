@@ -20,9 +20,12 @@
 .menu-button {
     -fx-border-color: transparent;
 }
+.menu-button:focused{
+    -fx-background-color: transparent;
+}
 
 .mfx-button{
-    -fx-background-color: transparent;
+    -fx-background-color: -fx-dark-grey;
     -fx-border-color: -fx-dark-grey;
     -fx-text-fill: -fx-base-color;
     -fx-font-size: 18;
@@ -58,6 +61,9 @@
 .input:focused .floating-text {
     -fx-background-color: -fx-base-color-dark;
     -fx-border-color: transparent;
+}
+.mfx-text-field:floating .floating-text {
+    -fx-text-fill: -fx-dark-grey;
 }
 .vboxLeft{
     -fx-background-color: -fx-base-color;
@@ -114,14 +120,20 @@
 }
 
 .mfx-rectangle-toggle-node:selected {
-    -fx-background-color: -fx-accent-yellow;
+    -fx-background-color: -fx-base-color-darker;
     -fx-background-radius: 5;
     -fx-border-width: 0;
     -fx-border-radius: 5;
 }
 
+.toolBox{
+    -fx-background-color: -fx-base-color;
+}
+
 .toolBox .label{
+    -fx-padding: 0 0 0 10;
     -fx-font-weight: bold;
+    -fx-text-fill: -fx-dark-grey;
     -fx-font-size: 18;
 }
 
@@ -137,7 +149,7 @@
 }
 
 .mfx-text-field .text-field {
-    -fx-highlight-fill: -fx-dark-grey; /* Selected text highlight */
+    -fx-highlight-fill: #C0C0C0; /* Selected text highlight */
 }
 
 .mfx-checkbox {
@@ -164,4 +176,37 @@
 
 .mfx-combo-box.not-editable .caret .mfx-font-icon {
     -mfx-color: transparent;
+}
+
+.text-area {
+    -fx-focus-color: -fx-dark-grey;
+    -fx-faint-focus-color: -fx-dark-grey;
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-padding: 5;
+    -fx-border-color: -fx-light-grey;
+    -fx-border-width: 1;
+    -fx-highlight-fill: -fx-light-grey; /* Selected text highlight */
+    -fx-highlight-text-fill: black; /* Selected text color */
+}
+
+.text-area .content {
+    -fx-border-style: none;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-font-family: "Open Sans Regular";
+    -fx-background-color: white;
+}
+
+.text-area:focused {
+    -fx-background-insets: 2;
+    -fx-border-insets: -0.5;
+    -fx-border-width: 1.5;
+    -fx-border-color: -fx-dark-grey;
+}
+
+/* Tab pane style */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-opacity: 0;
 }

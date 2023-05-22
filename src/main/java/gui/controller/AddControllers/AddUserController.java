@@ -2,6 +2,7 @@ package gui.controller.AddControllers;
 
 import be.User;
 import gui.nodes.dialogs.PasswordDialog;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -156,7 +157,7 @@ public class AddUserController extends AddController<User> implements Initializa
 
     private void showPasswordDialogue() {
         comboOptions.getSelectionModel().clearSelection();
-        PasswordDialog passwordDialog = DialogManager.getInstance().getPasswordDialogue(gridPane);
+        PasswordDialog passwordDialog = DialogManager.getInstance().getPasswordDialog(gridPane);
         passwordDialog.setUserToUpdate(userToUpdate);
         passwordDialog.setAdminEditing(UserModel.getLoggedInUser().getUserRole() == UserRole.ADMINISTRATOR);
         passwordDialog.showDialog();
@@ -349,6 +350,13 @@ public class AddUserController extends AddController<User> implements Initializa
                 }
             }
         });
+
+        // If creating a new user, set the focus to the first text field
+        if (!isEditing) {
+            Platform.runLater(() -> txtName.requestFocus());
+        } else { // Otherwise, set the focus to the combo box, as it makes the text field styled as a label look weird
+            Platform.runLater(() -> comboOptions.requestFocus());
+        }
     }
 
     public void refreshCard() {

@@ -21,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class ImagePreview extends VBox {
     private Observer<ImagePreview> observer;
@@ -102,25 +103,22 @@ public class ImagePreview extends VBox {
     }
 
     public void openAddDescriptionDialogue() {
-        CompletableFuture<String> result = DialogManager.getInstance().showTextInputDialogue("Add description",
-                "Add a description to the image", imageWrapper.getDescription(), this);
+        CompletableFuture<String> result = DialogManager.getInstance().showTextInputDialog("Add description",
+                "Add a description to the image", imageWrapper.getDescription(), this, true);
+        // Get the result of the dialogue and set the description of the image
         result.thenAccept(s -> {
-            imageWrapper.setDescription(s);
-            notifyObservers(observable, this);
+            if (s != null) {
+                imageWrapper.setDescription(s);
+                notifyObservers(observable, this);
+            }
         });
     }
 
     public void openSeeDescriptionDialogue() {
-        //TODO change to a custom dialog, use dialogueManager
         //TODO limit the size of the description to 256 characters
-        Dialog<String> dialog = new Dialog<>();
-        ButtonType type = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().add(type);
-        dialog.setTitle("See description");
-        dialog.setHeaderText("See the description of the image");
-        String description = imageWrapper.getDescription() == null ? "No description" : imageWrapper.getDescription();
-        dialog.setContentText("Description:\n" + description);
-        dialog.showAndWait();
+        String description = imageWrapper.getDescription() == null ? "No description available" : imageWrapper.getDescription();
+        DialogManager.getInstance().showTextInputDialog("See description",
+                "Add a description to the image", description, this, false);
     }
 
     public void makeContextMenuNotEditable() {

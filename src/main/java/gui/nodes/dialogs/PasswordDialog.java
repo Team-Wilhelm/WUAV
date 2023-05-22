@@ -4,12 +4,11 @@ import be.User;
 import gui.model.UserModel;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
-import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
-import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
 import io.github.palexdev.materialfx.enums.ScrimPriority;
 import javafx.beans.value.ChangeListener;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Window;
 import utils.HashPasswordHelper;
@@ -20,11 +19,12 @@ import java.util.Map;
 
 public class PasswordDialog extends CustomDialog {
     //TODO generify this class
-    private GridPane passwordGridPane;
+    private HBox columns;
+    private VBox rows;
     private HashMap<PasswordType, MFXPasswordField> passwordFields;
     private MFXButton btnConfirm, btnCancel;
     private byte[] newPassword, newSalt;
-    private int row = 0;
+    private int row = 1;
     private boolean passwordChanged;
     private HashPasswordHelper hashPasswordHelper;
 
@@ -52,8 +52,8 @@ public class PasswordDialog extends CustomDialog {
         passwordFields = new HashMap<>();
         hashPasswordHelper = new HashPasswordHelper();
 
-        setUpGridPane();
-        super.setContent(passwordGridPane);
+        setUpContent();
+        super.setContent(columns);
         this.setContent(super.getDialogContent());
         setUpDialogueWindow();
         addButtons();
@@ -93,23 +93,37 @@ public class PasswordDialog extends CustomDialog {
         );
     }
 
-    private void setUpGridPane() {
-        passwordGridPane = new GridPane();
-        passwordGridPane.setHgap(10);
-        passwordGridPane.setVgap(10);
-        passwordGridPane.setMaxWidth(Double.MAX_VALUE);
+    private void setUpContent() {
+        // Set up the columns with regions to center the content
+        columns = new HBox();
+        columns.setSpacing(10);
 
+        for (int i = 0; i < 2; i++) {
+            Region region = new Region();
+            HBox.setHgrow(region, Priority.SOMETIMES);
+            columns.getChildren().add(region);
+        }
+
+        // Set up the rows with the password fields
+        rows = new VBox();
+        rows.setSpacing(10);
+        rows.setPadding(new Insets(10));
+        setUpTextFields();
+
+        columns.getChildren().add(1, rows);
+    }
+
+    private void setUpTextFields() {
         // If the user is not an admin, add the current password field, otherwise start at the new password field
-        int startIndex = userToUpdate == UserModel.getLoggedInUser() ? 0 : 1;
-        for (int i = startIndex; i < PasswordType.values().length; i++) {
+        for (int i = 0; i < PasswordType.values().length; i++) {
             PasswordType passwordType = PasswordType.values()[i];
             MFXPasswordField textField = new MFXPasswordField();
             textField.setFloatingText(passwordType.getText());
-            textField.maxWidthProperty().bind(passwordGridPane.widthProperty().subtract(20));
+            textField.setMaxWidth(Double.MAX_VALUE);
             textField.textProperty().addListener(passwordListener);
             passwordFields.put(passwordType, textField);
-            passwordGridPane.add(textField, 1, row++);
-            GridPane.setHalignment(textField, javafx.geometry.HPos.CENTER);
+            rows.getChildren().add(textField);
+            VBox.setVgrow(textField, Priority.ALWAYS);
         }
     }
 
@@ -171,6 +185,9 @@ public class PasswordDialog extends CustomDialog {
         if (adminEditing) {
             passwordFields.get(PasswordType.OLD).setVisible(false);
             passwordFields.get(PasswordType.OLD).setManaged(false);
+        } else {
+            passwordFields.get(PasswordType.OLD).setVisible(true);
+            passwordFields.get(PasswordType.OLD).setManaged(true);
         }
     }
 }
