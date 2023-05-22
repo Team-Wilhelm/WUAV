@@ -35,6 +35,8 @@ public class DocumentModel implements IModel<Document> {
         ResultState resultState = documentManager.add(document);
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allDocuments.put(document.getDocumentID(), document);
+            //TODO
+            CustomerModel.getInstance().put(document.getCustomer().getCustomerID(), document.getCustomer());
         }
         return resultState;
     }

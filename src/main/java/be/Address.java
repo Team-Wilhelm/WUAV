@@ -77,15 +77,16 @@ public class Address {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Address address = (Address) o;
-        return Objects.equals(streetName, address.streetName)
-                && Objects.equals(streetNumber, address.streetNumber)
-                && Objects.equals(postcode, address.postcode)
-                && Objects.equals(town, address.town)
-                && Objects.equals(country, address.country);
+        return streetName.equalsIgnoreCase(address.streetName)
+                && streetNumber.equalsIgnoreCase(address.streetNumber)
+                && postcode.equalsIgnoreCase(address.postcode)
+                && town.equalsIgnoreCase(address.town)
+                && country.equalsIgnoreCase(address.country);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(streetName, streetNumber, postcode, town, country);
+        return Objects.hash(streetName.toLowerCase(), streetNumber.toLowerCase(), postcode.toLowerCase(),
+                town.toLowerCase(), country.toLowerCase());
     }
 }

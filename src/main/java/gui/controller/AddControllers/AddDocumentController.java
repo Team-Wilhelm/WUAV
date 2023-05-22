@@ -99,6 +99,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private final ThreadPool executorService;
     private boolean hasAccess = false;
     private ImagePreview lastFocused;
+    private HashMap<String, EventHandler<MouseEvent>> choices = new HashMap<>();
 
     // Document and customer information
     private UUID temporaryId;
@@ -144,7 +145,6 @@ public class AddDocumentController extends AddController<Document> implements In
         btnSave.disableProperty().bind(isInputChanged.not());
         btnDelete.disableProperty().bind(isEditing.not());
 
-
         canvasTab.setOnSelectionChanged(event -> {
             if (canvasTab.isSelected()) {
 
@@ -159,7 +159,6 @@ public class AddDocumentController extends AddController<Document> implements In
                 catch (NullPointerException e) { }
             }
         });
-
         addTooltips();
     }
 
@@ -195,17 +194,36 @@ public class AddDocumentController extends AddController<Document> implements In
         //TODO customers/addresses
         assignInputToVariables();
 
+        //TODO move the check to bll
+        Customer tempCustomer = customerModel.getByEmail(email);  // Try to find a customer with the same name
         Address address = new Address(streetName, houseNumber, postcode, city, country);
-        if (customer == null) {
+        if (customer == null) { // If no customer has been selected in autocomplete
             customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
+            if (customer.equals(tempCustomer)) { // If a customer with exactly the same data exists, use them
+                customer.setCustomerID(tempCustomer.getCustomerID());
+            }
         } else {
-            customer.setCustomerName(name);
-            customer.setCustomerEmail(email);
-            customer.setCustomerPhoneNumber(phoneNumber);
-            customer.setCustomerAddress(address);
-            address.setAddressID(customer.getCustomerAddress().getAddressID());
-            customer.setCustomerType(customerType);
-            customer.setLastContract(lastContract);
+            /* If the customer has been changed and is a part of more than one document,
+            ask the user if they want to update the customer in all documents or create a new customer */
+
+            if (tempCustomer.getContracts().size() > 1 && !customer.equals(tempCustomer)) {  // If a customer has been selected, check if any values have been changed
+                // Define the choices for the choice dialog and their actions
+                choices.put("Create a new customer", event -> {
+                    customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
+                });
+                choices.put("Update the customer in all documents", event -> {
+                    customer = tempCustomer;
+                    customer.setCustomerID(tempCustomer.getCustomerID());
+                    CustomerModel.getInstance().getAll().put(customer.getCustomerID(), customer);
+                    //TODO update customer in all documents
+                });
+
+                // Show the choice dialog
+                DialogManager.getInstance().showChoiceDialog("Editing an existing customer",
+                        "You are editing a customer with " + customer.getContracts().size() + " contracts that belong to them. " +
+                                "Would you like to create a new customer with these changes or update this customer in all pertaining documents?",
+                        gridPaneJob, choices);
+            }
         }
 
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
@@ -215,6 +233,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
         if (isEditing.get()) {
             currentDocument.setDocumentID(documentToEdit.getDocumentID());
+            currentDocument.setDateOfCreation(documentToEdit.getDateOfCreation());
         }
 
         SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
@@ -384,6 +403,7 @@ public class AddDocumentController extends AddController<Document> implements In
         toggleCustomerType.setSelected(document.getCustomer().getCustomerType() == CustomerType.PRIVATE);
 
         // Customer address
+        customer = document.getCustomer();
         txtStreetName.setText(document.getCustomer().getCustomerAddress().getStreetName());
         txtHouseNumber.setText(document.getCustomer().getCustomerAddress().getStreetNumber());
         txtCity.setText(document.getCustomer().getCustomerAddress().getTown());
@@ -723,7 +743,8 @@ public class AddDocumentController extends AddController<Document> implements In
                     txtCity.setText(customer.getCustomerAddress().getTown());
                     txtCountry.setText(customer.getCustomerAddress().getCountry());
                     toggleCustomerType.setSelected(customer.getCustomerType() == CustomerType.PRIVATE);
-                    dateLastContract.setValue(customer.getLastContract().toLocalDate());}
+                    dateLastContract.setValue(LocalDate.now()); // Update to today
+                }
             }
         });
     }

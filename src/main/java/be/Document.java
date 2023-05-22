@@ -1,5 +1,6 @@
 package be;
 
+import gui.model.CustomerModel;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -35,6 +36,16 @@ public class Document {
     public Document(UUID documentID, Customer customer, String jobDescription, String optionalNotes, String jobTitle, Date dateOfCreation) {
        this(customer, jobDescription, optionalNotes, jobTitle, dateOfCreation);
        this.documentID = documentID;
+
+       // Add the customer to the customer model if it doesn't exist yet and add this contract to the customer
+       CustomerModel customerModel = CustomerModel.getInstance();
+       this.customer = customerModel.getById(customer.getCustomerID()) == null ? customer : customerModel.getById(customer.getCustomerID());
+       UUID customerID = customer.getCustomerID();
+
+        if (!this.customer.getContracts().containsKey(this.documentID)) {
+            this.customer.addContract(this);
+            customerModel.getById(customerID).addContract(this);
+        }
     }
 
     public UUID getDocumentID() {

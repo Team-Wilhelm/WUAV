@@ -3,6 +3,8 @@ package be;
 import utils.enums.CustomerType;
 
 import java.sql.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -12,9 +14,9 @@ public class Customer {
     private Address customerAddress;
     private CustomerType customerType;
     private Date lastContract;
+    private HashMap<UUID, Document> contracts;
 
-    public Customer(){
-    }
+    public Customer(){}
 
     public Customer(String customerName, String customerEmail, String customerPhoneNumber, Address customerAddress, CustomerType customerType, Date lastContract) {
         this.customerName = customerName;
@@ -23,6 +25,7 @@ public class Customer {
         this.customerAddress = customerAddress;
         this.customerType = customerType;
         this.lastContract = lastContract;
+        this.contracts = new HashMap<>();
     }
 
     public Customer(UUID customerID, String customerName, String customerEmail, String customerPhoneNumber, Address customerAddress, CustomerType customerType, Date lastContract) {
@@ -86,6 +89,22 @@ public class Customer {
         this.lastContract = lastContract;
     }
 
+    public void addContract(Document contract){
+        this.contracts.put(contract.getDocumentID(), contract);
+    }
+
+    public void removeContract(Document contract){
+        this.contracts.remove(contract.getDocumentID());
+    }
+
+    public HashMap<UUID, Document> getContracts() {
+        return contracts;
+    }
+
+    public void setContracts(HashMap<UUID, Document> contracts) {
+        this.contracts = contracts;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -94,7 +113,8 @@ public class Customer {
         return Objects.equals(customerName, customer.customerName)
                 && Objects.equals(customerEmail, customer.customerEmail)
                 && Objects.equals(customerPhoneNumber, customer.customerPhoneNumber)
-                && customerType == customer.customerType;
+                && customerType == customer.customerType
+                && customerAddress.equals(customer.customerAddress);
     }
 
     @Override
