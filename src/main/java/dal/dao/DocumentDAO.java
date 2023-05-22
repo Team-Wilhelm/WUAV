@@ -1,5 +1,6 @@
 package dal.dao;
 
+import be.Customer;
 import be.Document;
 import be.ImageWrapper;
 import be.User;
@@ -32,16 +33,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     @Override
     public ResultState add(Document document) {
-        ResultState result = ResultState.SUCCESSFUL;
-
-        // Check, if the customer is already in the database, if not, add them
-        CustomerDAO customerDAO = new CustomerDAO();
-        if (document.getCustomer().getCustomerID() == null) {
-            customerDAO.add(document.getCustomer());
-        } else {
-            customerDAO.update(document.getCustomer());
-        }
-
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
@@ -79,13 +70,13 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             //Save and link image filepaths to document
             saveImagesForDocument(connection, document);
             documents.put(document.getDocumentID(), document);
+            return ResultState.SUCCESSFUL;
         } catch (Exception e) {
             e.printStackTrace();
-            result = ResultState.FAILED;
+            return ResultState.FAILED;
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        return result;
     }
 
     @Override
@@ -95,7 +86,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         Connection connection = null;
         try {
             // Check, if the customer is already in the database and update them, if not, add them
-            new CustomerDAO().addOrUpdateCustomer(document.getCustomer());
             connection = dbConnection.getConnection();
 
             // Update the document
@@ -179,14 +169,18 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             return documents.get(documentID);
         }
 
+        CustomerDAO customerDAO = new CustomerDAO();
+        Customer customer = customerDAO.getById(UUID.fromString(rs.getString("CustomerID")));
+
         Document document = new Document (
                 documentID,
-                new CustomerDAO().getById(UUID.fromString(rs.getString("CustomerID"))),
+                customer,
                 rs.getString("JobDescription"),
                 rs.getString("Notes"),
                 rs.getString("JobTitle"),
                 rs.getDate("DateOfCreation")
             );
+        customer.addContract(document);
         document.setLoadingImages(true);
         CompletableFuture.runAsync(() -> assignImagesToDocument(document), ThreadPool.getInstance().getExecutorService());
         return document;

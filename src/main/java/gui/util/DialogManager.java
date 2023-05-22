@@ -1,9 +1,6 @@
 package gui.util;
 
-import gui.nodes.dialogs.CustomDialog;
-import gui.nodes.dialogs.LoadingDialog;
-import gui.nodes.dialogs.PasswordDialog;
-import gui.nodes.dialogs.TextInputDialog;
+import gui.nodes.dialogs.*;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
@@ -14,9 +11,11 @@ import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,6 +38,7 @@ public class DialogManager {
     private PasswordDialog passwordDialog;
     private TextInputDialog textInputDialog;
     private LoadingDialog loadingDialog;
+    private ChoiceDialog choiceDialog;
 
     private DialogManager() {
         dialog = MFXGenericDialogBuilder.build()
@@ -65,6 +65,7 @@ public class DialogManager {
         passwordDialog = new PasswordDialog();
         textInputDialog = new TextInputDialog();
         loadingDialog = new LoadingDialog();
+        choiceDialog = new ChoiceDialog();
     }
 
     /**
@@ -77,6 +78,8 @@ public class DialogManager {
         return instance;
     }
 
+
+    // region Alerts
     public void showWarning(String header, String content, Pane parent) {
         convertDialogTo(Alert.AlertType.WARNING, header, content, parent);
         dialog.showDialog();
@@ -94,7 +97,7 @@ public class DialogManager {
 
     public CompletableFuture<ButtonType> showConfirmation(String header, String content, Pane parent) {
         convertDialogTo(Alert.AlertType.CONFIRMATION, header, content, parent);
-        dialog.showDialog();
+        dialog.showAndWait();
         return result;
     }
 
@@ -107,7 +110,9 @@ public class DialogManager {
             }
         });
     }
+    // endregion
 
+    // region Custom Dialogs
     public CompletableFuture<String> showTextInputDialog(String header, String contentDescription, String contentValue, Pane parent, boolean editable) {
         setUpCustomDialog(textInputDialog, parent, header, contentDescription);
         textInputDialog.setContentText(contentValue);
@@ -120,9 +125,70 @@ public class DialogManager {
         return passwordDialog;
     }
 
+    public void showLoadingDialog(String title, String content, Pane parent, Task<?> task, Runnable onFinished) {
+        setUpCustomDialog(loadingDialog, parent, title, content);
+        loadingDialog.setProgressLabel(content);
+        loadingDialog.progressProperty().bind(task.progressProperty());
+        loadingDialog.setOnCloseRequest(event -> task.cancel());
+
+        task.setOnSucceeded(event -> {
+            loadingDialog.progressProperty().unbind();
+            loadingDialog.setProgress(100);
+            loadingDialog.setProgressLabel("Done!");
+            onFinished.run();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    Platform.runLater(() -> {
+                        loadingDialog.close();
+                    });
+                }
+            }, 1000);
+        });
+        loadingDialog.showDialog();
+    }
+
+    public void showChoiceDialog(String title, String content, Pane parent, HashMap<String, Runnable> choices) {
+        setUpCustomDialog(choiceDialog, parent, title, content);
+        choiceDialog.setChoices(choices);
+        choiceDialog.showDialog();
+    }
+
+    // endregion
+
+    // region Utilities
+
+    /**
+     * Sets up an MFXStageDialog (with MFXGenericDialog as content) to be used as a classic alert.
+     * @param alertType the desired alert type
+     * @param header the header text
+     * @param content the content text
+     * @param parent the pane that will be used as the owner of the alert
+     */
     private void convertDialogTo(Alert.AlertType alertType, String header, String content, Pane parent) {
         result = new CompletableFuture<>();
         String styleClass = null;
+
+        if (dialog.getOwnerNode() != parent) {
+            dialog.setOwnerNode(parent);
+        }
+        if (dialog.getOwner() == null) {
+            dialog.initOwner(parent.getScene().getWindow());
+        } else if (dialog.getOwner() != parent.getScene().getWindow()) {
+            dialog = MFXGenericDialogBuilder.build()
+                    .toStageDialogBuilder()
+                    .setDraggable(true)
+                    .get();
+            dialogContent = MFXGenericDialogBuilder.build()
+                    .setOnMinimize(event -> dialog.setIconified(true))
+                    .setOnClose(event -> dialog.close())
+                    .setOnAlwaysOnTop(event -> dialog.setAlwaysOnTop(true))
+                    .get();
+            dialog.setContent(dialogContent);
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initOwner(parent.getScene().getWindow());
+            dialog.setOwnerNode(parent);
+        }
 
         dialogContent.setContentText(content);
         dialogContent.setHeaderText(header);
@@ -132,22 +198,6 @@ public class DialogManager {
                 Map.entry(btnConfirm, event -> dialog.close()),
                 Map.entry(btnCancel, event -> dialog.close())
         );
-
-        if (dialog.getOwnerNode() != parent) {
-            dialog.setOwnerNode(parent);
-        }
-
-        if (dialog.getOwner() == null) {
-            dialog.initOwner(parent.getScene().getWindow());
-        } else if (dialog.getOwner() != parent.getScene().getWindow()) {
-            dialog = MFXGenericDialogBuilder.build()
-                    .toStageDialogBuilder()
-                    .setDraggable(true)
-                    .get();
-            dialog.setContent(dialogContent);
-            dialog.initModality(Modality.APPLICATION_MODAL);
-            dialog.initOwner(parent.getScene().getWindow());
-        }
 
         switch (alertType) {
             case ERROR -> {
@@ -191,38 +241,6 @@ public class DialogManager {
             dialogContent.getStyleClass().add(styleClass);
     }
 
-    public void showLoadingDialog(String creatingPdf, String s, Pane parent) {
-
-
-    }
-
-    public void showLoadingDialog(String creatingPdf, String s, Pane parent, Runnable onFinished) {
-
-    }
-
-    public void showLoadingDialog(String title, String content, Pane parent, Task<?> task, Runnable onFinished) {
-        setUpCustomDialog(loadingDialog, parent, title, content);
-        loadingDialog.setProgressLabel(content);
-        loadingDialog.progressProperty().bind(task.progressProperty());
-        loadingDialog.setOnCloseRequest(event -> task.cancel());
-
-        task.setOnSucceeded(event -> {
-            loadingDialog.progressProperty().unbind();
-            loadingDialog.setProgress(100);
-            loadingDialog.setProgressLabel("Done!");
-            onFinished.run();
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    Platform.runLater(() -> {
-                        loadingDialog.close();
-                    });
-                }
-            }, 1000);
-        });
-        loadingDialog.showDialog();
-    }
-
     private void setUpCustomDialog(CustomDialog dialog, Pane parent) {
         dialog.clear();
 
@@ -241,4 +259,5 @@ public class DialogManager {
         dialog.setTitleText(title);
         dialog.setContentText(content);
     }
+    // endregion
 }

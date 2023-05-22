@@ -1,6 +1,7 @@
 package gui.model;
 
 import be.Customer;
+import be.Document;
 import bll.IManager;
 import bll.ManagerFactory;
 import bll.manager.CustomerManager;
@@ -20,7 +21,6 @@ public class CustomerModel implements IModel<Customer> {
     private CustomerModel() {
         customerManager = (CustomerManager) ManagerFactory.createManager(ManagerFactory.ManagerType.CUSTOMER);
         allCustomers = new HashMap<>();
-        reloadCustomers();
     }
 
     public static CustomerModel getInstance() {
@@ -35,18 +35,33 @@ public class CustomerModel implements IModel<Customer> {
         ResultState resultState = customerManager.add(customer);
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allCustomers.put(customer.getCustomerID(), customer);
+            customer.getContracts().values().forEach(document -> {
+                DocumentModel.getInstance().getById(document.getDocumentID()).setCustomer(customer);
+            });
         }
         return resultState;
     }
 
     @Override
     public ResultState update(Customer customer) {
-        return customerManager.update(customer);
+        ResultState resultState = customerManager.update(customer);
+        if (resultState.equals(ResultState.SUCCESSFUL)) {
+            allCustomers.put(customer.getCustomerID(), customer);
+            customer.getContracts().values().forEach(document -> {
+                DocumentModel.getInstance().getById(document.getDocumentID()).setCustomer(customer);
+            });
+        }
+        return resultState;
     }
 
     @Override
     public ResultState delete(UUID id) {
-        return customerManager.delete(id);
+        ResultState resultState = customerManager.delete(id);
+        if (resultState.equals(ResultState.SUCCESSFUL)) {
+            allCustomers.remove(id);
+            //TODO: delete all documents of customer
+        }
+        return resultState;
     }
 
     @Override
@@ -56,7 +71,7 @@ public class CustomerModel implements IModel<Customer> {
 
     @Override
     public Customer getById(UUID id) {
-        return customerManager.getById(id);
+        return allCustomers.get(id);
     }
 
     public void reloadCustomers() {
@@ -65,7 +80,6 @@ public class CustomerModel implements IModel<Customer> {
     }
 
     public void deleteExpiredCustomers(){
-        //TODO also delete documents or replace customer values
         allCustomers.values().stream().filter(customer ->
                 customer.getLastContract().before((Date.valueOf(LocalDate.now().minusMonths(48)))))
                 .forEach(customer -> delete(customer.getCustomerID()));
@@ -91,5 +105,22 @@ public class CustomerModel implements IModel<Customer> {
                 customer.getCustomerName().toLowerCase().contains(query) ||
                         customer.getCustomerEmail().toLowerCase().contains(query)).forEach(filteredCustomers::add);
         return filteredCustomers;
+    }
+
+    public void put(Customer customer) {
+        Customer temp = allCustomers.get(customer.getCustomerID());
+        if (temp != null) {
+            customer.setContracts(temp.getContracts());
+            allCustomers.replace(customer.getCustomerID(), customer);
+        } else {
+            allCustomers.put(customer.getCustomerID(), customer);
+        }
+    }
+
+    public void addContract(UUID customerID, Document contract) {
+        Customer customer = allCustomers.get(customerID);
+        if (customer != null) {
+            customer.addContract(contract);
+        }
     }
 }
