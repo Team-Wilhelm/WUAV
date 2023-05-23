@@ -8,6 +8,8 @@ import gui.util.DialogManager;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -45,14 +47,13 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     private MFXTextField searchBar;
     @FXML
     private Label expiryLabel;
-    private NotificationBubble notificationBubble;
+    private BooleanProperty expiredCustomersProperty = new SimpleBooleanProperty(false);
 
     private ObservableList<Customer> customerList = FXCollections.observableArrayList();
     private List<Customer> almostExpiredCustomers = new ArrayList<>();
     private final CustomerModel customerModel = CustomerModel.getInstance();
     private boolean hasAccess = false;
     private HashMap<String, Runnable> actions = new HashMap<>();
-    private HBox btnCustomersBox;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -65,10 +66,6 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         progressLabel.visibleProperty().bind(progressSpinner.visibleProperty()); // show label when spinner is visible
 
         setActions();
-
-        notificationBubble = new NotificationBubble();
-        //notificationBubble.visibleProperty().bind(Bindings.createBooleanBinding(
-          //      () -> almostExpiredCustomers.size() > 0));
     }
 
     private void populateTableView() {
@@ -172,8 +169,6 @@ public class CustomerInfoController extends ViewController<Customer> implements 
                 almostExpiredCustomers.add(customer);
             }
         }
-        System.out.println("Customers: " + customerList.size());
-        System.out.println("Almost expired customers: " + almostExpiredCustomers.size());
     }
 
     @Override
@@ -187,19 +182,13 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         refreshItems();
     }
 
-    public void showAlmostExpiredCustomers(HBox hbox) {
-        btnCustomersBox = hbox;
-        btnCustomersBox.getChildren().add(notificationBubble);
-        showAlmostExpiredCustomers();
-    }
-
     public void showAlmostExpiredCustomers() {
         if (customerModel.getAlmostExpiredCustomers() > 0) {
             expiryLabel.setText(customerModel.getAlmostExpiredCustomers() + " customer(s) with an almost expired contract found");
-            notificationBubble.setVisible(true);
+            expiredCustomersProperty.set(true);
         } else {
             expiryLabel.setText("No customers with an almost expired contract found");
-            notificationBubble.setVisible(false);
+            expiredCustomersProperty.set(false);
         }
     }
 
@@ -259,6 +248,10 @@ public class CustomerInfoController extends ViewController<Customer> implements 
             customerModel.update(customer);
             refreshItems();
         });
+    }
+
+    public BooleanProperty expiredCustomersProperty() {
+        return expiredCustomersProperty;
     }
 }
 

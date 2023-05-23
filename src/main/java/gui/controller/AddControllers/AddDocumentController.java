@@ -7,8 +7,6 @@ import gui.controller.CanvasController;
 import gui.nodes.textControls.MFXTextFieldWithAutofill;
 import gui.nodes.textControls.TextAreaWithFloatingText;
 import gui.tasks.GeneratePdfTask;
-import javafx.application.Platform;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import utils.enums.CustomerType;
 import utils.enums.UserRole;
@@ -59,7 +57,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.ResourceBundle;
 

@@ -1,10 +1,9 @@
 package gui.controller.ViewControllers;
 
 import be.Document;
-import io.github.palexdev.virtualizedfx.cell.Cell;
 import javafx.beans.binding.BooleanBinding;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.layout.GridPane;
 import utils.enums.DocumentFilter;
 import utils.enums.UserRole;
@@ -58,6 +57,7 @@ public class DocumentController extends ViewController<Document> implements Init
     private final DocumentModel documentModel = DocumentModel.getInstance();
     private boolean hasAccess = false;
     private BooleanBinding anyDocumentsLoadingImages;
+    private BooleanProperty customerChangedProperty = new SimpleBooleanProperty(false);
 
     public DocumentController() {}
 
@@ -279,5 +279,13 @@ public class DocumentController extends ViewController<Document> implements Init
         } else {
             return str;
         }
+    }
+
+    public BooleanProperty customerChangedProperty() {
+        return customerChangedProperty;
+    }
+
+    public void setCustomerChanged(boolean customerChanged) {
+        customerChangedProperty.set(customerChanged);
     }
 }

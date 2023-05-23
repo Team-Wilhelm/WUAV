@@ -1,6 +1,7 @@
 package gui.controller.AddControllers;
 
 import be.Document;
+import gui.controller.ViewControllers.DocumentController;
 import gui.controller.ViewControllers.ViewController;
 import gui.tasks.GeneratePdfTask;
 import gui.tasks.SaveTask;
@@ -37,6 +38,7 @@ public abstract class AddController<T> {
                     }
                     if (addController instanceof AddDocumentController) {
                         ((AddDocumentController) addController).setUpPdfListView();
+                        ((DocumentController) controller).setCustomerChanged(true);
                     }
                 } else if (task.getValue() == ResultState.DUPLICATE_DATA) {
                     dialogManager.showError("Username already exists!", "Username already exists!", owner);

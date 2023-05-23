@@ -4,6 +4,7 @@ import be.Customer;
 import gui.controller.AddControllers.AddUserController;
 import gui.controller.ViewControllers.CustomerInfoController;
 import gui.model.UserModel;
+import gui.nodes.NotificationBubble;
 import gui.util.DialogManager;
 import gui.util.SceneManager;
 import gui.controller.ViewControllers.DocumentController;
@@ -11,6 +12,9 @@ import gui.controller.ViewControllers.UserController;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
 import io.github.palexdev.materialfx.css.themes.Themes;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -39,6 +43,8 @@ public class MenuController implements Initializable {
     private CustomerInfoController customerController;
     private LoginViewController loginViewController;
     private MFXButton logOutButton;
+    private NotificationBubble notificationBubble;
+    private BooleanProperty customerChangedProperty = new SimpleBooleanProperty(false);
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -64,6 +70,18 @@ public class MenuController implements Initializable {
             currentScene = documentView;
             gridPane.add(currentScene, 2, 0, 1, gridPane.getRowCount());
 
+            // Makes sure that any time a customer is saved, the notification bubble is updated
+            customerChangedProperty.bind(documentController.customerChangedProperty());
+            customerChangedProperty.addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    customerController.showAlmostExpiredCustomers();
+                }
+            });
+
+            // Set the notification bubble
+            notificationBubble = new NotificationBubble();
+            btnCustomersBox.getChildren().add(notificationBubble);
+            notificationBubble.visibleProperty().bind(customerController.expiredCustomersProperty());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -77,6 +95,7 @@ public class MenuController implements Initializable {
               if (scene == documentView) {
                   documentController.addShortcuts();
               }
+              customerController.showAlmostExpiredCustomers();
        }
     }
 
@@ -123,7 +142,7 @@ public class MenuController implements Initializable {
     public void userLogInAction(Scene scene) {
         setVisibilityForUserRole();
         myProfileController.setIsEditing(UserModel.getLoggedInUser());
-        customerController.showAlmostExpiredCustomers(btnCustomersBox);
+        customerController.showAlmostExpiredCustomers();
     }
 
     private void setVisibilityForUserRole() {
