@@ -17,6 +17,7 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.Region?>
+<?import io.github.palexdev.materialfx.controls.MFXComboBox?>
 <GridPane fx:id="gridPane" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="600.0" styleClass="background" stylesheets="@../css/style.css" vgap="10.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controller.ViewControllers.DocumentController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" percentWidth="100" prefWidth="100.0" />
@@ -32,7 +33,7 @@
 
             <MFXTextField fx:id="searchBar" floatingText="Search for documents" maxWidth="600" prefWidth="500" HBox.hgrow="ALWAYS">
             </MFXTextField>
-
+            <MFXComboBox fx:id="filter" floatingText="Filter" />
             <Region HBox.hgrow="ALWAYS" />
 
             <Label fx:id="progressLabel" text="Label">
