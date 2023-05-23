@@ -74,11 +74,6 @@ public class CustomerModel implements IModel<Customer> {
         return allCustomers.get(id);
     }
 
-    public void reloadCustomers() {
-        allCustomers.clear();
-        allCustomers.putAll(customerManager.getAll());
-    }
-
     public void deleteExpiredCustomers(){
         allCustomers.values().stream().filter(customer ->
                 customer.getLastContract().before((Date.valueOf(LocalDate.now().minusMonths(48)))))

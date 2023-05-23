@@ -111,10 +111,6 @@ public class DocumentModel implements IModel<Document> {
         return documentManager.getDrawingFromDocument(document);
     }
 
-    public void reloadDocuments() {
-        allDocuments.clear();
-        allDocuments.putAll(documentManager.getAll());
-    }
 
     public void addOrUpdateCustomer(Document document) {
         if (document.getCustomer().getCustomerID() == null) {
