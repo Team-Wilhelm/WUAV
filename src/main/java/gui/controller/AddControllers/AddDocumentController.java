@@ -192,7 +192,6 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
-        //TODO customers/addresses
         assignInputToVariables();
 
         Customer customerByEmail = customerModel.getByEmail(email);  // Try to find a customer with the same email
@@ -210,23 +209,6 @@ public class AddDocumentController extends AddController<Document> implements In
 
         if (customer.getCustomerEmail().equals(customerByEmail.getCustomerEmail())) {
             if (customerByEmail.getContracts().size() > 0 && !customer.equals(customerByEmail)) {
-
-                /*
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Editing an existing customer");
-                alert.setHeaderText("You are editing a customer with " + customerByEmail.getContracts().size() + " other contract(s) belonging to them.");
-                alert.setContentText("Updating this customer will update them in all pertaining documents. Are you sure you want to continue?");
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.isPresent() && result.get() == ButtonType.OK) {
-                    customer.setCustomerID(customerByEmail.getCustomerID());
-                    customer.getCustomerAddress().setAddressID(customerByEmail.getCustomerAddress().getAddressID());
-                    customer.setContracts(customerByEmail.getContracts());
-                } else {
-                    customer = null;
-                }
-
-                 */
-
                 CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Editing an existing customer",
                         "You are editing a customer with " + customerByEmail.getContracts().size() + " other contract(s) belonging to them.\n" +
                                 "Updating this customer will update them in all pertaining documents.\n\nAre you sure you want to continue?", flowPanePictures);
@@ -240,8 +222,6 @@ public class AddDocumentController extends AddController<Document> implements In
                         customer = null;
                     }
                 });
-
-
             } else {
                 customer.setCustomerID(customerByEmail.getCustomerID());
                 customer.getCustomerAddress().setAddressID(customerByEmail.getCustomerAddress().getAddressID());
