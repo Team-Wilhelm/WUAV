@@ -50,6 +50,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     private List<Customer> almostExpiredCustomers = new ArrayList<>();
     private final CustomerModel customerModel = CustomerModel.getInstance();
     private boolean hasAccess = false;
+    private HashMap<String, Runnable> actions = new HashMap<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -60,6 +61,8 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         refreshItems();
         populateTableView();
         progressLabel.visibleProperty().bind(progressSpinner.visibleProperty()); // show label when spinner is visible
+
+        setActions();
     }
 
     private void populateTableView() {
@@ -181,39 +184,8 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     private void editCustomerAction(MouseEvent event) {
         if (event.getClickCount() == 2) {
             if (!tblCustomers.getSelectionModel().getSelection().isEmpty()) {
-                //TODO: Change to materialfx dialog
-                //TODO refresh documents after editing
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Update Customer");
-                alert.setHeaderText("Edit or delete a customer");
-                alert.setContentText("What would you like to do?");
-
-                // Create the buttons
-                ButtonType deleteButton = new ButtonType("Delete Customer");
-                ButtonType extendButton = new ButtonType("Extend by 48 months");
-                ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-                // Set the buttons to the alert
-                alert.getButtonTypes().setAll(deleteButton, extendButton, cancelButton);
-
-                // Show the alert and wait for a response
-                Optional<ButtonType> result = alert.showAndWait();
-
-                if (result.isPresent()) {
-                    if (result.get() == deleteButton) {
-                        customerModel.delete(tblCustomers.getSelectionModel().getSelectedValue().getCustomerID());
-                        reloadCustomers();
-                    } else if (result.get() == extendButton) {
-                        // Extend dateOfLastContract by 48 months
-                        tblCustomers.getSelectionModel().getSelectedValue().setLastContract(Date.valueOf(LocalDate.now()));
-                        reloadCustomers();
-                    } else {
-                        alert.close();
-                    }
-                }
-            }
-            else {
-                DialogManager.getInstance().showError("No customer selected", "Please select a customer", gridPane);
+                DialogManager.getInstance().showChoiceDialog("Update customer, extend Contract or delete customer",
+                        "What would you like to do?", gridPane, actions);
             }
         }
     }
@@ -230,6 +202,21 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         } else {
             return str;
         }
+    }
+
+    private void setActions() {
+        actions.put("Delete Customer", () -> {
+            customerModel.delete(tblCustomers.getSelectionModel().getSelectedValue().getCustomerID());
+            reloadCustomers();
+        });
+
+        actions.put("Extend by 48 months", () -> {
+            tblCustomers.getSelectionModel().getSelectedValue().setLastContract(Date.valueOf(LocalDate.now()));
+            reloadCustomers();
+        });
+
+        actions.put("Cancel", () -> {
+        });
     }
 }
 
