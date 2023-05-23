@@ -4,7 +4,6 @@ import be.Address;
 import be.Customer;
 import utils.enums.CustomerType;
 import dal.DBConnection;
-import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
 import utils.enums.ResultState;
 
@@ -16,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class CustomerDAO extends DAO implements IDAO<Customer> {
+public class CustomerDAO implements IDAO<Customer> {
     private final DBConnection dbConnection;
     public CustomerDAO() {
         dbConnection = DBConnection.getInstance();
@@ -147,8 +146,22 @@ public class CustomerDAO extends DAO implements IDAO<Customer> {
 
     @Override
     public ResultState delete(UUID id) {
-        String sql = "UPDATE Customer SET Deleted = 1 WHERE CustomerID = ?";
-        return delete(id, sql);
+        String sql = "DELETE FROM Document WHERE Document.CustomerID = ? " +
+                "DELETE FROM Customer WHERE Customer.CustomerID = ?;";
+        Connection connection = null;
+        try {
+            connection = dbConnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, id.toString());
+            ps.setString(2, id.toString());
+            ps.executeUpdate();
+            return ResultState.SUCCESSFUL;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return ResultState.FAILED;
+        } finally {
+            dbConnection.releaseConnection(connection);
+        }
     }
 
     @Override
