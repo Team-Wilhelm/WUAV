@@ -146,8 +146,8 @@ public class CustomerDAO implements IDAO<Customer> {
 
     @Override
     public ResultState delete(UUID id) {
-        String sql = "DELETE FROM Document WHERE Document.CustomerID = ? " +
-                "DELETE FROM Customer WHERE Customer.CustomerID = ?;";
+        String sql = "DELETE FROM Document WHERE CustomerID = ? " +
+                "DELETE FROM Customer WHERE CustomerID = ?;";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();

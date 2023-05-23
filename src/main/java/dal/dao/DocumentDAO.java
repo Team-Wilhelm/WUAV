@@ -126,7 +126,8 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     @Override
     public ResultState delete(UUID id) {
         String sql = "UPDATE Document SET Deleted = 1 WHERE DocumentID = ?;" +
-                "DELETE FROM Document_Image_Link WHERE DocumentID = ?";
+                "DELETE FROM Document_Image_Link WHERE DocumentID = ?;" +
+                "DELETE FROM Document_Drawing_Link WHERE DocumentID = ?;";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
