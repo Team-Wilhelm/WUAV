@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PasswordDialog extends CustomDialog {
-    //TODO generify this class
     private HBox columns;
     private VBox rows;
     private HashMap<PasswordType, MFXPasswordField> passwordFields;

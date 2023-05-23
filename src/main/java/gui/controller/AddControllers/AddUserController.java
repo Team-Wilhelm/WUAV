@@ -232,6 +232,10 @@ public class AddUserController extends AddController<User> implements Initializa
         comboPosition.getSelectionModel().selectItem(user.getUserRole());
         imgProfilePicture.setImage(CropImageToCircle.getRoundedImage(user.getProfilePicture()));
         profilePicturePath = user.getProfilePicturePath();
+
+        if (user == UserModel.getLoggedInUser()) {
+            comboOptions.getItems().removeIf(item -> item.equals(EditingOptions.DELETE));
+        }
     }
 
     private boolean checkInput() {

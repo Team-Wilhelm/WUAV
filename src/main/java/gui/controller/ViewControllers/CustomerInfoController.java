@@ -203,7 +203,6 @@ public class CustomerInfoController extends ViewController<Customer> implements 
                     if (result.get() == deleteButton) {
                         customerModel.delete(tblCustomers.getSelectionModel().getSelectedValue().getCustomerID());
                         reloadCustomers();
-                        //TODO delete document associated with customer too or replace data with something else?
                     } else if (result.get() == extendButton) {
                         // Extend dateOfLastContract by 48 months
                         tblCustomers.getSelectionModel().getSelectedValue().setLastContract(Date.valueOf(LocalDate.now()));

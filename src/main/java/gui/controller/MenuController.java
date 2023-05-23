@@ -120,8 +120,6 @@ public class MenuController implements Initializable {
      */
     public void userLogInAction(Scene scene) {
         setVisibilityForUserRole();
-        //TODO may cause issues with other views (as they are not really scenes)
-        //myProfileController.setShortcutsAndAccelerators(scene);   // Because the scene already exists, we can add the shortcuts here
         myProfileController.setIsEditing(UserModel.getLoggedInUser());
         if(UserModel.getLoggedInUser().getUserRole().equals(UserRole.ADMINISTRATOR)
                 || UserModel.getLoggedInUser().getUserRole().equals(UserRole.PROJECT_MANAGER)){

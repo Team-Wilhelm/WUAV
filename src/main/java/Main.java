@@ -24,18 +24,7 @@ import java.util.concurrent.CompletableFuture;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        long start = System.currentTimeMillis();
-        Parent root;
-        if (!true)
-            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
-        else {
-            User user = UserModel.getInstance().getUserByUsername("admin");
-            UserModel.getInstance().setLoggedInUser(user);
-            //TODO change back
-            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.MENU_SCENE)));
-            primaryStage.setMaximized(true);
-        }
-
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
         primaryStage.setTitle("WUAV Documentation Management System");
         primaryStage.getIcons().add(new Image("/img/icons/WUAV.png"));
 
@@ -58,7 +47,6 @@ public class Main extends Application {
             } else if (e.getClickCount() == 2 && !primaryStage.isMaximized())
                 primaryStage.setMaximized(true);
         });
-        System.out.println("Time to load: " + (System.currentTimeMillis() - start) + "ms");
     }
 
     public static void main(String[] args) {
