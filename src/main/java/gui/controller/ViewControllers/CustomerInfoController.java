@@ -197,6 +197,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     @FXML
     @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER})
     private void editCustomerAction(MouseEvent event) {
+        //TODO: Fix
         if (event.getClickCount() == 2) {
             System.out.println("Double clicked");
         if (new AccessChecker().hasAccess(this.getClass())) {

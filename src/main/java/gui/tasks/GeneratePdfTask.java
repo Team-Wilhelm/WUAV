@@ -25,17 +25,9 @@ public class GeneratePdfTask extends Task<ResultState> implements TaskCallback {
     @Override
     protected ResultState call() throws Exception {
         try {
-            updateProgress(25, 100); // Starting
-            /* Pre-generate the first pdf so we know the final number of pages and can use it in place for
-             * ordering the final pdf's pages
-             */
-            //int numberOfPages = pdfGenerator.getNumberOfPages(document, checkboxWrappers);
-            updateProgress(50, 100); // Halfway there
-
-            // Generate the actual pdf
+            pdfGenerator.progressProperty().addListener((observable, oldValue, newValue) -> updateProgress(newValue.doubleValue(), 100));
+            // Generate the document
             pdfPath = pdfGenerator.generatePdf(document, checkboxWrappers);
-            updateProgress(100, 100); // Done
-
             return ResultState.SUCCESSFUL;
         } catch (Exception e) {
             e.printStackTrace();

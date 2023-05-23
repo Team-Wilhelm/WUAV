@@ -3,6 +3,7 @@ package bll.pdf;
 import be.Address;
 import be.Document;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import utils.enums.DocumentPropertyType;
 import com.itextpdf.io.font.FontConstants;
 import com.itextpdf.io.image.ImageData;
@@ -33,8 +34,12 @@ public class PdfGenerator {
     private Paragraph lineBreak3 = new Paragraph("\n" + "\n" + "\n");
     private AreaBreak pageBreak = new AreaBreak(AreaBreakType.NEXT_AREA);
     private float margin = 75;
+    private DoubleProperty progressProperty = new SimpleDoubleProperty(0);
+    private int totalSteps;
+    private int currentStep;
 
     public Path generatePdf(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes) {
+        totalSteps = checkBoxes.size() * 2;
         PdfDocumentWrapper temporary = getNumberOfPages(document, checkBoxes);
         PdfDocumentWrapper pdf = generateItextDocument(document, checkBoxes, temporary);
         pdf.getPdfDocument().close();
@@ -67,18 +72,23 @@ public class PdfGenerator {
                 if (checkboxWrapper.getProperty() == DocumentPropertyType.DATE_OF_CREATION) {
                     doc.add(new Paragraph(String.valueOf(document.getDateOfCreation())));
                     doc.add(lineBreak);
+                    increaseProgress();
                 }
                 if (checkboxWrapper.getProperty() == DocumentPropertyType.JOB_TITLE) {
                     doc.add(new Paragraph(document.getJobTitle()).setBold().setFontSize(14));
+                    increaseProgress();
                 }
                 if (checkboxWrapper.getProperty() == DocumentPropertyType.JOB_DESCRIPTION) {
                     doc.add(new Paragraph(document.getJobDescription()));
+                    increaseProgress();
                 }
                 if (checkboxWrapper.getProperty() == DocumentPropertyType.NOTES) {
                     doc.add(getOptionalNotes(document));
+                    increaseProgress();
                 }
                 if (checkboxWrapper.getProperty() == DocumentPropertyType.TECHNICIANS) {
                     doc.add(new Paragraph(document.getTechnicianNames()));
+                    increaseProgress();
                 }
             }
             //Add images
@@ -87,6 +97,7 @@ public class PdfGenerator {
                 doc.add(pageBreak);
                 for (DocumentPropertyCheckboxWrapper image : imageCheckboxes) {
                     doc.add(createImageTable(image));
+                    increaseProgress();
                 }
             }
             return new PdfDocumentWrapper(doc, path, document, checkBoxes);
@@ -211,5 +222,24 @@ public class PdfGenerator {
             path = Path.of(home + "/Downloads/" + document.getDocumentID() + " (" + i + ")" + ".pdf");
         }
         return path;
+    }
+
+    public DoubleProperty progressProperty() {
+        return progressProperty;
+    }
+
+   public double getProgress() {
+       return progressProperty.get();
+   }
+
+    public void setProgress(double progress) {
+        if (progressProperty != null) {
+            progressProperty.set(progress);
+        }
+    }
+
+    private void increaseProgress() {
+        currentStep++;
+        setProgress((double) currentStep / totalSteps * 100);
     }
 }
