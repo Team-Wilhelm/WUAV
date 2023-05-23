@@ -31,8 +31,7 @@ public class TextInputDialog extends CustomDialog {
         textArea = new TextArea();
         textArea.setWrapText(true);
         contentBox.getChildren().add(textArea);
-        //textArea.setMaxTextLength(256);
-        //TODO add max length
+        setMaxTextLength(256);
 
         super.setContent(contentBox);
         this.setContent(super.getDialogContent());
@@ -45,9 +44,14 @@ public class TextInputDialog extends CustomDialog {
         );
     }
 
-   /* public void setMaxTextLength(int length) {
-        textArea.setMaxTextLength(length);
-    }*/
+   public void setMaxTextLength(int length) {
+        textArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (textArea.textProperty().getValueSafe().length() > length) {
+                String s = textArea.textProperty().getValueSafe().substring(0, length);
+                textArea.setText(s);
+            }
+        });
+    }
 
 
     public void setEditorText(String text) {

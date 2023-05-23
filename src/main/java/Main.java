@@ -1,4 +1,5 @@
 import be.User;
+import gui.util.DialogManager;
 import gui.util.SceneManager;
 import gui.model.UserModel;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
@@ -7,31 +8,23 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import utils.ThreadPool;
 
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 
 public class Main extends Application {
-    //TODO custom window frame
     @Override
     public void start(Stage primaryStage) throws Exception {
-        long start = System.currentTimeMillis();
-        Parent root;
-        if (!true)
-            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
-        else {
-            User user = UserModel.getInstance().getUserByUsername("admin");
-            UserModel.getInstance().setLoggedInUser(user);
-            //TODO change back
-            root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.MENU_SCENE)));
-            primaryStage.setMaximized(true);
-        }
-
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
         primaryStage.setTitle("WUAV Documentation Management System");
         primaryStage.getIcons().add(new Image("/img/icons/WUAV.png"));
 
@@ -54,14 +47,6 @@ public class Main extends Application {
             } else if (e.getClickCount() == 2 && !primaryStage.isMaximized())
                 primaryStage.setMaximized(true);
         });
-
-        primaryStage.setOnCloseRequest(e -> {
-            //TODO show confirmation dialogue
-            primaryStage.close();
-            stop();
-            System.exit(0);
-        });
-        System.out.println("Time to load: " + (System.currentTimeMillis() - start) + "ms");
     }
 
     public static void main(String[] args) {

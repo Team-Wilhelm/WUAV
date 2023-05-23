@@ -151,7 +151,7 @@ public class DialogManager {
     public void showChoiceDialog(String title, String content, Pane parent, HashMap<String, Runnable> choices) {
         setUpCustomDialog(choiceDialog, parent, title, content);
         choiceDialog.setChoices(choices);
-        choiceDialog.showDialog();
+        choiceDialog.showAndWait();
     }
 
     // endregion

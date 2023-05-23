@@ -35,10 +35,10 @@ public class DocumentModel implements IModel<Document> {
 
     @Override
     public ResultState add(Document document) {
+        addOrUpdateCustomer(document);
         ResultState resultState = documentManager.add(document);
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allDocuments.put(document.getDocumentID(), document);
-            addOrUpdateCustomer(document);
             customerModel.put(document.getCustomer());
         }
         return resultState;
@@ -46,10 +46,10 @@ public class DocumentModel implements IModel<Document> {
 
     @Override
     public ResultState update(Document document) {
+        addOrUpdateCustomer(document);
         ResultState resultState = documentManager.update(document);
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allDocuments.put(document.getDocumentID(), document);
-            addOrUpdateCustomer(document);
             customerModel.put(document.getCustomer());
         }
         return resultState;

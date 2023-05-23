@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.Timer;
 
 public abstract class AddController<T> {
-    //TODO review this class
     protected abstract void assignInputToVariables();
     protected abstract void assignListenersToTextFields();
     protected abstract void setIsEditing(T objectToEdit);

@@ -36,7 +36,9 @@ import utils.enums.UserRole;
 import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class CustomerInfoController extends ViewController<Customer> implements Initializable {
 
@@ -56,6 +58,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     private List<Customer> almostExpiredCustomers = new ArrayList<>();
     private final CustomerModel customerModel = CustomerModel.getInstance();
     private boolean hasAccess = false;
+    private HashMap<String, Runnable> actions = new HashMap<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -66,6 +69,8 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         refreshItems();
         populateTableView();
         progressLabel.visibleProperty().bind(progressSpinner.visibleProperty()); // show label when spinner is visible
+
+        setActions();
     }
 
     private void populateTableView() {
@@ -206,45 +211,26 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         UserRole userRole = UserModel.getLoggedInUser().getUserRole();
         boolean hasAccess = (userRole == UserRole.ADMINISTRATOR || userRole == UserRole.PROJECT_MANAGER);
         if (event.getClickCount() == 2) {
-            if (!tblCustomers.getSelectionModel().getSelection().isEmpty()
-                    && hasAccess) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Update Customer");
-                alert.setHeaderText("Edit or delete a customer");
-                alert.setContentText("What would you like to do?");
-
-                // Create the buttons
-                ButtonType deleteButton = new ButtonType("Delete Customer");
-                ButtonType extendButton = new ButtonType("Extend by 48 months");
-                ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-                // Set the buttons to the alert
-                alert.getButtonTypes().setAll(deleteButton, extendButton, cancelButton);
-
-                // Show the alert and wait for a response
-                Optional<ButtonType> result = alert.showAndWait();
-
-                if (result.isPresent()) {
-                    if (result.get() == deleteButton) {
-                        customerModel.delete(tblCustomers.getSelectionModel().getSelectedValue().getCustomerID());
-                        almostExpiredCustomers.remove(tblCustomers.getSelectionModel().getSelectedValue());
-                        refreshItems();
-                    } else if (result.get() == extendButton) {
-                        // Extend dateOfLastContract by 48 months
-                        Customer customer = tblCustomers.getSelectionModel().getSelectedValue();
-                        customer.setLastContract(Date.valueOf(LocalDate.now()));
-                        almostExpiredCustomers.remove(tblCustomers.getSelectionModel().getSelectedValue());
-                        customerModel.update(customer);
-                        refreshItems();
-                    } else {
-                        alert.close();
-                    }
-                }
-            }
-            else if (hasAccess){
-                DialogManager.getInstance().showError("No customer selected", "Please select a customer", gridPane);
+            if (!tblCustomers.getSelectionModel().getSelection().isEmpty()) {
+                Customer customer = tblCustomers.getSelectionModel().getSelectedValue();
+                DialogManager.getInstance().showChoiceDialog("Extend contract or delete customer",
+                        "This customer has " + getTimeUntilContractExpires(customer) + " until their contract expires, what would you like to do?",
+                        gridPane, actions);
             }
         }
+    }
+
+    private String getTimeUntilContractExpires(Customer customer) {
+        String timeUntilContractExpires = "";
+        LocalDate contractExpiry = customer.getLastContract().toLocalDate().plusMonths(48);
+        LocalDate now = LocalDate.now();
+        Period period = Period.between(now, contractExpiry);
+        if (period.getMonths() > 0) {
+            timeUntilContractExpires += period.getMonths() + " month(s)";
+        } else {
+            timeUntilContractExpires += period.getDays() + " day(s)";
+        }
+        return timeUntilContractExpires;
     }
 
     public void setVisibilityForUserRole() {
@@ -259,6 +245,23 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         } else {
             return str;
         }
+    }
+
+    private void setActions() {
+        actions.put("Delete Customer", () -> {
+            customerModel.delete(tblCustomers.getSelectionModel().getSelectedValue().getCustomerID());
+            almostExpiredCustomers.remove(tblCustomers.getSelectionModel().getSelectedValue());
+            refreshItems();
+        });
+
+        actions.put("Extend by 48 months", () -> {
+            // Extend dateOfLastContract by 48 months
+            Customer customer = tblCustomers.getSelectionModel().getSelectedValue();
+            customer.setLastContract(Date.valueOf(LocalDate.now()));
+            almostExpiredCustomers.remove(tblCustomers.getSelectionModel().getSelectedValue());
+            customerModel.update(customer);
+            refreshItems();
+        });
     }
 }
 

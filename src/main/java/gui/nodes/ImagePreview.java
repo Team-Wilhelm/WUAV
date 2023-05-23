@@ -115,7 +115,6 @@ public class ImagePreview extends VBox {
     }
 
     public void openSeeDescriptionDialogue() {
-        //TODO limit the size of the description to 256 characters
         String description = imageWrapper.getDescription() == null ? "No description available" : imageWrapper.getDescription();
         DialogManager.getInstance().showTextInputDialog("See description",
                 "Add a description to the image", description, this, false);

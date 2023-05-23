@@ -66,30 +66,32 @@ public class DocumentPropertiesList extends GridPane {
     }
 
     private void displayProperties() {
-        //TODO throws exception when document is null
-        int row = 1;
+        try {
+            int row = 1;
 
-        // Necessary properties
-        Date date = document.getDateOfCreation() != null ? document.getDateOfCreation() : Date.valueOf(LocalDate.now());
-        addProperty(DocumentPropertyType.DATE_OF_CREATION.toString(), date.toString(), row++);
-        addProperty(DocumentPropertyType.JOB_TITLE.toString(), document.getJobTitle(), row++);
+            // Necessary properties
+            Date date = document.getDateOfCreation() != null ? document.getDateOfCreation() : Date.valueOf(LocalDate.now());
+            addProperty(DocumentPropertyType.DATE_OF_CREATION.toString(), date.toString(), row++);
+            addProperty(DocumentPropertyType.JOB_TITLE.toString(), document.getJobTitle(), row++);
 
-        int characters = Math.min(document.getJobDescription().length(), 50);
-        String jobDescription = document.getJobDescription().length() > 50 ?
-                document.getJobDescription().substring(0, characters) + "..." : document.getJobDescription();
-        addProperty(DocumentPropertyType.JOB_DESCRIPTION.toString(), jobDescription, row++);
+            int characters = Math.min(document.getJobDescription().length(), 50);
+            String jobDescription = document.getJobDescription().length() > 50 ?
+                    document.getJobDescription().substring(0, characters) + "..." : document.getJobDescription();
+            addProperty(DocumentPropertyType.JOB_DESCRIPTION.toString(), jobDescription, row++);
 
-        // Optional properties
-        if (document.getOptionalNotes() != null && !document.getOptionalNotes().isEmpty())
-            addProperty(DocumentPropertyType.NOTES.toString(), document.getOptionalNotes(), row++);
+            // Optional properties
+            if (document.getOptionalNotes() != null && !document.getOptionalNotes().isEmpty())
+                addProperty(DocumentPropertyType.NOTES.toString(), document.getOptionalNotes(), row++);
 
-        for (ImageWrapper imageWrapper : document.getDocumentImages()) {
-            addProperty(DocumentPropertyType.IMAGE.toString(), imageWrapper, row++);
-        }
+            for (ImageWrapper imageWrapper : document.getDocumentImages()) {
+                addProperty(DocumentPropertyType.IMAGE.toString(), imageWrapper, row++);
+            }
 
-        String technicianNames = document.getTechnicianNames().substring(document.getTechnicianNames().indexOf(":") + 1); // (Technicians:) Name 1, Name 2, Name 3
-        if (!technicianNames.isEmpty()) {
-            addProperty(DocumentPropertyType.TECHNICIANS.toString(), document.getTechnicianNames(), row++);
+            String technicianNames = document.getTechnicianNames().substring(document.getTechnicianNames().indexOf(":") + 1); // (Technicians:) Name 1, Name 2, Name 3
+            if (!technicianNames.isEmpty()) {
+                addProperty(DocumentPropertyType.TECHNICIANS.toString(), document.getTechnicianNames(), row++);
+            }
+        } catch (Exception e) {
         }
     }
 

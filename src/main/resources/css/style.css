@@ -44,10 +44,12 @@
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
 }
+
 .hbox.input .anchor-pane {
     -fx-background-color: -fx-base-color-darker;
     -fx-border-color: transparent;
 }
+
 .loginVbox{
     -fx-background-color: TRANSPARENT;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 2, 0, 0, 1);
@@ -58,10 +60,13 @@
 .input:selected,
 .input .floating-text,
 .input:selected .floating-text,
-.input:focused .floating-text {
+.input:focused .floating-text,
+.input .mfx-text-field {
     -fx-background-color: -fx-base-color-dark;
     -fx-border-color: transparent;
+    -mfx-main: -fx-base-color-dark;
 }
+
 .mfx-text-field:floating .floating-text {
     -fx-text-fill: -fx-dark-grey;
 }
@@ -140,7 +145,7 @@
 
 /*Removal of default materialFX purple colour*/
 .mfx-text-field {
-    -mfx-main: -fx-base-color-dark;
+    -mfx-main: -fx-dark-grey;
 }
 
 .mfx-toggle-button {
@@ -210,3 +215,4 @@
 .tab-pane .tab-header-area .tab-header-background {
     -fx-opacity: 0;
 }
+

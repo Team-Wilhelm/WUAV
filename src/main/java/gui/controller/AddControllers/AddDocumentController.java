@@ -8,6 +8,7 @@ import gui.nodes.textControls.MFXTextFieldWithAutofill;
 import gui.nodes.textControls.TextAreaWithFloatingText;
 import gui.tasks.GeneratePdfTask;
 import javafx.application.Platform;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import utils.enums.CustomerType;
 import utils.enums.UserRole;
@@ -207,7 +208,7 @@ public class AddDocumentController extends AddController<Document> implements In
             customer.setLastContract(lastContract);
         }
 
-        if (customer.getCustomerEmail().equals(customerByEmail.getCustomerEmail())) {
+        if (customerByEmail != null && customer.getCustomerEmail().equals(customerByEmail.getCustomerEmail())) {
             if (customerByEmail.getContracts().size() > 0 && !customer.equals(customerByEmail)) {
                 CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Editing an existing customer",
                         "You are editing a customer with " + customerByEmail.getContracts().size() + " other contract(s) belonging to them.\n" +
@@ -788,17 +789,25 @@ public class AddDocumentController extends AddController<Document> implements In
     // endregion
 
     public void setOnCloseRequest() {
-        /*btnSave.getScene().getWindow().setOnCloseRequest(event -> {
-            // TODO why doesn't the dialog get displayed ?
-            if (isInputChanged.get() || !isEditing.get()) {
-                DialogManager.getInstance().showConfirmation("Close this window?",
-                        "You have unsaved changes. Are you sure you want to close this window?", gridPaneJob, () -> {
-                    ((Stage) btnSave.getScene().getWindow()).close();
+        Stage stage = (Stage) btnSave.getScene().getWindow();
+        stage.setOnCloseRequest(e -> {
+            isInputChanged();
+            if (isInputChanged.getValue() || !isEditing.getValue()) {
+                HashMap<String, Runnable> actions = new HashMap<>();
+                actions.put("Save", () -> {
+                    saveAction(null);
+                    stage.close();
                 });
-            } else {
-                ((Stage) btnSave.getScene().getWindow()).close();
+
+                actions.put("Close", stage::close);
+
+                DialogManager.getInstance().showChoiceDialog(
+                        "Close this window", "You have unsaved changes.\n" +
+                                "Do you want to close this window without saving?", flowPanePictures, actions
+                        );
+                e.consume();
+
             }
         });
-         */
     }
 }
