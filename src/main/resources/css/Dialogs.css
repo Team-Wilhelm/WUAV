@@ -1,0 +1,36 @@
+@import "Colors.css";
+
+.mfx-dialog .actions-pane .mfx-button,
+.mfx-button{
+    -fx-background-color: transparent;
+    -fx-background-radius: 5;
+    -fx-padding: 7 10 7 10;
+
+    -fx-font-family: "Open Sans Bold";
+}
+
+.mfx-dialog .actions-pane .mfx-button .mfx-ripple-generator,
+.mfx-button .mfx-ripple-generator {
+    -mfx-auto-clip: true;
+    -mfx-background-opacity: 0.3;
+    -mfx-ripple-radius: 50;
+}
+
+.mfx-dialog .actions-pane .mfx-button .text,
+.mfx-button .text {
+    -fx-font-smoothing-type: lcd;
+}
+
+.mfx-dialog .actions-pane .mfx-button:hover,
+.mfx-button:hover {
+    -fx-background-color: #ededf0;
+}
+
+/*Removal of default materialFX purple colour*/
+.mfx-text-field {
+    -mfx-main: -fx-dark-grey;
+}
+
+.mfx-text-field .text-field {
+    -fx-highlight-fill: #C0C0C0; /* Selected text highlight */
+}

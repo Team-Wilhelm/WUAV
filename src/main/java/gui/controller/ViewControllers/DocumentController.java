@@ -68,7 +68,7 @@ public class DocumentController extends ViewController<Document> implements Init
 
         progressLabel.visibleProperty().bind(progressSpinner.visibleProperty()); // show label when spinner is visible
 
-        checkIfImagesAreLoaded(); //TODO properly implement this
+        checkIfImagesAreLoaded();
     }
 
     //region progress methods
@@ -216,7 +216,7 @@ public class DocumentController extends ViewController<Document> implements Init
             } else {
                 progressSpinner.setProgress(100);
                 progressLabel.setText("Images loaded");
-                progressSpinner.visibleProperty().unbind(); //TODO check why it's not unbound
+                progressSpinner.visibleProperty().unbind();
 
                 new Timer().schedule(new TimerTask() {
                     @Override

@@ -13,7 +13,6 @@ public abstract class CustomDialog extends MFXStageDialog {
     };
 
     public CustomDialog(String title, String content) {
-        //TODO customize how the dialog looks
         super();
         dialogContent = MFXGenericDialogBuilder.build()
                 .setOnMinimize(event -> this.setIconified(true))
@@ -23,7 +22,7 @@ public abstract class CustomDialog extends MFXStageDialog {
                 .setContentText(content)
                 .makeScrollable(true)
                 .get();
-        dialogContent.getStylesheets().add("/css/style.css");
+        dialogContent.getStylesheets().add("/css/Dialogs.css");
     }
 
     public abstract void clear();

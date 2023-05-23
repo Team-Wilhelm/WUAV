@@ -1,4 +1,5 @@
 import be.User;
+import gui.util.DialogManager;
 import gui.util.SceneManager;
 import gui.model.UserModel;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
@@ -7,13 +8,17 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import utils.ThreadPool;
 
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 
 public class Main extends Application {
@@ -52,13 +57,6 @@ public class Main extends Application {
                 primaryStage.centerOnScreen();
             } else if (e.getClickCount() == 2 && !primaryStage.isMaximized())
                 primaryStage.setMaximized(true);
-        });
-
-        primaryStage.setOnCloseRequest(e -> {
-            //TODO show confirmation dialogue
-            primaryStage.close();
-            stop();
-            System.exit(0);
         });
         System.out.println("Time to load: " + (System.currentTimeMillis() - start) + "ms");
     }
