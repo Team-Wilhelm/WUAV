@@ -58,6 +58,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.ResourceBundle;
 
@@ -92,13 +93,14 @@ public class AddDocumentController extends AddController<Document> implements In
     private CustomerModel customerModel;
     private Document documentToEdit, currentDocument;
     private DocumentController documentController;
-    private final ObservableList<ImageWrapper> pictures;
+    private ObservableList<ImageWrapper> pictures;
     private final ObservableList<ImagePreview> imagePreviews = FXCollections.observableArrayList();
     private DialogManager dialogManager;
     private ObservableList<User> allTechnicians;
     private final ThreadPool executorService;
     private boolean hasAccess = false;
     private ImagePreview lastFocused;
+    private HashMap<String, Runnable> choices = new HashMap<>();
 
     // Document and customer information
     private UUID temporaryId;
@@ -144,7 +146,6 @@ public class AddDocumentController extends AddController<Document> implements In
         btnSave.disableProperty().bind(isInputChanged.not());
         btnDelete.disableProperty().bind(isEditing.not());
 
-
         canvasTab.setOnSelectionChanged(event -> {
             if (canvasTab.isSelected()) {
 
@@ -159,7 +160,6 @@ public class AddDocumentController extends AddController<Document> implements In
                 catch (NullPointerException e) { }
             }
         });
-
         addTooltips();
     }
 
@@ -185,29 +185,51 @@ public class AddDocumentController extends AddController<Document> implements In
             ImageWrapper image = new ImageWrapper(path, selectedFile.getName());
             pictures.add(image);
             if (isEditing.get())
-                isInputChanged(documentToEdit);
+                isInputChanged();
         }
         refreshItems();
     }
 
     @FXML
     private void saveAction(ActionEvent actionEvent) {
-        //TODO customers/addresses
         assignInputToVariables();
 
+        Customer customerByEmail = customerModel.getByEmail(email);  // Try to find a customer with the same email
         Address address = new Address(streetName, houseNumber, postcode, city, country);
-        if (customer == null) {
+        if (customer == null) { // If no customer has been selected in autocomplete
             customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
         } else {
-            customer.setCustomerName(name);
-            customer.setCustomerEmail(email);
-            customer.setCustomerPhoneNumber(phoneNumber);
             customer.setCustomerAddress(address);
-            address.setAddressID(customer.getCustomerAddress().getAddressID());
+            customer.setCustomerEmail(email);
+            customer.setCustomerName(name);
+            customer.setCustomerPhoneNumber(phoneNumber);
             customer.setCustomerType(customerType);
             customer.setLastContract(lastContract);
         }
 
+        if (customer.getCustomerEmail().equals(customerByEmail.getCustomerEmail())) {
+            if (customerByEmail.getContracts().size() > 0 && !customer.equals(customerByEmail)) {
+                CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Editing an existing customer",
+                        "You are editing a customer with " + customerByEmail.getContracts().size() + " other contract(s) belonging to them.\n" +
+                                "Updating this customer will update them in all pertaining documents.\n\nAre you sure you want to continue?", flowPanePictures);
+                result.thenRun(() -> {
+                    ButtonType buttonType = result.join(); // Wait for the user to confirm the dialog
+                    if (buttonType.equals(ButtonType.OK)) {
+                        customer.setCustomerID(customerByEmail.getCustomerID());
+                        customer.getCustomerAddress().setAddressID(customerByEmail.getCustomerAddress().getAddressID());
+                        customer.setContracts(customerByEmail.getContracts());
+                    } else {
+                        customer = null;
+                    }
+                });
+            } else {
+                customer.setCustomerID(customerByEmail.getCustomerID());
+                customer.getCustomerAddress().setAddressID(customerByEmail.getCustomerAddress().getAddressID());
+                customer.setContracts(customerByEmail.getContracts());
+            }
+        }
+
+        if (customer == null) {return; }
         currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
@@ -215,6 +237,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
         if (isEditing.get()) {
             currentDocument.setDocumentID(documentToEdit.getDocumentID());
+            currentDocument.setDateOfCreation(documentToEdit.getDateOfCreation());
         }
 
         SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
@@ -350,9 +373,9 @@ public class AddDocumentController extends AddController<Document> implements In
         public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
             if (newValue.equals(pdfTab) || newValue.equals(picturesTab)) {
                 if (isEditing.get()) {
-                    isInputChanged(documentToEdit);
+                    isInputChanged();
                 } else if (currentDocument != null && !isEditing.get()) {
-                    isInputChanged(currentDocument);
+                    isInputChanged();
                 }
 
                 if (isInputChanged.get() && newValue.equals(pdfTab)) {
@@ -384,6 +407,7 @@ public class AddDocumentController extends AddController<Document> implements In
         toggleCustomerType.setSelected(document.getCustomer().getCustomerType() == CustomerType.PRIVATE);
 
         // Customer address
+        customer = document.getCustomer();
         txtStreetName.setText(document.getCustomer().getCustomerAddress().getStreetName());
         txtHouseNumber.setText(document.getCustomer().getCustomerAddress().getStreetNumber());
         txtCity.setText(document.getCustomer().getCustomerAddress().getTown());
@@ -396,8 +420,7 @@ public class AddDocumentController extends AddController<Document> implements In
         txtNotes.setText(document.getOptionalNotes());
 
         // Pictures
-        List<ImageWrapper> documentImages = new ArrayList<>(document.getDocumentImages());
-        pictures.setAll(documentImages);
+        pictures = FXCollections.observableArrayList(document.getDocumentImages());
 
         // Technicians
         technicians.clear();
@@ -507,6 +530,7 @@ public class AddDocumentController extends AddController<Document> implements In
             });
 
             imagePreviews.add(imagePreview);
+            isInputChanged();
         });
     }
 
@@ -575,8 +599,7 @@ public class AddDocumentController extends AddController<Document> implements In
                     pictures.addAll(imagePreviews.stream().map(ImagePreview::getImageWrapper).toList());
 
                     success = true;
-                    if (isEditing.get())
-                        isInputChanged(documentToEdit);
+                    isInputChanged();
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
@@ -615,7 +638,8 @@ public class AddDocumentController extends AddController<Document> implements In
         this.documentController = documentController;
     }
 
-    private void isInputChanged(Document document){
+    private void isInputChanged(){
+        Document document = isEditing.get() ? documentToEdit : currentDocument;
         // Check if job information has changed
         if (!txtJobTitle.getText().trim().equals(document.getJobTitle())) {
             isInputChanged.setValue(true);
@@ -723,7 +747,8 @@ public class AddDocumentController extends AddController<Document> implements In
                     txtCity.setText(customer.getCustomerAddress().getTown());
                     txtCountry.setText(customer.getCustomerAddress().getCountry());
                     toggleCustomerType.setSelected(customer.getCustomerType() == CustomerType.PRIVATE);
-                    dateLastContract.setValue(customer.getLastContract().toLocalDate());}
+                    dateLastContract.setValue(LocalDate.now()); // Update to today
+                }
             }
         });
     }
@@ -774,7 +799,6 @@ public class AddDocumentController extends AddController<Document> implements In
                 ((Stage) btnSave.getScene().getWindow()).close();
             }
         });
-
          */
     }
 }

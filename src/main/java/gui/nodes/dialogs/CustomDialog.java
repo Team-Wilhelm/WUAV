@@ -21,6 +21,7 @@ public abstract class CustomDialog extends MFXStageDialog {
                 .setOnClose(event -> this.close())
                 .setHeaderText(title)
                 .setContentText(content)
+                .makeScrollable(true)
                 .get();
         dialogContent.getStylesheets().add("/css/style.css");
     }

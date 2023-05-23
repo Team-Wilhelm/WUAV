@@ -187,7 +187,6 @@ public class MyToolBar extends VBox {
                 var url = BlobService.getInstance().UploadFile(output.getAbsolutePath(), doc.getDocumentID());
                 output.delete();
                 // Add this field to PDF generation
-                System.out.println(url);
                 DocumentModel.getInstance().addDrawingToDocument(doc, url);
             } catch (IOException eex) {
                 throw new RuntimeException(eex);

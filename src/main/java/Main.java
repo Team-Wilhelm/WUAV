@@ -1,3 +1,4 @@
+import be.User;
 import gui.util.SceneManager;
 import gui.model.UserModel;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
@@ -16,19 +17,19 @@ import java.util.Objects;
 
 
 public class Main extends Application {
-    //TODO check for customers who have been in the system for over 48 months and delete them
     //TODO custom window frame
     @Override
     public void start(Stage primaryStage) throws Exception {
         long start = System.currentTimeMillis();
         Parent root;
-        if (true)
+        if (!true)
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
         else {
+            User user = UserModel.getInstance().getUserByUsername("admin");
+            UserModel.getInstance().setLoggedInUser(user);
             //TODO change back
             root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.MENU_SCENE)));
             primaryStage.setMaximized(true);
-            UserModel.getInstance().setLoggedInUser(UserModel.getInstance().getUserByUsername("admin"));
         }
 
         primaryStage.setTitle("WUAV Documentation Management System");

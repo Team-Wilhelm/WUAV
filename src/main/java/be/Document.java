@@ -1,5 +1,6 @@
 package be;
 
+import gui.model.CustomerModel;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
