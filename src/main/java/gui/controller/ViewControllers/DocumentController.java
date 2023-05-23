@@ -1,8 +1,12 @@
 package gui.controller.ViewControllers;
 
 import be.Document;
+import io.github.palexdev.virtualizedfx.cell.Cell;
 import javafx.beans.binding.BooleanBinding;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
+import utils.enums.DocumentFilter;
 import utils.enums.UserRole;
 import gui.model.UserModel;
 import gui.util.SceneManager;
@@ -27,11 +31,16 @@ import javafx.stage.Modality;
 import gui.util.DialogManager;
 import javafx.stage.Window;
 
+import javax.security.auth.callback.Callback;
 import java.net.URL;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
 
 public class DocumentController extends ViewController<Document> implements Initializable {
+    @FXML
+    public MFXComboBox<DocumentFilter> filter;
     @FXML
     private MFXTableView<Document> tblDocument;
     @FXML
@@ -69,6 +78,42 @@ public class DocumentController extends ViewController<Document> implements Init
         progressLabel.visibleProperty().bind(progressSpinner.visibleProperty()); // show label when spinner is visible
 
         checkIfImagesAreLoaded();
+        checkIfImagesAreLoaded(); //TODO properly implement this
+
+        filter.getItems().addAll(DocumentFilter.values());
+
+        filter.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> applyFilter(newValue)
+        );
+    }
+
+    private void applyFilter(DocumentFilter selectedFilter) {
+        List<Document> filteredDocuments;
+
+        if (selectedFilter == DocumentFilter.ALL) {
+            filteredDocuments = documentList;
+        } else {
+            LocalDate startDate = LocalDate.now().minusDays(selectedFilter.getDays());
+            // Filter documents based on the startDate
+            filteredDocuments = filterDocumentsByCreationDate(startDate);
+        }
+
+        tblDocument.setItems(FXCollections.observableArrayList(filteredDocuments));
+    }
+    private ObservableList<Document> filterDocumentsByCreationDate(LocalDate startDate) {
+        ObservableList<Document> allDocuments = documentList;
+        ObservableList<Document> filteredDocuments = FXCollections.observableArrayList();
+
+        for (Document document : allDocuments) {
+            LocalDate creationDate = document.getDateOfCreation().toLocalDate();
+
+            // Include the document if its creation date is on or after the start date
+            if (!creationDate.isBefore(startDate)) {
+                filteredDocuments.add(document);
+            }
+        }
+
+        return filteredDocuments;
     }
 
     //region progress methods
