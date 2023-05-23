@@ -2,6 +2,7 @@ package bll.pdf;
 
 import be.Address;
 import be.Document;
+import javafx.beans.property.DoubleProperty;
 import utils.enums.DocumentPropertyType;
 import com.itextpdf.io.font.FontConstants;
 import com.itextpdf.io.image.ImageData;
@@ -14,35 +15,47 @@ import com.itextpdf.layout.border.Border;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.property.*;
 import gui.nodes.DocumentPropertyCheckboxWrapper;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
 public class PdfGenerator {
     private static PdfFont FONT;
     private static final int FONT_SIZE = 12;
-    PdfPageEventHandler pageNumberHandler;
+    private PdfPageEventHandler pageNumberHandler;
 
     //Create formatting elements
-    Paragraph lineBreak = new Paragraph();
-    Paragraph lineBreak3 = new Paragraph("\n" + "\n" + "\n");
-    AreaBreak pageBreak = new AreaBreak(AreaBreakType.NEXT_AREA);
-    float margin = 75;
+    private Paragraph lineBreak = new Paragraph();
+    private Paragraph lineBreak3 = new Paragraph("\n" + "\n" + "\n");
+    private AreaBreak pageBreak = new AreaBreak(AreaBreakType.NEXT_AREA);
+    private float margin = 75;
 
-    public Path generatePdf(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes, int numberOfPages) {
+    public Path generatePdf(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes) {
+        PdfDocumentWrapper temporary = getNumberOfPages(document, checkBoxes);
+        PdfDocumentWrapper pdf = generateItextDocument(document, checkBoxes, temporary);
+        pdf.getPdfDocument().close();
+        return pdf.getPath();
+    }
+
+    private PdfDocumentWrapper generateItextDocument(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes, PdfDocumentWrapper wrapper) {
         try {
             FONT = PdfFontFactory.createFont(FontConstants.HELVETICA);
+
             // Open a new PDF document
-            String home = System.getProperty("user.home");
-            PdfWriter writer = new PdfWriter(home + "/Downloads/" + document.getDocumentID() + ".pdf");
+            Path path = getPath(document);
+            PdfWriter writer = new PdfWriter(path.toString());
             PdfDocument pdfDoc = new PdfDocument(writer);
-
-            // Create and set the event handler on the PdfDocument
-            pageNumberHandler = new PdfPageEventHandler(pdfDoc, numberOfPages);
-            pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, pageNumberHandler);
-
             com.itextpdf.layout.Document doc = new com.itextpdf.layout.Document(pdfDoc);
+
+            if (wrapper != null) {
+                pageNumberHandler = new PdfPageEventHandler(pdfDoc, wrapper.getNumberOfPages());
+                pdfDoc.addEventHandler(PdfDocumentEvent.END_PAGE, pageNumberHandler);
+            }
+
             doc.setMargins(margin, margin, margin, margin);
             doc.add(getHeaderTable(document));
             doc.add(lineBreak);
@@ -50,7 +63,7 @@ public class PdfGenerator {
             doc.add(lineBreak3);
 
             // Determine which properties to add to the document
-            for (DocumentPropertyCheckboxWrapper checkboxWrapper: checkBoxes) {
+            for (DocumentPropertyCheckboxWrapper checkboxWrapper : checkBoxes) {
                 if (checkboxWrapper.getProperty() == DocumentPropertyType.DATE_OF_CREATION) {
                     doc.add(new Paragraph(String.valueOf(document.getDateOfCreation())));
                     doc.add(lineBreak);
@@ -72,17 +85,23 @@ public class PdfGenerator {
             List<DocumentPropertyCheckboxWrapper> imageCheckboxes = checkBoxes.stream().filter(checkbox -> checkbox.getProperty() == DocumentPropertyType.IMAGE).toList();
             if (!imageCheckboxes.isEmpty()) {
                 doc.add(pageBreak);
-                 for (DocumentPropertyCheckboxWrapper image: imageCheckboxes) {
-                    doc.add(createImageTable(image)).setHeight((doc.getPdfDocument().getDefaultPageSize().getHeight()/2)-margin);
+                for (DocumentPropertyCheckboxWrapper image : imageCheckboxes) {
+                    doc.add(createImageTable(image));
                 }
             }
-            doc.close();
-            //TODO: Change to a more appropriate path if we decide to keep more than one version of the document
-            return Path.of(home + "/Downloads/" + document.getDocumentID() + ".pdf");
-            } catch(IOException e){
-                throw new RuntimeException(e);
-            }
+            return new PdfDocumentWrapper(doc, path, document, checkBoxes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+
         }
+    }
+
+    public PdfDocumentWrapper getNumberOfPages(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes) {
+        PdfDocumentWrapper wrapper = generateItextDocument(document, checkBoxes, null);
+        wrapper.getPdfDocument().close();
+        wrapper.delete();
+        return wrapper;
+    }
 
     private Table createImageTable(DocumentPropertyCheckboxWrapper image) {
         Table imageTable = new Table(1);
@@ -180,56 +199,17 @@ public class PdfGenerator {
         }
     }
 
-    public int getNumberOfPages(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes) {
-        int numberOfPages;
-        try {
-            FONT = PdfFontFactory.createFont(FontConstants.HELVETICA);
-
-            // Open a new PDF document
-            String home = System.getProperty("user.home");
-            PdfWriter writer = new PdfWriter(home + "/Downloads/" + document.getDocumentID() + ".pdf");
-            PdfDocument pdfDoc = new PdfDocument(writer);
-            com.itextpdf.layout.Document doc = new com.itextpdf.layout.Document(pdfDoc);
-
-            doc.setMargins(margin, margin, margin, margin);
-            doc.add(getHeaderTable(document));
-            doc.add(lineBreak);
-            doc.add(getLogoTable());
-            doc.add(lineBreak3);
-
-            // Determine which properties to add to the document
-            for (DocumentPropertyCheckboxWrapper checkboxWrapper: checkBoxes) {
-                if (checkboxWrapper.getProperty() == DocumentPropertyType.DATE_OF_CREATION) {
-                    doc.add(new Paragraph(String.valueOf(document.getDateOfCreation())));
-                    doc.add(lineBreak);
-                }
-                if (checkboxWrapper.getProperty() == DocumentPropertyType.JOB_TITLE) {
-                    doc.add(new Paragraph(document.getJobTitle()).setBold().setFontSize(14));
-                }
-                if (checkboxWrapper.getProperty() == DocumentPropertyType.JOB_DESCRIPTION) {
-                    doc.add(new Paragraph(document.getJobDescription()));
-                }
-                if (checkboxWrapper.getProperty() == DocumentPropertyType.NOTES) {
-                    doc.add(getOptionalNotes(document));
-                }
-                if (checkboxWrapper.getProperty() == DocumentPropertyType.TECHNICIANS) {
-                    doc.add(new Paragraph(document.getTechnicianNames()));
-                }
+    private Path getPath(Document document) {
+        // Check if the file already exists
+        String home = System.getProperty("user.home");
+        Path path = Path.of(home + "/Downloads/" + document.getDocumentID() + ".pdf");
+        if (new File(home + "/Downloads/" + document.getDocumentID() + ".pdf").exists()) {
+            int i = 1;
+            while (new File(home + "/Downloads/" + document.getDocumentID() + " (" + i + ")" + ".pdf").exists()) {
+                i++;
             }
-            //Add images
-            List<DocumentPropertyCheckboxWrapper> imageCheckboxes = checkBoxes.stream().filter(checkbox -> checkbox.getProperty() == DocumentPropertyType.IMAGE).toList();
-            if (!imageCheckboxes.isEmpty()) {
-                doc.add(pageBreak);
-                for (DocumentPropertyCheckboxWrapper image: imageCheckboxes) {
-                    doc.add(createImageTable(image));
-                }
-            }
-            numberOfPages = pdfDoc.getNumberOfPages();
-            doc.close();
-
-        } catch(IOException e){
-            throw new RuntimeException(e);
+            path = Path.of(home + "/Downloads/" + document.getDocumentID() + " (" + i + ")" + ".pdf");
         }
-        return numberOfPages;
+        return path;
     }
 }

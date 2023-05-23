@@ -62,7 +62,6 @@ public class CustomerModel implements IModel<Customer> {
             for (Document document : DocumentModel.getInstance().getAll().values()) {
                 DocumentModel.getInstance().delete(document.getDocumentID());
             }
-            //TODO: delete all documents of customer
         }
         return resultState;
     }

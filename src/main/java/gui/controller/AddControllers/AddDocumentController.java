@@ -803,7 +803,6 @@ public class AddDocumentController extends AddController<Document> implements In
                                 "Do you want to close this window without saving?", flowPanePictures, actions
                         );
                 e.consume();
-
             }
         });
     }

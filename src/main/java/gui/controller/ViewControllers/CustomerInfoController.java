@@ -27,6 +27,8 @@ import javafx.scene.shape.Circle;
 import utils.enums.CustomerType;
 import utils.enums.ResultState;
 import utils.enums.UserRole;
+import utils.permissions.AccessChecker;
+import utils.permissions.RequiresPermission;
 
 import java.net.URL;
 import java.sql.Date;
@@ -184,29 +186,32 @@ public class CustomerInfoController extends ViewController<Customer> implements 
 
     public void showAlmostExpiredCustomers() {
         if (customerModel.getAlmostExpiredCustomers() > 0) {
-            expiryLabel.setText(customerModel.getAlmostExpiredCustomers() + " customer(s) with an almost expired contract found");
+            expiryLabel.setText("Found " + customerModel.getAlmostExpiredCustomers() + " customer(s) with an almost expired contract");
             expiredCustomersProperty.set(true);
         } else {
-            expiryLabel.setText("No customers with an almost expired contract found");
+            expiryLabel.setText("");
             expiredCustomersProperty.set(false);
         }
     }
 
     @FXML
+    @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER})
     private void editCustomerAction(MouseEvent event) {
-        UserRole userRole = UserModel.getLoggedInUser().getUserRole();
-        boolean hasAccess = (userRole == UserRole.ADMINISTRATOR || userRole == UserRole.PROJECT_MANAGER);
         if (event.getClickCount() == 2) {
-            if (!tblCustomers.getSelectionModel().getSelection().isEmpty()) {
-                Customer customer = tblCustomers.getSelectionModel().getSelectedValue();
-                DialogManager.getInstance().showChoiceDialog("Extend contract or delete customer",
-                        "This customer has " + getTimeUntilContractExpires(customer) + " until their contract expires, what would you like to do?",
-                        gridPane, actions);
+            System.out.println("Double clicked");
+        if (new AccessChecker().hasAccess(this.getClass())) {
+                if (!tblCustomers.getSelectionModel().getSelection().isEmpty()) {
+                    Customer customer = tblCustomers.getSelectionModel().getSelectedValue();
+                    DialogManager.getInstance().showChoiceDialog("Extend contract or delete customer",
+                            "This customer has " + getTimeUntilContractExpires(customer) + " until their contract expires, what would you like to do?",
+                            gridPane, actions);
+                }
             }
         }
     }
 
     private String getTimeUntilContractExpires(Customer customer) {
+        //TODO: Fix
         String timeUntilContractExpires = "";
         LocalDate contractExpiry = customer.getLastContract().toLocalDate().plusMonths(48);
         LocalDate now = LocalDate.now();

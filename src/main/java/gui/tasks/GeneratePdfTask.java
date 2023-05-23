@@ -29,11 +29,11 @@ public class GeneratePdfTask extends Task<ResultState> implements TaskCallback {
             /* Pre-generate the first pdf so we know the final number of pages and can use it in place for
              * ordering the final pdf's pages
              */
-            int numberOfPages = pdfGenerator.getNumberOfPages(document, checkboxWrappers);
+            //int numberOfPages = pdfGenerator.getNumberOfPages(document, checkboxWrappers);
             updateProgress(50, 100); // Halfway there
 
             // Generate the actual pdf
-            pdfPath = pdfGenerator.generatePdf(document, checkboxWrappers, numberOfPages);
+            pdfPath = pdfGenerator.generatePdf(document, checkboxWrappers);
             updateProgress(100, 100); // Done
 
             return ResultState.SUCCESSFUL;
