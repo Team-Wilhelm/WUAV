@@ -102,15 +102,7 @@ public class UserDAO extends DAO implements IDAO<User> {
             ResultSet resultSet = ps.executeQuery();
 
             while (resultSet.next()) {
-                List<UUID> documentIDs = new ArrayList<>();
-                String documentIdsStr = resultSet.getString("DocumentIDs");
-                if (documentIdsStr != null) {
-                    String[] documentIdsArr = documentIdsStr.split(",");
-                    for (String documentIdStr : documentIdsArr) {
-                        documentIDs.add(UUID.fromString(documentIdStr));
-                    }
-                }
-                User user = getUserFromResultSet(resultSet, documentIDs, true);
+                User user = getUser(resultSet, false);
                 users.put(user.getUserID(), user);
             }
         } catch (Exception e) {
@@ -123,11 +115,15 @@ public class UserDAO extends DAO implements IDAO<User> {
 
     @Override
     public User getById(UUID id) {
-        //TODO: Fix this
-        System.out.println("Getting user with ID: " + id);
-        String sql = "SELECT * FROM SystemUser LEFT JOIN User_Document_Link " +
-                "ON SystemUser.UserID = User_Document_Link.UserID " +
-                "WHERE SystemUser.UserID = ?";
+        String sql = "SELECT SystemUser.*, " +
+                "STUFF((" +
+                "SELECT ',' + CONVERT(VARCHAR(36), User_Document_Link.DocumentID, 1) " +
+                "FROM User_Document_Link " +
+                "WHERE SystemUser.UserID = User_Document_Link.UserID " +
+                "FOR XML PATH('')), 1, 1, '') AS DocumentIDs " +
+                "FROM SystemUser " +
+                "WHERE SystemUser.Deleted = 0 " +
+                "AND SystemUser.UserID = ?";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
@@ -136,25 +132,29 @@ public class UserDAO extends DAO implements IDAO<User> {
             ResultSet resultSet = ps.executeQuery();
 
             // Get a list of document IDs assigned to the user
-            List<UUID> documentIDs = new ArrayList<>();
-            User user = null;
-            int i = 0;
-            while (resultSet.next()) {
-                if (i == 0) {
-                    user = getUserFromResultSet(resultSet, documentIDs, false);
-                }
-                documentIDs.add(UUID.fromString(resultSet.getString("DocumentID")));
-                i++;
+            if (resultSet.next()) {
+                return getUser(resultSet, true);
             }
-            assert user != null;
-            user.setAssignedDocuments(documentDAO.getDocumentsByIDs(documentIDs));
-            return user;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             dbConnection.releaseConnection(connection);
         }
         return null;
+    }
+
+    private User getUser(ResultSet resultSet, boolean assignDocuments) throws SQLException {
+        List<UUID> documentIDs = new ArrayList<>();
+        String documentIdsStr = resultSet.getString("DocumentIDs");
+        if (documentIdsStr != null) {
+            String[] documentIdsArr = documentIdsStr.split(",");
+            for (String documentIdStr : documentIdsArr) {
+                documentIDs.add(UUID.fromString(documentIdStr));
+            }
+        }
+        User user = getUserFromResultSet(resultSet, documentIDs, assignDocuments);
+        user.setAssignedDocuments(documentDAO.getDocumentsByIDs(documentIDs));
+        return user;
     }
 
     public boolean logIn(String username, byte[] password) {

@@ -26,7 +26,6 @@ import javax.imageio.ImageIO;
 import java.io.File;
 
 public class ImageCropper {
-    //TODO add resizing to the rectangle
     private int CROP_WIDTH = 400;
     private int CROP_HEIGHT = 400;
     private int imageWidth, imageHeight;

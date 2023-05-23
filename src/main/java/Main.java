@@ -17,7 +17,6 @@ import java.util.Objects;
 
 
 public class Main extends Application {
-    //TODO custom window frame
     @Override
     public void start(Stage primaryStage) throws Exception {
         long start = System.currentTimeMillis();
