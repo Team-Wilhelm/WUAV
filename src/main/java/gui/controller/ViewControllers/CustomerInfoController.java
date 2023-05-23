@@ -227,13 +227,15 @@ public class CustomerInfoController extends ViewController<Customer> implements 
                 if (result.isPresent()) {
                     if (result.get() == deleteButton) {
                         customerModel.delete(tblCustomers.getSelectionModel().getSelectedValue().getCustomerID());
-                        reloadCustomers();
+                        almostExpiredCustomers.remove(tblCustomers.getSelectionModel().getSelectedValue());
+                        refreshItems();
                     } else if (result.get() == extendButton) {
                         // Extend dateOfLastContract by 48 months
                         Customer customer = tblCustomers.getSelectionModel().getSelectedValue();
                         customer.setLastContract(Date.valueOf(LocalDate.now()));
+                        almostExpiredCustomers.remove(tblCustomers.getSelectionModel().getSelectedValue());
                         customerModel.update(customer);
-                        reloadCustomers();
+                        refreshItems();
                     } else {
                         alert.close();
                     }
