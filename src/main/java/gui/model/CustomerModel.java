@@ -65,7 +65,6 @@ public class CustomerModel implements IModel<Customer> {
     }
 
     public void deleteExpiredCustomers(){
-        //TODO also delete documents or replace customer values
         allCustomers.values().stream().filter(customer ->
                 customer.getLastContract().before((Date.valueOf(LocalDate.now().minusMonths(48)))))
                 .forEach(customer -> delete(customer.getCustomerID()));

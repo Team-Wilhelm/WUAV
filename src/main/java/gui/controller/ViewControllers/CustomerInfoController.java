@@ -209,8 +209,6 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         if (event.getClickCount() == 2) {
             if (!tblCustomers.getSelectionModel().getSelection().isEmpty()
                     && hasAccess) {
-                //TODO: Change to materialfx dialog
-                //TODO refresh documents after editing
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Update Customer");
                 alert.setHeaderText("Edit or delete a customer");
@@ -231,10 +229,11 @@ public class CustomerInfoController extends ViewController<Customer> implements 
                     if (result.get() == deleteButton) {
                         customerModel.delete(tblCustomers.getSelectionModel().getSelectedValue().getCustomerID());
                         reloadCustomers();
-                        //TODO delete document associated with customer too or replace data with something else?
                     } else if (result.get() == extendButton) {
                         // Extend dateOfLastContract by 48 months
-                        tblCustomers.getSelectionModel().getSelectedValue().setLastContract(Date.valueOf(LocalDate.now()));
+                        Customer customer = tblCustomers.getSelectionModel().getSelectedValue();
+                        customer.setLastContract(Date.valueOf(LocalDate.now()));
+                        customerModel.update(customer);
                         reloadCustomers();
                     } else {
                         alert.close();

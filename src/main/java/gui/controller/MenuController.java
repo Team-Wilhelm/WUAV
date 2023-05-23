@@ -100,6 +100,7 @@ public class MenuController implements Initializable {
     }
 
     public void btnDocumentAction() {
+        documentController.reloadDocuments();
         switchScene(documentView);
     }
 

@@ -237,4 +237,9 @@ public class DocumentController extends ViewController<Document> implements Init
             return str;
         }
     }
+
+    public void reloadDocuments() {
+        documentModel.reloadDocuments();
+        refreshItems();
+    }
 }

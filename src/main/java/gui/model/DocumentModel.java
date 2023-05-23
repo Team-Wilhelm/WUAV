@@ -80,8 +80,6 @@ public class DocumentModel implements IModel<Document> {
                                 || document.getCustomer().getCustomerEmail().toLowerCase().contains(query)
                                 || document.getDateOfCreation().toString().toLowerCase().contains(query)
                                 || document.getJobTitle().toLowerCase().contains(query)
-                                //|| document.getTechnicians().stream().allMatch(user -> user.getFullName().toLowerCase().contains(query.toLowerCase()))
-                                //|| document.getTechnicians().stream().allMatch(user -> user.getUsername().toLowerCase().contains(query.toLowerCase()))
                         ).forEach(filteredDocuments::add);
         return filteredDocuments;
     }
@@ -91,5 +89,10 @@ public class DocumentModel implements IModel<Document> {
     }
     public String getDrawingFromDocument(Document document){
         return documentManager.getDrawingFromDocument(document);
+    }
+
+    public void reloadDocuments() {
+        allDocuments.clear();
+        allDocuments.putAll(documentManager.getAll());
     }
 }
