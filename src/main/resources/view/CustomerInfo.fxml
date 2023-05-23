@@ -22,7 +22,7 @@
     <VBox GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
         <HBox spacing="15">
             <padding>
-                <Insets bottom="20" top="5" />
+                <Insets bottom="5.0" top="5.0" />
             </padding>
 
             <MFXTextField fx:id="searchBar" floatingText="Search for customers" maxWidth="600" prefWidth="500" HBox.hgrow="ALWAYS">
@@ -42,7 +42,7 @@
             </MFXProgressSpinner>
 
         </HBox>
-      <HBox fx:id="expiredCustomersHBox" />
+      <Label fx:id="expiryLabel" text="Label" />
    
         <MFXTableView fx:id="tblCustomers" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="600.0" VBox.vgrow="ALWAYS" />
         <padding>

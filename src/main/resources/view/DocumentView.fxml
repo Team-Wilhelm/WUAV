@@ -13,8 +13,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.Region?>
 <?import io.github.palexdev.materialfx.controls.MFXComboBox?>
@@ -51,7 +49,7 @@
             <MFXButton fx:id="btnAddDocument" onAction="#addDocumentAction" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="addButton, rounded" text="">
                 <graphic>
                     <ImageView fitHeight="150.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="/img/icons/ic_round-plus.png" />
+                        <Image url="@../img/icons/ic_round-plus.png" />
                     </ImageView>
                 </graphic>
                 <padding>

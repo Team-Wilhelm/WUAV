@@ -113,7 +113,6 @@ public class MenuController implements Initializable {
 
     public void btnCustomersAction() {
         customerController.deleteExpiredCustomers();
-        customerController.reloadCustomers();
         switchScene(customerView);
     }
 

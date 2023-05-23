@@ -78,7 +78,6 @@ public class DocumentController extends ViewController<Document> implements Init
         progressLabel.visibleProperty().bind(progressSpinner.visibleProperty()); // show label when spinner is visible
 
         checkIfImagesAreLoaded();
-        checkIfImagesAreLoaded(); //TODO properly implement this
 
         filter.getItems().addAll(DocumentFilter.values());
 

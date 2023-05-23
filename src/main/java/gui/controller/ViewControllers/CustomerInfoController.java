@@ -1,12 +1,10 @@
 package gui.controller.ViewControllers;
 
-import be.Address;
 import be.Customer;
-import be.User;
 import gui.model.CustomerModel;
 import gui.model.UserModel;
+import gui.nodes.NotificationBubble;
 import gui.util.DialogManager;
-import gui.util.SceneManager;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
 import javafx.beans.binding.Bindings;
@@ -17,18 +15,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.stage.Window;
 import utils.enums.CustomerType;
 import utils.enums.ResultState;
 import utils.enums.UserRole;
@@ -38,12 +31,8 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class CustomerInfoController extends ViewController<Customer> implements Initializable {
-
-    @FXML
-    private HBox expiredCustomersHBox;
     @FXML
     private MFXProgressSpinner progressSpinner;
     @FXML
@@ -54,11 +43,16 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     private MFXTableView<Customer> tblCustomers;
     @FXML
     private MFXTextField searchBar;
+    @FXML
+    private Label expiryLabel;
+    private NotificationBubble notificationBubble;
+
     private ObservableList<Customer> customerList = FXCollections.observableArrayList();
     private List<Customer> almostExpiredCustomers = new ArrayList<>();
     private final CustomerModel customerModel = CustomerModel.getInstance();
     private boolean hasAccess = false;
     private HashMap<String, Runnable> actions = new HashMap<>();
+    private HBox btnCustomersBox;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -66,11 +60,15 @@ public class CustomerInfoController extends ViewController<Customer> implements 
 
         searchBar.textProperty().addListener((observable, oldValue, newValue) ->
                 tblCustomers.getItems().setAll(customerModel.searchCustomers(searchBar.getText().toLowerCase().trim())));
-        refreshItems();
+        refreshItems(List.copyOf(customerModel.getAll().values()));
         populateTableView();
         progressLabel.visibleProperty().bind(progressSpinner.visibleProperty()); // show label when spinner is visible
 
         setActions();
+
+        notificationBubble = new NotificationBubble();
+        //notificationBubble.visibleProperty().bind(Bindings.createBooleanBinding(
+          //      () -> almostExpiredCustomers.size() > 0));
     }
 
     private void populateTableView() {
@@ -133,8 +131,8 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         tblCustomers.setFooterVisible(false);
     }
 
-    private void setRowColour(Customer customer, MFXTableRowCell<Customer, ?> row){
-        if(customer.getLastContract().before(Date.valueOf(LocalDate.now().minusMonths(47)))){
+    private void setRowColour(Customer customer, MFXTableRowCell<Customer, ?> row) {
+        if (customer.getLastContract().before(Date.valueOf(LocalDate.now().minusMonths(47)))) {
             row.setTextFill(javafx.scene.paint.Color.RED);
         }
     }
@@ -167,16 +165,21 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     public void refreshItems(List<Customer> customers) {
         customerList.clear();
         customerList.addAll(customers);
+
+        almostExpiredCustomers.clear();
+        for (Customer customer : customerList) {
+            if (customer.getLastContract().before(Date.valueOf(LocalDate.now().minusMonths(47)))) {
+                almostExpiredCustomers.add(customer);
+            }
+        }
+        System.out.println("Customers: " + customerList.size());
+        System.out.println("Almost expired customers: " + almostExpiredCustomers.size());
     }
 
     @Override
     public void refreshItems() {
         refreshItems(List.copyOf(customerModel.getAll().values()));
-    }
-
-    public void reloadCustomers() {
-        //customerModel.reloadCustomers();
-        refreshItems();
+        showAlmostExpiredCustomers();
     }
 
     public void deleteExpiredCustomers() {
@@ -185,26 +188,20 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     }
 
     public void showAlmostExpiredCustomers(HBox hbox) {
-        if(customerModel.getAlmostExpiredCustomers() >0) {
-            Label label = new Label("You have " + customerModel.getAlmostExpiredCustomers() + " customer(s) with an almost expired contract");
-            expiredCustomersHBox.getChildren().add(label);
-            createNotificationBubble(hbox);
+        btnCustomersBox = hbox;
+        btnCustomersBox.getChildren().add(notificationBubble);
+        showAlmostExpiredCustomers();
+    }
+
+    public void showAlmostExpiredCustomers() {
+        if (customerModel.getAlmostExpiredCustomers() > 0) {
+            expiryLabel.setText(customerModel.getAlmostExpiredCustomers() + " customer(s) with an almost expired contract found");
+            notificationBubble.setVisible(true);
+        } else {
+            expiryLabel.setText("No customers with an almost expired contract found");
+            notificationBubble.setVisible(false);
         }
     }
-
-    private void createNotificationBubble(HBox hbox) {
-        Circle bubble = new Circle(7);
-        bubble.setFill(Color.RED);
-        bubble.setStroke(Color.WHITE);
-
-        StackPane bubblePane = new StackPane();
-        bubblePane.getChildren().add(bubble);
-        StackPane.setMargin(bubble, new Insets(0, 0, 0, 0));
-        StackPane.setAlignment(bubble, Pos.CENTER_RIGHT);
-
-        hbox.getChildren().add(bubblePane);
-    }
-
 
     @FXML
     private void editCustomerAction(MouseEvent event) {
@@ -226,7 +223,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         LocalDate now = LocalDate.now();
         Period period = Period.between(now, contractExpiry);
         if (period.getMonths() > 0) {
-            timeUntilContractExpires += period.getMonths() + " month(s)";
+            timeUntilContractExpires += period.getMonths() + " month(s), ";
         } else {
             timeUntilContractExpires += period.getDays() + " day(s)";
         }
