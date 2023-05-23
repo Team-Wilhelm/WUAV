@@ -227,10 +227,9 @@ public class AddDocumentController extends AddController<Document> implements In
 
                  */
 
-
                 CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Editing an existing customer",
                         "You are editing a customer with " + customerByEmail.getContracts().size() + " other contract(s) belonging to them.\n" +
-                                "Updating this customer will update them in all pertaining documents.\nAre you sure you want to continue?", flowPanePictures);
+                                "Updating this customer will update them in all pertaining documents.\n\nAre you sure you want to continue?", flowPanePictures);
                 result.thenRun(() -> {
                     ButtonType buttonType = result.join(); // Wait for the user to confirm the dialog
                     if (buttonType.equals(ButtonType.OK)) {
