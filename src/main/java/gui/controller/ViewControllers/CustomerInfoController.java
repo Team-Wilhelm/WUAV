@@ -194,34 +194,46 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         }
     }
 
-    @FXML
-    @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER})
     private void editCustomerAction(MouseEvent event) {
-        //TODO: Fix
-        if (event.getClickCount() == 2) {
-            System.out.println("Double clicked");
-        if (new AccessChecker().hasAccess(this.getClass())) {
-                if (!tblCustomers.getSelectionModel().getSelection().isEmpty()) {
-                    Customer customer = tblCustomers.getSelectionModel().getSelectedValue();
-                    DialogManager.getInstance().showChoiceDialog("Extend contract or delete customer",
-                            "This customer has " + getTimeUntilContractExpires(customer) + " until their contract expires, what would you like to do?",
-                            gridPane, actions);
-                }
+        UserRole userRole = UserModel.getLoggedInUser().getUserRole();
+        if (event.getClickCount() == 2 && (userRole == UserRole.ADMINISTRATOR || userRole == UserRole.PROJECT_MANAGER)) {
+            if (!tblCustomers.getSelectionModel().getSelection().isEmpty()) {
+                Customer customer = tblCustomers.getSelectionModel().getSelectedValue();
+                DialogManager.getInstance().showChoiceDialog("Extend contract or delete customer",
+                        "This customer has " + getTimeUntilContractExpires(customer) + " until their contract expires, what would you like to do?",
+                        gridPane, actions);
             }
         }
     }
 
     private String getTimeUntilContractExpires(Customer customer) {
-        //TODO: Fix
         String timeUntilContractExpires = "";
         LocalDate contractExpiry = customer.getLastContract().toLocalDate().plusMonths(48);
         LocalDate now = LocalDate.now();
         Period period = Period.between(now, contractExpiry);
-        if (period.getMonths() > 0) {
-            timeUntilContractExpires += period.getMonths() + " month(s), ";
-        } else {
-            timeUntilContractExpires += period.getDays() + " day(s)";
+
+        // Years
+        if (period.getYears() > 0) {
+            timeUntilContractExpires += period.getYears() + " year(s)";
         }
+
+        // Months
+        if (period.getMonths() > 0) {
+            if (timeUntilContractExpires.length() > 0)
+                timeUntilContractExpires += ", ";
+            timeUntilContractExpires += period.getMonths() + " month(s)";
+        }
+
+        // Days
+        if (timeUntilContractExpires.length() > 0)
+            timeUntilContractExpires += " and ";
+        if (period.getDays() == 0)
+            timeUntilContractExpires += "0 days";
+        else if (period.getDays() == 1)
+            timeUntilContractExpires += "1 day";
+        else
+            timeUntilContractExpires += period.getDays() + " days";
+
         return timeUntilContractExpires;
     }
 

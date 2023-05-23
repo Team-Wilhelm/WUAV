@@ -25,9 +25,8 @@ public class GeneratePdfTask extends Task<ResultState> implements TaskCallback {
     @Override
     protected ResultState call() throws Exception {
         try {
-            pdfGenerator.progressProperty().addListener((observable, oldValue, newValue) -> updateProgress(newValue.doubleValue(), 100));
-            // Generate the document
-            pdfPath = pdfGenerator.generatePdf(document, checkboxWrappers);
+            pdfGenerator.progressProperty().addListener((observable, oldValue, newValue) -> updateProgress(newValue.doubleValue(), 100)); // Make the progress bar update
+            pdfPath = pdfGenerator.generatePdf(document, checkboxWrappers); // Generate the document
             return ResultState.SUCCESSFUL;
         } catch (Exception e) {
             e.printStackTrace();
