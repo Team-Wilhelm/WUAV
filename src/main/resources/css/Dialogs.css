@@ -1,5 +1,9 @@
 @import "Colors.css";
 
+* {
+    -fx-font-size: 14;
+}
+
 .mfx-dialog .actions-pane .mfx-button,
 .mfx-button{
     -fx-background-color: transparent;
