@@ -84,7 +84,7 @@ public class DocumentModel implements IModel<Document> {
             if (customerModel.getById(document.getCustomer().getCustomerID()) == null) {
                 customerModel.put(document.getCustomer());
             } else {
-                customerModel.getById(document.getCustomer().getCustomerID()).addContract(document);
+                customerModel.addContract(document.getCustomer().getCustomerID(), document);
             }
         }
     }

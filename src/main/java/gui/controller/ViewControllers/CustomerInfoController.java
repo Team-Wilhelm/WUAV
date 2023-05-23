@@ -133,7 +133,6 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     public void setProgressVisibility(boolean visible) {
         progressSpinner.progressProperty().unbind();
         progressSpinner.setVisible(visible);
-        progressLabel.setVisible(visible);
     }
 
     @Override

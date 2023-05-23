@@ -195,72 +195,76 @@ public class AddDocumentController extends AddController<Document> implements In
         //TODO customers/addresses
         assignInputToVariables();
 
-        //TODO move the check to bll
-        Customer customerByEmail = customerModel.getByEmail(email);  // Try to find a customer with the same name
-
+        Customer customerByEmail = customerModel.getByEmail(email);  // Try to find a customer with the same email
         Address address = new Address(streetName, houseNumber, postcode, city, country);
-        Customer tempCustomer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
-
         if (customer == null) { // If no customer has been selected in autocomplete
-            customer = tempCustomer;
-            if (customer.equals(customerByEmail)) { // If a customer with exactly the same data exists, use them
-                customer.setCustomerID(customerByEmail.getCustomerID());
-                address.setAddressID(customerByEmail.getCustomerAddress().getAddressID());
-            }
+            customer = new Customer(name, email, phoneNumber, address, customerType, lastContract);
         } else {
-            /* If the customer has been changed and belongs to more than this document,
-            ask the user if they want to update the customer in all documents or create a new customer */
-            //TODO i don't understand this
-            if (customer.getContracts().size() > 0 && !tempCustomer.equals(customer)) {  // Check if any values have been changed
-               /*
+            customer.setCustomerAddress(address);
+            customer.setCustomerEmail(email);
+            customer.setCustomerName(name);
+            customer.setCustomerPhoneNumber(phoneNumber);
+            customer.setCustomerType(customerType);
+            customer.setLastContract(lastContract);
+        }
+
+        if (customer.getCustomerEmail().equals(customerByEmail.getCustomerEmail())) {
+            if (customerByEmail.getContracts().size() > 0 && !customer.equals(customerByEmail)) {
+
+                /*
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Editing an existing customer");
+                alert.setHeaderText("You are editing a customer with " + customerByEmail.getContracts().size() + " other contract(s) belonging to them.");
+                alert.setContentText("Updating this customer will update them in all pertaining documents. Are you sure you want to continue?");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    customer.setCustomerID(customerByEmail.getCustomerID());
+                    customer.getCustomerAddress().setAddressID(customerByEmail.getCustomerAddress().getAddressID());
+                    customer.setContracts(customerByEmail.getContracts());
+                } else {
+                    customer = null;
+                }
+
+                 */
+
+
                 CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Editing an existing customer",
-                        "You are editing a customer with " + customer.getContracts().size() + " other contract(s) belonging to them.\n" +
+                        "You are editing a customer with " + customerByEmail.getContracts().size() + " other contract(s) belonging to them.\n" +
                                 "Updating this customer will update them in all pertaining documents.\nAre you sure you want to continue?", flowPanePictures);
                 result.thenRun(() -> {
                     ButtonType buttonType = result.join(); // Wait for the user to confirm the dialog
                     if (buttonType.equals(ButtonType.OK)) {
-                        tempCustomer.setCustomerID(customer.getCustomerID());
-                        tempCustomer.getCustomerAddress().setAddressID(customer.getCustomerAddress().getAddressID());
-                        tempCustomer.setContracts(customer.getContracts());
-                        customer = tempCustomer;
+                        customer.setCustomerID(customerByEmail.getCustomerID());
+                        customer.getCustomerAddress().setAddressID(customerByEmail.getCustomerAddress().getAddressID());
+                        customer.setContracts(customerByEmail.getContracts());
                     } else {
                         customer = null;
                     }
                 });
 
-                */
 
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Editing an existing customer");
-                alert.setHeaderText("You are editing a customer with " + customer.getContracts().size() + " other contract(s) belonging to them.");
-                alert.setContentText("Updating this customer will update them in all pertaining documents. Are you sure you want to continue?");
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.isPresent() && result.get() == ButtonType.OK) {
-                    tempCustomer.setCustomerID(customer.getCustomerID());
-                    tempCustomer.getCustomerAddress().setAddressID(customer.getCustomerAddress().getAddressID());
-                    tempCustomer.setContracts(customer.getContracts());
-                    customer = tempCustomer;
-                } else {
-                    customer = null;
-                }
+            } else {
+                customer.setCustomerID(customerByEmail.getCustomerID());
+                customer.getCustomerAddress().setAddressID(customerByEmail.getCustomerAddress().getAddressID());
+                customer.setContracts(customerByEmail.getContracts());
             }
-            if (customer == null) return; // If the user has cancelled the dialog, return without saving
-
-            currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
-            currentDocument.setTechnicians(technicians);
-            currentDocument.setDocumentImages(pictures);
-            technicians.forEach(technician -> technician.addDocument(currentDocument));
-
-            if (isEditing.get()) {
-                currentDocument.setDocumentID(documentToEdit.getDocumentID());
-                currentDocument.setDateOfCreation(documentToEdit.getDateOfCreation());
-            }
-
-            SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
-            setUpSaveTask(task, documentController, gridPanePdf, this);
-            executorService.execute(task);
-            pdfTab.setDisable(false);
         }
+
+        if (customer == null) {return; }
+        currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
+        currentDocument.setTechnicians(technicians);
+        currentDocument.setDocumentImages(pictures);
+        technicians.forEach(technician -> technician.addDocument(currentDocument));
+
+        if (isEditing.get()) {
+            currentDocument.setDocumentID(documentToEdit.getDocumentID());
+            currentDocument.setDateOfCreation(documentToEdit.getDateOfCreation());
+        }
+
+        SaveTask<Document> task = new SaveTask<>(currentDocument, isEditing.get(), documentModel);
+        setUpSaveTask(task, documentController, gridPanePdf, this);
+        executorService.execute(task);
+        pdfTab.setDisable(false);
     }
 
     @FXML

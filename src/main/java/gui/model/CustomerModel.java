@@ -1,6 +1,7 @@
 package gui.model;
 
 import be.Customer;
+import be.Document;
 import bll.IManager;
 import bll.ManagerFactory;
 import bll.manager.CustomerManager;
@@ -20,7 +21,6 @@ public class CustomerModel implements IModel<Customer> {
     private CustomerModel() {
         customerManager = (CustomerManager) ManagerFactory.createManager(ManagerFactory.ManagerType.CUSTOMER);
         allCustomers = new HashMap<>();
-        //reloadCustomers();
     }
 
     public static CustomerModel getInstance() {
@@ -35,6 +35,9 @@ public class CustomerModel implements IModel<Customer> {
         ResultState resultState = customerManager.add(customer);
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allCustomers.put(customer.getCustomerID(), customer);
+            customer.getContracts().values().forEach(document -> {
+                DocumentModel.getInstance().getById(document.getDocumentID()).setCustomer(customer);
+            });
         }
         return resultState;
     }
@@ -56,6 +59,7 @@ public class CustomerModel implements IModel<Customer> {
         ResultState resultState = customerManager.delete(id);
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allCustomers.remove(id);
+            //TODO: delete all documents of customer
         }
         return resultState;
     }
@@ -110,6 +114,13 @@ public class CustomerModel implements IModel<Customer> {
             allCustomers.replace(customer.getCustomerID(), customer);
         } else {
             allCustomers.put(customer.getCustomerID(), customer);
+        }
+    }
+
+    public void addContract(UUID customerID, Document contract) {
+        Customer customer = allCustomers.get(customerID);
+        if (customer != null) {
+            customer.addContract(contract);
         }
     }
 }
