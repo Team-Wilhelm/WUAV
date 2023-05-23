@@ -32,7 +32,9 @@ import utils.enums.UserRole;
 import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class CustomerInfoController extends ViewController<Customer> implements Initializable {
 
@@ -184,10 +186,25 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     private void editCustomerAction(MouseEvent event) {
         if (event.getClickCount() == 2) {
             if (!tblCustomers.getSelectionModel().getSelection().isEmpty()) {
-                DialogManager.getInstance().showChoiceDialog("Update customer, extend Contract or delete customer",
-                        "What would you like to do?", gridPane, actions);
+                Customer customer = tblCustomers.getSelectionModel().getSelectedValue();
+                DialogManager.getInstance().showChoiceDialog("Extend contract or delete customer",
+                        "This customer has " + getTimeUntilContractExpires(customer) + " until their contract expires, what would you like to do?",
+                        gridPane, actions);
             }
         }
+    }
+
+    private String getTimeUntilContractExpires(Customer customer) {
+        String timeUntilContractExpires = "";
+        LocalDate contractExpiry = customer.getLastContract().toLocalDate().plusMonths(48);
+        LocalDate now = LocalDate.now();
+        Period period = Period.between(now, contractExpiry);
+        if (period.getMonths() > 0) {
+            timeUntilContractExpires += period.getMonths() + " month(s)";
+        } else {
+            timeUntilContractExpires += period.getDays() + " day(s)";
+        }
+        return timeUntilContractExpires;
     }
 
     public void setVisibilityForUserRole() {
@@ -213,9 +230,6 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         actions.put("Extend by 48 months", () -> {
             tblCustomers.getSelectionModel().getSelectedValue().setLastContract(Date.valueOf(LocalDate.now()));
             reloadCustomers();
-        });
-
-        actions.put("Cancel", () -> {
         });
     }
 }

@@ -208,7 +208,7 @@ public class AddDocumentController extends AddController<Document> implements In
             customer.setLastContract(lastContract);
         }
 
-        if (customer.getCustomerEmail().equals(customerByEmail.getCustomerEmail())) {
+        if (customerByEmail != null && customer.getCustomerEmail().equals(customerByEmail.getCustomerEmail())) {
             if (customerByEmail.getContracts().size() > 0 && !customer.equals(customerByEmail)) {
                 CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Editing an existing customer",
                         "You are editing a customer with " + customerByEmail.getContracts().size() + " other contract(s) belonging to them.\n" +
