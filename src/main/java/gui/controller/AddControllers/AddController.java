@@ -25,6 +25,13 @@ public abstract class AddController<T> {
     protected abstract void setIsEditing(T objectToEdit);
     private final DialogManager dialogManager = DialogManager.getInstance();
 
+    /**
+     * Set up save task for the controller
+     * @param task task to set up
+     * @param controller controller to set up
+     * @param owner owner of the task
+     * @param addController controller to add
+     */
     protected void setUpSaveTask(SaveTask<T> task, ViewController<T> controller, Pane owner, AddController<T> addController) {
         setUpTask(task, controller, owner);
 
@@ -59,6 +66,12 @@ public abstract class AddController<T> {
         });
     }
 
+    /**
+     * Set up task for the controller
+     * @param task task to set up
+     * @param controller controller to set up
+     * @param owner owner of the task
+     */
     private void setUpTask(Task<ResultState> task, ViewController<T> controller, Pane owner) {
         task.setOnRunning(event -> {
             controller.bindProgressToTask(task);
@@ -71,6 +84,12 @@ public abstract class AddController<T> {
         });
     }
 
+    /**
+     * Set up delete task for the controller
+     * @param task task to set up
+     * @param viewController controller to set up
+     * @param owner owner of the task
+     */
     protected void setUpDeleteTask(Task<ResultState> task, ViewController<T> viewController, Pane owner) {
         setUpTask(task, viewController, owner);
 
@@ -94,9 +113,9 @@ public abstract class AddController<T> {
 
     /**
      * Opens a loading dialog while the PDF is being created and opens the PDF when it is done
-     * @param task
-     * @param document
-     * @param owner
+     * @param task task to set up
+     * @param document document to set up
+     * @param owner owner of the task
      */
     protected void setUpPdfTask(GeneratePdfTask task, Document document, Pane owner) {
         task.setOnRunning(event -> {
@@ -110,7 +129,10 @@ public abstract class AddController<T> {
         });
     }
 
-
+    /**
+     * Hides the progress bar after 3 seconds
+     * @param controller controller to set up
+     */
     private void hideMessageAfterTimeout(ViewController<T> controller) {
         // unbind the progress label and spinner from the task and set spinner to 100%
         controller.unbindProgress();
@@ -127,18 +149,36 @@ public abstract class AddController<T> {
         );
     }
 
+    /**
+     * Closes the window
+     * @param event event to close
+     */
     protected void closeWindow(Event event) {
         ((Node) event.getSource()).getScene().getWindow().hide();
     }
 
+    /**
+     * Closes the window
+     * @param node node to close
+     */
     protected void closeWindow(Node node) {
         node.getScene().getWindow().hide();
     }
 
+    /**
+     * Checks if the input is empty
+     * @param textField text field to check
+     * @return true if the input is empty
+     */
     protected boolean isInputEmpty(MFXTextField textField) {
         return textField.getText().trim().isEmpty();
     }
 
+    /**
+     * Checks if the input is empty
+     * @param textArea text area to check
+     * @return true if the input is empty
+     */
     protected boolean isInputEmpty(TextArea textArea) {
         return textArea.getText().trim().isEmpty();
     }

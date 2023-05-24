@@ -21,6 +21,11 @@ public class UserManager implements IManager<User> {
         dao = (UserDAO) DAOFactory.createDAO(DAOFactory.DAOType.USER);
     }
 
+    /**
+     * Add a user to the database
+     * @param user user to add
+     * @return ResultState / NO_PERMISSION
+     */
     @Override
     @RequiresPermission(UserRole.ADMINISTRATOR)
     public ResultState add(User user) {
@@ -32,6 +37,11 @@ public class UserManager implements IManager<User> {
         }
     }
 
+    /**
+     * Update a user in the database
+     * @param user user to update
+     * @return ResultState / NO_PERMISSION
+     */
     @Override
     @RequiresPermission(UserRole.ADMINISTRATOR)
     public ResultState update(User user) {
@@ -43,6 +53,11 @@ public class UserManager implements IManager<User> {
         }
     }
 
+    /**
+     * Delete a user from the database
+     * @param id id of the user to delete
+     * @return ResultState / NO_PERMISSION
+     */
     @Override
     @RequiresPermission(UserRole.ADMINISTRATOR)
     public ResultState delete(UUID id) {
@@ -54,16 +69,31 @@ public class UserManager implements IManager<User> {
         }
     }
 
+    /**
+     * Get all users from the database
+     * @return Map<UUID, User>
+     */
     @Override
     public Map<UUID, User> getAll() {
         return dao.getAll();
     }
 
+    /**
+     * Get a user by id from the database
+     * @param id id of the user to get
+     * @return User
+     */
     @Override
     public User getById(UUID id) {
         return dao.getById(id);
     }
 
+    /**
+     * Log in a user
+     * @param username username
+     * @param password password
+     * @return boolean
+     */
     public boolean logIn(String username, byte[] password){
         return dao.logIn(username, password);
     }
