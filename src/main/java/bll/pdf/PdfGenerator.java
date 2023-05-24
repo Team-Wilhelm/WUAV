@@ -94,9 +94,10 @@ public class PdfGenerator {
             //Add images
             List<DocumentPropertyCheckboxWrapper> imageCheckboxes = checkBoxes.stream().filter(checkbox -> checkbox.getProperty() == DocumentPropertyType.IMAGE).toList();
             if (!imageCheckboxes.isEmpty()) {
+                float maxHeight = (pdfDoc.getDefaultPageSize().getHeight()/2) - margin;
                 doc.add(pageBreak);
                 for (DocumentPropertyCheckboxWrapper image : imageCheckboxes) {
-                    doc.add(createImageTable(image));
+                    doc.add(createImageTable(image).setMaxHeight(maxHeight));
                     increaseProgress();
                 }
             }
