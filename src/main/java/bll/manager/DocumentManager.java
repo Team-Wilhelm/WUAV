@@ -2,6 +2,7 @@ package bll.manager;
 
 import be.Document;
 import be.User;
+import utils.enums.BusinessEntityType;
 import utils.enums.ResultState;
 import utils.enums.UserRole;
 import bll.IManager;
@@ -19,7 +20,7 @@ public class DocumentManager implements IManager<Document> {
     private final AccessChecker checker = new AccessChecker();
 
     public DocumentManager() {
-        dao = (DocumentDAO) DAOFactory.createDAO(DAOFactory.DAOType.DOCUMENT);
+        dao = (DocumentDAO) DAOFactory.createDAO(BusinessEntityType.DOCUMENT);
     }
 
     /**

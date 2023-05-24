@@ -7,6 +7,7 @@ import bll.ManagerFactory;
 import bll.manager.CustomerManager;
 import gui.util.DialogManager;
 import javafx.scene.layout.Pane;
+import utils.enums.BusinessEntityType;
 import utils.enums.ResultState;
 
 import java.sql.Date;
@@ -19,7 +20,7 @@ public class CustomerModel implements IModel<Customer> {
     private HashMap<UUID, Customer> allCustomers;
 
     private CustomerModel() {
-        customerManager = (CustomerManager) ManagerFactory.createManager(ManagerFactory.ManagerType.CUSTOMER);
+        customerManager = (CustomerManager) ManagerFactory.createManager(BusinessEntityType.CUSTOMER);
         allCustomers = new HashMap<>();
     }
 

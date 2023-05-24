@@ -1,6 +1,7 @@
 package bll.manager;
 
 import be.User;
+import utils.enums.BusinessEntityType;
 import utils.enums.ResultState;
 import utils.enums.UserRole;
 import bll.IManager;
@@ -18,7 +19,7 @@ public class UserManager implements IManager<User> {
     private AccessChecker checker = new AccessChecker();
 
     public UserManager() {
-        dao = (UserDAO) DAOFactory.createDAO(DAOFactory.DAOType.USER);
+        dao = (UserDAO) DAOFactory.createDAO(BusinessEntityType.USER);
     }
 
     /**

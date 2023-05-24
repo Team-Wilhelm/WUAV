@@ -5,6 +5,7 @@ import be.User;
 import gui.nodes.DocumentCard;
 import bll.manager.DocumentManager;
 import bll.ManagerFactory;
+import utils.enums.BusinessEntityType;
 import utils.enums.ResultState;
 import gui.util.drawing.MyShape;
 
@@ -20,7 +21,7 @@ public class DocumentModel implements IModel<Document> {
     private HashMap<UUID, Document> allDocuments;
 
     private DocumentModel() {
-        documentManager = (DocumentManager) ManagerFactory.createManager(ManagerFactory.ManagerType.DOCUMENT);
+        documentManager = (DocumentManager) ManagerFactory.createManager(BusinessEntityType.DOCUMENT);
         allDocuments = new HashMap<>();
         customerModel = CustomerModel.getInstance();
         setAllDocuments();

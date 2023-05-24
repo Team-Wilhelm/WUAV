@@ -4,6 +4,7 @@ import be.User;
 import gui.nodes.UserCard;
 import bll.ManagerFactory;
 import bll.manager.UserManager;
+import utils.enums.BusinessEntityType;
 import utils.enums.ResultState;
 
 import java.util.*;
@@ -21,7 +22,7 @@ public class UserModel implements IModel<User> {
     private static User loggedInUser;
 
     private UserModel() {
-        userManager = (UserManager) ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
+        userManager = (UserManager) ManagerFactory.createManager(BusinessEntityType.USER);
         allUsers = new HashMap<>();
         loadedCards = new HashMap<>();
         setAllUsersFromManager();
