@@ -216,3 +216,8 @@
     -fx-opacity: 0;
 }
 
+.splash{
+    -fx-background-image: url("/img/backgroundImages/Splash.png");
+    -fx-background-size: cover;
+    -fx-background-position: center;
+}
