@@ -75,6 +75,9 @@ public class ImageCropper {
         stage = new Stage();
     }
 
+    /**
+     * Confirm the crop and save the image.
+     */
     private void confirmCrop() {
         String home = System.getProperty("user.home");
         String path = home + "/Downloads/";
@@ -91,6 +94,9 @@ public class ImageCropper {
         }
     }
 
+    /**
+     * Reset the crop rectangle to its original position and size.
+     */
     private void resetCrop() {
         imageView.setImage(image);
         imageView.setFitWidth(imageWidth);
@@ -102,6 +108,9 @@ public class ImageCropper {
         stage.centerOnScreen();
     }
 
+    /**
+     * Finish the crop and display the cropped image.
+     */
     private void finishCrop() {
         // Calculate the scale factor between the actual image and the displayed image
         double scaleX = image.getWidth() / imageView.getFitWidth();

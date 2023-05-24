@@ -6,6 +6,11 @@ import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 
 public class HashPasswordHelper {
+    /**
+     * Hashes a password using PBKDF2WithHmacSHA1
+     * @param password password to hash
+     * @return byte[][]
+     */
     public byte[][] hashPassword(String password) {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
@@ -21,6 +26,13 @@ public class HashPasswordHelper {
         }
     }
 
+    /**
+     * Hashes a password using PBKDF2WithHmacSHA1
+     * Used for checking if a password is correct
+     * @param password password to hash
+     * @param salt salt to use
+     * @return byte[]
+     */
     public byte[] hashPassword(String password, byte[] salt) {
         try {
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);

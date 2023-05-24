@@ -21,7 +21,12 @@ public class PdfPageEventHandler implements IEventHandler {
         this.pdfDoc = pdfDoc;
         this.numberOfPages = numberOfPages;
     }
-       @Override
+
+    /**
+     * Handle an event
+     * @param event
+     */
+    @Override
     public void handleEvent(Event event) {
         try {
             PdfFont FONT = PdfFontFactory.createFont(FontConstants.HELVETICA);

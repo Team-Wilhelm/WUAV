@@ -87,13 +87,13 @@ public class AddDocumentController extends AddController<Document> implements In
     private TextAreaWithFloatingText txtJobDescription, txtNotes;
     private DocumentPropertiesList propertiesList;
 
-    private DocumentModel documentModel;
-    private CustomerModel customerModel;
+    private final DocumentModel documentModel;
+    private final CustomerModel customerModel;
     private Document documentToEdit, currentDocument;
     private DocumentController documentController;
     private ObservableList<ImageWrapper> pictures;
     private final ObservableList<ImagePreview> imagePreviews = FXCollections.observableArrayList();
-    private DialogManager dialogManager;
+    private final DialogManager dialogManager;
     private ObservableList<User> allTechnicians;
     private final ThreadPool executorService;
     private boolean hasAccess = false;
@@ -161,6 +161,11 @@ public class AddDocumentController extends AddController<Document> implements In
         addTooltips();
     }
 
+    /**
+     * Uploads the pictures to the blob storage
+     * @param actionEvent
+     * @throws Exception
+     */
     @FXML
     private void uploadPicturesAction(ActionEvent actionEvent) throws Exception {
         FileChooser fileChooser = new FileChooser();
