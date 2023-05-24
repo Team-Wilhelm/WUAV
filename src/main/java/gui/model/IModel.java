@@ -14,5 +14,4 @@ public interface IModel<T> {
     ResultState delete(UUID id);
     Map<UUID, T> getAll();
     T getById(UUID id);
-
 }

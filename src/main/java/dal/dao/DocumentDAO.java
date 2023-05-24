@@ -124,6 +124,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, id.toString());
             ps.setString(2, id.toString());
+            ps.setString(3, id.toString());
             ps.executeUpdate();
             documents.remove(id);
             return ResultState.SUCCESSFUL;
