@@ -48,6 +48,9 @@ public class CanvasPane extends Pane {
         drawGrid();
     }
 
+    /**
+     * Add background grid to the canvas.
+     */
     private void drawGrid() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         double cellWidth = 20;  // Width of each grid cell
@@ -131,6 +134,9 @@ public class CanvasPane extends Pane {
         render();
     }
 
+    /**
+     * Deselect all the shapes.
+     */
     public void deselectAll() {
         for (MyShape myShape : shapes) {
             myShape.setSelected(false);

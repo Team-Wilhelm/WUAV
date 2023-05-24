@@ -14,13 +14,18 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class CustomerManager implements IManager<Customer> {
-    private CustomerDAO dao;
+    private final CustomerDAO dao;
     private AccessChecker checker = new AccessChecker();
 
     public CustomerManager() {
         dao = (CustomerDAO) DAOFactory.createDAO(DAOFactory.DAOType.CUSTOMER);
     }
 
+    /**
+     * Add a customer to the database
+     * @param customer customer to add
+     * @return ResultState / NO_PERMISSION
+     */
     @Override
     @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER, UserRole.TECHNICIAN})
     public ResultState add(Customer customer) {
@@ -32,6 +37,11 @@ public class CustomerManager implements IManager<Customer> {
         }
     }
 
+    /**
+     * Update a customer in the database
+     * @param customer customer to update
+     * @return ResultState / NO_PERMISSION
+     */
     @Override
     @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER, UserRole.TECHNICIAN})
     public ResultState update(Customer customer) {
@@ -43,6 +53,11 @@ public class CustomerManager implements IManager<Customer> {
         }
     }
 
+    /**
+     * Delete a customer from the database
+     * @param id id of the customer to delete
+     * @return ResultState / NO_PERMISSION
+     */
     @Override
     @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER})
     public ResultState delete(UUID id) {
@@ -54,11 +69,20 @@ public class CustomerManager implements IManager<Customer> {
         }
     }
 
+    /**
+     * Get all customers from the database
+     * @return Map<UUID, Customer>
+     */
     @Override
     public Map<UUID, Customer> getAll() {
         return dao.getAll();
     }
 
+    /**
+     * Get a customer by id from the database
+     * @param id id of the customer to get
+     * @return Customer
+     */
     @Override
     public Customer getById(UUID id) {
         return dao.getById(id);
