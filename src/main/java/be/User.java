@@ -1,13 +1,12 @@
 package be;
 
 import utils.enums.UserRole;
-import be.interfaces.Observable;
 import dal.factories.DocumentImageFactory;
 import javafx.scene.image.Image;
 
 import java.util.*;
 
-public class User extends Observable<User> {
+public class User {
     private UUID userID;
     private String fullName, username, phoneNumber, profilePicturePath;
     private byte[][] password;
@@ -29,7 +28,6 @@ public class User extends Observable<User> {
 
         this.profilePicturePath = Objects.requireNonNullElse(profilePicturePath, "/img/icons/userIcon.png");
         this.profilePicture = DocumentImageFactory.getInstance().create(profilePicturePath);
-        notifyObservers(this);
     }
 
     public User(UUID userID, String fullName, String username, byte[][] password, String phoneNumber, UserRole userRole, String profilePicturePath) {
@@ -43,7 +41,6 @@ public class User extends Observable<User> {
 
     public void setUserID(UUID userID) {
         this.userID = userID;
-        notifyObservers(this);
     }
 
     public String getFullName() {
@@ -128,7 +125,6 @@ public class User extends Observable<User> {
 
     public void setProfilePicturePath(String profilePicturePath) {
         this.profilePicturePath = profilePicturePath;
-        notifyObservers(this);
     }
 
     public String getAssignation(Document document){

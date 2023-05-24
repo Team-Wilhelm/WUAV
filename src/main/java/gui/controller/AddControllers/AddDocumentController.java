@@ -516,7 +516,7 @@ public class AddDocumentController extends AddController<Document> implements In
                     imagePreviews.remove(imagePreview);
                     pictures.remove(image);
                 } if (e.isControlDown() && e.getCode().equals(KeyCode.E)) {
-                    imagePreview.openDescriptionDialogue(hasAccess);
+                    imagePreview.openDescriptionDialog(hasAccess);
                 }
             });
 

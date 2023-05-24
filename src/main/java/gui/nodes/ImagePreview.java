@@ -21,7 +21,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class ImagePreview extends VBox {
     private Observer<ImagePreview> observer;
@@ -82,7 +81,7 @@ public class ImagePreview extends VBox {
                 .setText("Add description")
                 .setAccelerator("Ctrl + E")
                 .setOnAction(event -> {
-                    openAddDescriptionDialogue();
+                    openAddDescriptionDialog();
                 })
                 .get();
 
@@ -97,12 +96,12 @@ public class ImagePreview extends VBox {
 
         this.setOnKeyPressed(e -> {
             if (e.isControlDown() && e.getCode().equals(KeyCode.E)) {
-                openAddDescriptionDialogue();
+                openAddDescriptionDialog();
             }
         });
     }
 
-    public void openAddDescriptionDialogue() {
+    public void openAddDescriptionDialog() {
         CompletableFuture<String> result = DialogManager.getInstance().showTextInputDialog("Add description",
                 "Add a description to the image", imageWrapper.getDescription(), this, true);
         // Get the result of the dialogue and set the description of the image
@@ -114,7 +113,7 @@ public class ImagePreview extends VBox {
         });
     }
 
-    public void openSeeDescriptionDialogue() {
+    public void openSeeDescriptionDialog() {
         String description = imageWrapper.getDescription() == null ? "No description available" : imageWrapper.getDescription();
         DialogManager.getInstance().showTextInputDialog("See description",
                 "Add a description to the image", description, this, false);
@@ -127,7 +126,7 @@ public class ImagePreview extends VBox {
                 .setText("See description")
                 .setAccelerator("Ctrl + E")
                 .setOnAction(event -> {
-                    openSeeDescriptionDialogue();
+                    openSeeDescriptionDialog();
                 })
                 .get();
         contextMenu.getItems().addAll(seeDescriptionItem);
@@ -135,7 +134,7 @@ public class ImagePreview extends VBox {
 
         this.setOnKeyPressed(e -> {
             if (e.isControlDown() && e.getCode().equals(KeyCode.E)) {
-                openSeeDescriptionDialogue();
+                openSeeDescriptionDialog();
             }
         });
     }
@@ -167,11 +166,11 @@ public class ImagePreview extends VBox {
         observer.update(observable, arg);
     }
 
-    public void openDescriptionDialogue(boolean hasAccess) {
+    public void openDescriptionDialog(boolean hasAccess) {
         if (hasAccess) {
-            openAddDescriptionDialogue();
+            openAddDescriptionDialog();
         } else {
-            openSeeDescriptionDialogue();
+            openSeeDescriptionDialog();
         }
     }
 }

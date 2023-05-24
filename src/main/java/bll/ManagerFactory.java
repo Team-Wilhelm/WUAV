@@ -7,7 +7,7 @@ import utils.enums.BusinessEntityType;
 
 public class ManagerFactory {
 
-    public static IManager createManager(BusinessEntityType type) {
+    public static IManager<?> createManager(BusinessEntityType type) {
         return switch (type) {
             case CUSTOMER -> new CustomerManager();
             case USER -> new UserManager();

@@ -8,7 +8,7 @@ import utils.enums.BusinessEntityType;
 
 public class DAOFactory {
 
-    public static IDAO createDAO(BusinessEntityType type) {
+    public static IDAO<?> createDAO(BusinessEntityType type) {
         return switch (type) {
             case CUSTOMER -> new CustomerDAO();
             case USER -> new UserDAO();

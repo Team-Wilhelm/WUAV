@@ -1,8 +1,6 @@
 package gui.nodes;
 
 import be.User;
-import be.interfaces.Observable;
-import be.interfaces.Observer;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
