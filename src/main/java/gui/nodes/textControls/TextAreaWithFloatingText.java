@@ -52,9 +52,10 @@ public class TextAreaWithFloatingText extends StackPane {
         });
 
        this.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue.length() > maxTextLengthProperty.get()) {
-                textArea.setText(oldValue);
-            }
+           if (textArea.textProperty().getValueSafe().length() > maxTextLengthProperty.get()) {
+               String s = textArea.textProperty().getValueSafe().substring(0, maxTextLengthProperty.get());
+               textArea.setText(s);
+           }
         });
 
         createBindings();

@@ -798,7 +798,7 @@ public class AddDocumentController extends AddController<Document> implements In
     public void setOnCloseRequest() {
         Stage stage = (Stage) btnSave.getScene().getWindow();
         stage.setOnCloseRequest(e -> {
-            isInputChanged();
+            if (isEditing.getValue()) isInputChanged();
             if (isInputChanged.getValue() || !isEditing.getValue()) {
                 HashMap<String, Runnable> actions = new HashMap<>();
                 actions.put("Save", () -> {
