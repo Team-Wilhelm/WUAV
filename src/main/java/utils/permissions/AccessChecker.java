@@ -1,7 +1,7 @@
 package utils.permissions;
 
-import utils.enums.UserRole;
 import gui.model.UserModel;
+import utils.enums.UserRole;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

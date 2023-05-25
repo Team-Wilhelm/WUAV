@@ -16,8 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DocumentDAO extends DAO implements IDAO<Document> {
     private final DBConnection dbConnection;
@@ -215,7 +215,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     public void refreshCache() {
         documents.clear();
-        long startTime = System.currentTimeMillis();
         String sql = "SELECT * FROM Document WHERE Deleted = 0";
         Connection connection = null;
         try {

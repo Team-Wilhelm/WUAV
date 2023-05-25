@@ -2,13 +2,13 @@ package bll.manager;
 
 import be.Document;
 import be.User;
+import bll.IManager;
+import dal.dao.DocumentDAO;
+import dal.factories.DAOFactory;
+import gui.model.UserModel;
 import utils.enums.BusinessEntityType;
 import utils.enums.ResultState;
 import utils.enums.UserRole;
-import bll.IManager;
-import dal.factories.DAOFactory;
-import dal.dao.DocumentDAO;
-import gui.model.UserModel;
 import utils.permissions.AccessChecker;
 import utils.permissions.RequiresPermission;
 

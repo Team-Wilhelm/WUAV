@@ -5,14 +5,14 @@ import gui.controller.ViewControllers.DocumentController;
 import gui.controller.ViewControllers.ViewController;
 import gui.tasks.GeneratePdfTask;
 import gui.tasks.SaveTask;
-import utils.enums.ResultState;
+import gui.util.DialogManager;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
-import gui.util.DialogManager;
+import utils.enums.ResultState;
 
 import java.awt.*;
 import java.io.File;

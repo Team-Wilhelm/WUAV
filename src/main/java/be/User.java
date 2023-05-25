@@ -1,10 +1,12 @@
 package be;
 
-import utils.enums.UserRole;
 import dal.factories.DocumentImageFactory;
 import javafx.scene.image.Image;
+import utils.enums.UserRole;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.UUID;
 
 public class User {
     private UUID userID;

@@ -6,14 +6,14 @@ import io.github.palexdev.materialfx.i18n.I18N;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
-import javafx.css.*;
+import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.*;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 
 

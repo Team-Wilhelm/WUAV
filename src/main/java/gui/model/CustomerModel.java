@@ -2,11 +2,8 @@ package gui.model;
 
 import be.Customer;
 import be.Document;
-import bll.IManager;
 import bll.ManagerFactory;
 import bll.manager.CustomerManager;
-import gui.util.DialogManager;
-import javafx.scene.layout.Pane;
 import utils.enums.BusinessEntityType;
 import utils.enums.ResultState;
 

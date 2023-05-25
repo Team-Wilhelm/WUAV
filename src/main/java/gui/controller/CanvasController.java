@@ -1,5 +1,5 @@
 package gui.controller;
-import com.sun.jna.platform.win32.Guid;
+
 import gui.util.drawing.CanvasPane;
 import gui.util.drawing.MyToolBar;
 import javafx.application.Platform;
@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 

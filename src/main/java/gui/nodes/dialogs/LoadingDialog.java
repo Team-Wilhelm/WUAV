@@ -4,8 +4,8 @@ import io.github.palexdev.materialfx.controls.MFXProgressBar;
 import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 
 
 public class LoadingDialog extends CustomDialog {

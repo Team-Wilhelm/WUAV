@@ -2,9 +2,9 @@ package dal.dao;
 
 import be.Address;
 import be.Customer;
-import utils.enums.CustomerType;
 import dal.DBConnection;
 import dal.interfaces.IDAO;
+import utils.enums.CustomerType;
 import utils.enums.ResultState;
 
 import java.sql.Connection;

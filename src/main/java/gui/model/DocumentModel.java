@@ -2,17 +2,12 @@ package gui.model;
 
 import be.Document;
 import be.User;
-import gui.nodes.DocumentCard;
-import bll.manager.DocumentManager;
 import bll.ManagerFactory;
+import bll.manager.DocumentManager;
 import utils.enums.BusinessEntityType;
 import utils.enums.ResultState;
-import gui.util.drawing.MyShape;
 
-import javax.print.Doc;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class DocumentModel implements IModel<Document> {
     private static DocumentModel instance;

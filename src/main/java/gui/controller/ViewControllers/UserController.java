@@ -1,13 +1,11 @@
 package gui.controller.ViewControllers;
 
 import be.User;
-import utils.enums.UserRole;
-import gui.nodes.UserCard;
-import gui.util.SceneManager;
 import gui.controller.AddControllers.AddUserController;
 import gui.model.UserModel;
-import utils.enums.ResultState;
+import gui.nodes.UserCard;
 import gui.util.DialogManager;
+import gui.util.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -24,6 +22,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Window;
+import utils.enums.ResultState;
+import utils.enums.UserRole;
 import utils.permissions.AccessChecker;
 
 import java.io.IOException;

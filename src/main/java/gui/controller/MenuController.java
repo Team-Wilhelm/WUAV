@@ -1,18 +1,16 @@
 package gui.controller;
 
-import be.Customer;
 import gui.controller.AddControllers.AddUserController;
 import gui.controller.ViewControllers.CustomerInfoController;
+import gui.controller.ViewControllers.DocumentController;
+import gui.controller.ViewControllers.UserController;
 import gui.model.UserModel;
 import gui.nodes.NotificationBubble;
 import gui.util.DialogManager;
 import gui.util.SceneManager;
-import gui.controller.ViewControllers.DocumentController;
-import gui.controller.ViewControllers.UserController;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
 import io.github.palexdev.materialfx.css.themes.Themes;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
@@ -25,10 +23,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import utils.enums.UserRole;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class MenuController implements Initializable {

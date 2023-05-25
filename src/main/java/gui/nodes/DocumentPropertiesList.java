@@ -2,7 +2,6 @@ package gui.nodes;
 
 import be.Document;
 import be.ImageWrapper;
-import utils.enums.DocumentPropertyType;
 import io.github.palexdev.materialfx.controls.MFXCheckbox;
 import io.github.palexdev.materialfx.controls.MFXToggleButton;
 import javafx.geometry.HPos;
@@ -10,8 +9,12 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.text.TextAlignment;
+import utils.enums.DocumentPropertyType;
 
 import java.sql.Date;
 import java.time.LocalDate;

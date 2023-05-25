@@ -2,7 +2,6 @@ package dal.factories;
 
 import javafx.scene.image.Image;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DocumentImageFactory {
