@@ -33,6 +33,7 @@ public class Main extends Application {
                 Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
 
                 Scene scene = new Scene(root);
+                primaryStage.setScene(scene);
                 MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
 
                 primaryStage.centerOnScreen();
