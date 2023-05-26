@@ -34,10 +34,12 @@ public class Main extends Application {
 
                 Scene scene = new Scene(root);
                 primaryStage.setScene(scene);
+                primaryStage.setWidth(Screen.getPrimary().getBounds().getWidth() - 400);
+                primaryStage.setHeight(Screen.getPrimary().getBounds().getHeight() - 200);
                 MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
 
-                primaryStage.centerOnScreen();
                 primaryStage.show();
+                primaryStage.centerOnScreen();
 
                 // All tables always visible
                 //primaryStage.setMinWidth(1310);

@@ -104,7 +104,7 @@ public class MenuController implements Initializable {
                 MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
                 stage.setScene(scene);
                 stage.setMaximized(false);
-                stage.setWidth(Screen.getPrimary().getBounds().getWidth() - 200);
+                stage.setWidth(Screen.getPrimary().getBounds().getWidth() - 400);
                 stage.setHeight(Screen.getPrimary().getBounds().getHeight() - 200);
                 stage.centerOnScreen();
                 stage.show();
