@@ -1,53 +1,26 @@
 import be.Address;
 import be.Customer;
-import be.Document;
-import be.User;
 import bll.manager.CustomerManager;
-import bll.manager.DocumentManager;
-import bll.pdf.PdfDocumentWrapper;
-import bll.pdf.PdfGenerator;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import gui.controller.ViewControllers.CustomerInfoController;
-import gui.model.CustomerModel;
-import gui.model.UserModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import utils.HashPasswordHelper;
 import utils.enums.CustomerType;
-import utils.enums.ResultState;
 import utils.enums.UserRole;
 import utils.permissions.AccessChecker;
-
+import utils.permissions.RequiresPermission;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class WilhelmTest {
-
-    @DisplayName("Tests that the pdf file is saved correctly, and not overwritten")
-    @Test
-    void pdfFileNameAndPath() {
-        // Arrange
-
-
-        // Act
-
-
-        // Assert
-    }
 
     @DisplayName("Checks if expired customer contracts are correctly identified")
     @Test
     void checkCustomerExpiry(){
         // Arrange
-        UserModel userModel = UserModel.getInstance();
-        User user = new User();
-        user.setUserRole(UserRole.ADMINISTRATOR);
-        userModel.setLoggedInUser(user);
-
         Address address = new Address("street","number", "city", "zip", "country");
         Customer customer1 = new Customer(UUID.randomUUID(),"name", "email", "phone", address, CustomerType.BUSINESS, Date.valueOf(LocalDate.now()));
         Customer customer2 = new Customer(UUID.randomUUID(),"name", "email", "phone", address, CustomerType.BUSINESS, Date.valueOf(LocalDate.now().minusMonths(46)));
@@ -65,42 +38,59 @@ public class WilhelmTest {
         CustomerManager customerManager = new CustomerManager();
 
         // Act
-        int actual = customerManager.getAlmostExpiredCustomers(allCustomers);
+        int actual = customerManager.calculateExpiredCustomers(allCustomers);
 
         // Assert
         int expected = 2;
         Assertions.assertEquals(expected, actual);
     }
 
-
-    @DisplayName("Tests that the user is logged in and out correctly")
+    //TODO please check that I did this correctly
+    @DisplayName("Checks if password hashing works correctly")
     @Test
-    void checkLoginAndOut(){
+    void checkPasswordHashing(){
         // Arrange
-        UserModel userModel = UserModel.getInstance();
-        User user = new User();
+        HashPasswordHelper hashPasswordHelper = new HashPasswordHelper();
+        String password = "password";
+        byte[][] hashedPassword = hashPasswordHelper.hashPassword(password);
 
-        //Act the first
-        userModel.setLoggedInUser(user);
-        //Assert
-        assertSame(UserModel.getLoggedInUser(), user);
+        // Act
+        boolean actual = (Arrays.equals(hashedPassword[0], hashPasswordHelper.hashPassword(password, hashedPassword[1])));
 
-        // Act the second
-        userModel.logOut();
         // Assert
-        assertNull(UserModel.getLoggedInUser());
+        Assertions.assertTrue(actual);
     }
-    @DisplayName("Checks that a salesperson cannot add a document")
-    @Test
-    void checkAccessLimitation(){
-        // Arrange
-        UserModel userModel = UserModel.getInstance();
-        User user = new User();
-        user.setUserRole(UserRole.SALESPERSON);
-        userModel.setLoggedInUser(user);
-        DocumentManager documentManager = new DocumentManager();
 
-        // Act & Assert
-        Assertions.assertEquals(ResultState.NO_PERMISSION, documentManager.add(new Document()));
+
+    @DisplayName("Checks the UserRole validation in the AccessChecker class")
+    @Test
+    void checkAccessLimitationTrue() {
+        //Arrange
+        AccessChecker accessChecker = new AccessChecker();
+
+        //Act & Assert
+        Assertions.assertTrue(accessChecker.calculateAccess(TestClass.class, UserRole.ADMINISTRATOR));
     }
+
+    @DisplayName("Checks the UserRole validation in the AccessChecker class")
+    @Test
+    void checkAccessLimitationFalse() {
+        //Arrange
+        AccessChecker accessChecker = new AccessChecker();
+
+        //Act & Assert
+        Assertions.assertFalse(accessChecker.calculateAccess(TestClass.class, UserRole.SALESPERSON));
+    }
+
+    /**
+     * This is a test class used to perform the test of the calculateAccess method in the AccessChecker class.
+     * It contains a method with the RequiresPermission annotation.
+     */
+    protected class TestClass {
+        @RequiresPermission(UserRole.ADMINISTRATOR)
+        public String accessCheckTestMethod(){
+            return "Hello World!";
+        }
+    }
+
 }

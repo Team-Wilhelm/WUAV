@@ -88,15 +88,26 @@ public class CustomerManager implements IManager<Customer> {
         return dao.getById(id);
     }
 
+    /**
+     * Gets the amount of customers that have a contract that expires in 2 months or less
+     */
     @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER})
     public int getAlmostExpiredCustomers(HashMap<UUID, Customer> customers){
         if (checker.hasAccess(this.getClass())) {
-            List<Customer> almostExpiredCustomers = new ArrayList<>();
-            customers.values().stream().filter(customer ->
-                            customer.getLastContract().before((Date.valueOf(LocalDate.now().minusMonths(47)))))
-                    .forEach(almostExpiredCustomers::add);
-            return almostExpiredCustomers.size();
+            return calculateExpiredCustomers(customers);
         }
         return 0;
+    }
+
+    /**
+     * Calculate the amount of customers that have a contract that expires in 2 months or less
+     * Visibility set to public in order to allow for unit testing
+     */
+    public int calculateExpiredCustomers(HashMap<UUID, Customer> customers){
+        List<Customer> almostExpiredCustomers = new ArrayList<>();
+        customers.values().stream().filter(customer ->
+                        customer.getLastContract().before((Date.valueOf(LocalDate.now().minusMonths(47)))))
+                .forEach(almostExpiredCustomers::add);
+        return almostExpiredCustomers.size();
     }
 }
