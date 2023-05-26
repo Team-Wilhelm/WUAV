@@ -2,6 +2,7 @@ package gui.nodes;
 
 import be.Document;
 import be.ImageWrapper;
+import gui.util.ImageByteConverter;
 import io.github.palexdev.materialfx.controls.MFXCheckbox;
 import io.github.palexdev.materialfx.controls.MFXToggleButton;
 import javafx.geometry.HPos;
@@ -107,7 +108,7 @@ public class DocumentPropertiesList extends GridPane {
     }
 
     private void addProperty(String label, ImageWrapper imageWrapper, int row) {
-        ImageView imageView = new ImageView(imageWrapper.getImage());
+        ImageView imageView = ImageByteConverter.getImageViewFromBytes(imageWrapper.getImageBytes());
         imageView.setFitHeight(50);
         imageView.setFitWidth(50);
 

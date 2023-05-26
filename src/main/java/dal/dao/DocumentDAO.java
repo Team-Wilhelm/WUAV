@@ -190,7 +190,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     }
 
     public void assignImagesToDocument(Document document){
-        String sql = "SELECT * FROM Document_Image_Link WHERE DocumentID =? ORDER BY PictureIndex;";
+        String sql = "SELECT * FROM Document_Image_Link WHERE DocumentID = ? ORDER BY PictureIndex;";
         Connection connection = null;
         List<ImageWrapper> images = new ArrayList<>();
         try {

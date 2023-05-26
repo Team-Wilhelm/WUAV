@@ -3,6 +3,7 @@ package gui.nodes;
 import be.ImageWrapper;
 import be.interfaces.Observer;
 import gui.util.DialogManager;
+import gui.util.ImageByteConverter;
 import io.github.palexdev.materialfx.controls.MFXContextMenu;
 import io.github.palexdev.materialfx.controls.MFXContextMenuItem;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
@@ -46,7 +47,7 @@ public class ImagePreview extends VBox {
         this.getStyleClass().addAll("document-view", "rounded");
 
         fileName = new Label(imageWrapper.getName());
-        imageView = new ImageView(imageWrapper.getImage());
+        imageView = ImageByteConverter.getImageViewFromBytes(imageWrapper.getImageBytes());
         imageView.setFitWidth(150);
         imageView.setFitHeight(100);
 

@@ -1,11 +1,11 @@
 package dal.factories;
 
-import javafx.scene.image.Image;
-
+import java.io.*;
+import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DocumentImageFactory {
-    private ConcurrentHashMap<String, Image> imageCache = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, byte[]> imageCache = new ConcurrentHashMap<>();
     private static DocumentImageFactory instance;
 
     private DocumentImageFactory() {}
@@ -17,12 +17,29 @@ public class DocumentImageFactory {
         return instance;
     }
 
-    public Image create(String path) {
-        Image image = imageCache.get(path);
+    public byte[] create(String path) {
+        byte[] image = imageCache.get(path);
         if (image == null) {
-            image = new Image(path);
-            imageCache.put(path, image);
+            try {
+                image = getBytesFromURL(path);
+                imageCache.put(path, image);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return image;
+    }
+
+    private byte[] getBytesFromURL(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try (InputStream inputStream = url.openStream()) {
+            int n = 0;
+            byte [] buffer = new byte[4096];
+            while (-1 != (n = inputStream.read(buffer))) {
+                output.write(buffer, 0, n);
+            }
+        }
+        return output.toByteArray();
     }
 }

@@ -14,7 +14,7 @@ public class User {
     private byte[][] password;
     private HashMap<UUID, Document> assignedDocuments;
     private UserRole userRole;
-    private Image profilePicture;
+    private byte[] profilePicture;
 
     public User(){
         assignedDocuments = new HashMap<>();
@@ -93,11 +93,11 @@ public class User {
         this.userRole = userRole;
     }
 
-    public Image getProfilePicture() {
+    public byte[] getProfilePicture() {
         return profilePicture;
     }
 
-    public void setProfilePicture(Image profilePicture) {
+    public void setProfilePicture(byte[] profilePicture) {
         this.profilePicture = profilePicture;
     }
 

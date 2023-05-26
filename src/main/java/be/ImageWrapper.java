@@ -3,22 +3,23 @@ package be;
 import gui.nodes.ImagePreview;
 import javafx.scene.image.Image;
 
+import java.io.ByteArrayInputStream;
+
 public class ImageWrapper {
     private String url, name, description;
-    private Image image;
+    private byte[] imageBytes;
     private ImagePreview imagePreview;
 
-    public ImageWrapper(String url, String name, Image image, String description) {
+    public ImageWrapper(String url, String name, byte[] imageBytes, String description) {
         this(url, name);
-        this.image = image;
+        this.imageBytes = imageBytes;
         this.description = description;
+        this.imagePreview = new ImagePreview(this);
     }
 
     public ImageWrapper(String url, String name) {
         this.url = url;
         this.name = name;
-        this.image = new Image(url);
-        this.imagePreview = new ImagePreview(this);
     }
 
     public String getUrl() {
@@ -27,8 +28,8 @@ public class ImageWrapper {
     public String getName() {
         return name;
     }
-    public Image getImage() {
-        return image;
+    public byte[] getImageBytes() {
+        return imageBytes;
     }
     public ImagePreview getImagePreview() {
         return imagePreview;

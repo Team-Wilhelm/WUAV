@@ -8,6 +8,7 @@ import gui.tasks.DeleteTask;
 import gui.tasks.SaveTask;
 import gui.util.CropImageToCircle;
 import gui.util.DialogManager;
+import gui.util.ImageByteConverter;
 import gui.util.ImageCropper;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
@@ -38,6 +39,7 @@ import utils.enums.EditingOptions;
 import utils.enums.ResultState;
 import utils.enums.UserRole;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
@@ -236,7 +238,7 @@ public class AddUserController extends AddController<User> implements Initializa
         txtUsername.setText(user.getUsername());
         txtPhoneNumber.setText(user.getPhoneNumber().isEmpty() ? "No phone number available" : user.getPhoneNumber());
         comboPosition.getSelectionModel().selectItem(user.getUserRole());
-        imgProfilePicture.setImage(CropImageToCircle.getRoundedImage(user.getProfilePicture()));
+        imgProfilePicture.setImage(CropImageToCircle.getRoundedImage(ImageByteConverter.getImageFromBytes(user.getProfilePicture())));
         profilePicturePath = user.getProfilePicturePath();
 
         if (user == UserModel.getLoggedInUser()) {

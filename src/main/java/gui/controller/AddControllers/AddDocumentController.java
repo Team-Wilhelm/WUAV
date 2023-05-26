@@ -17,6 +17,7 @@ import gui.tasks.DeleteTask;
 import gui.tasks.GeneratePdfTask;
 import gui.tasks.SaveTask;
 import gui.util.DialogManager;
+import gui.util.ImageByteConverter;
 import io.github.palexdev.materialfx.controls.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -507,7 +508,7 @@ public class AddDocumentController extends AddController<Document> implements In
                     try {
                         // Get the blob url, download picture and open the image in the default image viewer
                         String downloadPath = System.getProperty("user.home") + "/Downloads/" + image.getName();
-                        Image imageToOpen = image.getImage();
+                        Image imageToOpen = ImageByteConverter.getImageFromBytes(image.getImageBytes());
                         File file = new File(downloadPath);
                         ImageIO.write(SwingFXUtils.fromFXImage(imageToOpen, null), "png", file);
                         Desktop.getDesktop().open(file);
