@@ -33,6 +33,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     @Override
     public ResultState add(Document document) {
+        //TODO transactions
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();

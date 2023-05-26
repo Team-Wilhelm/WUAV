@@ -273,7 +273,10 @@ public class AddDocumentController extends AddController<Document> implements In
     }
 
     public void assignUserToDocument(User technician) {
-        if (documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())) {
+        UserRole userRole = UserModel.getLoggedInUser().getUserRole();
+        if (documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())
+                || userRole == UserRole.ADMINISTRATOR
+                || userRole == UserRole.PROJECT_MANAGER) {
             if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
                 technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
                 technicians.add(technician);
