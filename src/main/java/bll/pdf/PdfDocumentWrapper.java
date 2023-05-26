@@ -1,7 +1,6 @@
 package bll.pdf;
 
 import be.Document;
-import com.itextpdf.kernel.pdf.PdfDocument;
 import gui.nodes.DocumentPropertyCheckboxWrapper;
 
 import java.io.IOException;

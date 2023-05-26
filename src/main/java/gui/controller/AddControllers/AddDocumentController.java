@@ -4,22 +4,21 @@ import be.*;
 import be.interfaces.Observable;
 import be.interfaces.Observer;
 import gui.controller.CanvasController;
-import gui.nodes.textControls.MFXTextFieldWithAutofill;
-import gui.nodes.textControls.TextAreaWithFloatingText;
-import gui.tasks.GeneratePdfTask;
-import javafx.stage.Stage;
-import utils.enums.CustomerType;
-import utils.enums.UserRole;
 import gui.controller.ViewControllers.DocumentController;
 import gui.model.CustomerModel;
 import gui.model.DocumentModel;
 import gui.model.UserModel;
+import gui.nodes.DocumentPropertiesList;
+import gui.nodes.DocumentPropertyCheckboxWrapper;
+import gui.nodes.ImagePreview;
+import gui.nodes.textControls.MFXTextFieldWithAutofill;
+import gui.nodes.textControls.TextAreaWithFloatingText;
 import gui.tasks.DeleteTask;
+import gui.tasks.GeneratePdfTask;
 import gui.tasks.SaveTask;
-import utils.enums.ResultState;
 import gui.util.DialogManager;
+import gui.util.ImageByteConverter;
 import io.github.palexdev.materialfx.controls.*;
-import gui.nodes.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -36,17 +35,25 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import utils.BlobService;
 import utils.ThreadPool;
+import utils.enums.CustomerType;
+import utils.enums.ResultState;
+import utils.enums.UserRole;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
@@ -54,11 +61,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.ResourceBundle;
 
 public class AddDocumentController extends AddController<Document> implements Initializable, Observer<ImagePreview> {
     @FXML
@@ -268,7 +274,10 @@ public class AddDocumentController extends AddController<Document> implements In
     }
 
     public void assignUserToDocument(User technician) {
-        if (documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())) {
+        UserRole userRole = UserModel.getLoggedInUser().getUserRole();
+        if (documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())
+                || userRole == UserRole.ADMINISTRATOR
+                || userRole == UserRole.PROJECT_MANAGER) {
             if (technician.getAssignedDocuments().get(documentToEdit.getDocumentID()) == null) {
                 technician.getAssignedDocuments().put(documentToEdit.getDocumentID(), documentToEdit);
                 technicians.add(technician);
@@ -499,7 +508,7 @@ public class AddDocumentController extends AddController<Document> implements In
                     try {
                         // Get the blob url, download picture and open the image in the default image viewer
                         String downloadPath = System.getProperty("user.home") + "/Downloads/" + image.getName();
-                        Image imageToOpen = image.getImage();
+                        Image imageToOpen = ImageByteConverter.getImageFromBytes(image.getImageBytes());
                         File file = new File(downloadPath);
                         ImageIO.write(SwingFXUtils.fromFXImage(imageToOpen, null), "png", file);
                         Desktop.getDesktop().open(file);
@@ -516,7 +525,7 @@ public class AddDocumentController extends AddController<Document> implements In
                     imagePreviews.remove(imagePreview);
                     pictures.remove(image);
                 } if (e.isControlDown() && e.getCode().equals(KeyCode.E)) {
-                    imagePreview.openDescriptionDialogue(hasAccess);
+                    imagePreview.openDescriptionDialog(hasAccess);
                 }
             });
 
@@ -793,7 +802,7 @@ public class AddDocumentController extends AddController<Document> implements In
     public void setOnCloseRequest() {
         Stage stage = (Stage) btnSave.getScene().getWindow();
         stage.setOnCloseRequest(e -> {
-            isInputChanged();
+            if (isEditing.getValue()) isInputChanged();
             if (isInputChanged.getValue() || !isEditing.getValue()) {
                 HashMap<String, Runnable> actions = new HashMap<>();
                 actions.put("Save", () -> {

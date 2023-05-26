@@ -1,20 +1,17 @@
 package gui.controller.ViewControllers;
 
 import be.Document;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.layout.GridPane;
-import utils.enums.DocumentFilter;
-import utils.enums.UserRole;
-import gui.model.UserModel;
-import gui.util.SceneManager;
 import gui.controller.AddControllers.AddDocumentController;
 import gui.model.DocumentModel;
-import utils.enums.ResultState;
+import gui.model.UserModel;
+import gui.util.DialogManager;
+import gui.util.SceneManager;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -26,16 +23,17 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
-import gui.util.DialogManager;
 import javafx.stage.Window;
+import utils.enums.DocumentFilter;
+import utils.enums.ResultState;
+import utils.enums.UserRole;
 
-import javax.security.auth.callback.Callback;
 import java.net.URL;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
 
 public class DocumentController extends ViewController<Document> implements Initializable {
     @FXML

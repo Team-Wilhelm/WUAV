@@ -2,11 +2,8 @@ package gui.model;
 
 import utils.enums.ResultState;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 
 public interface IModel<T> {
     ResultState add(T obj);
@@ -14,5 +11,4 @@ public interface IModel<T> {
     ResultState delete(UUID id);
     Map<UUID, T> getAll();
     T getById(UUID id);
-
 }

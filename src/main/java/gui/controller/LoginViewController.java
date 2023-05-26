@@ -1,9 +1,9 @@
 package gui.controller;
 
 import be.User;
-import gui.util.SceneManager;
 import gui.model.UserModel;
 import gui.util.DialogManager;
+import gui.util.SceneManager;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.MFXTextField;

@@ -1,11 +1,11 @@
 package dal.dao;
 
 import be.User;
-import utils.enums.ResultState;
-import utils.enums.UserRole;
 import dal.DBConnection;
 import dal.interfaces.DAO;
 import dal.interfaces.IDAO;
+import utils.enums.ResultState;
+import utils.enums.UserRole;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

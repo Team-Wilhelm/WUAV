@@ -1,12 +1,13 @@
 package bll.manager;
 
 import be.User;
+import bll.IManager;
+import dal.dao.UserDAO;
+import dal.factories.DAOFactory;
+import gui.model.UserModel;
+import utils.enums.BusinessEntityType;
 import utils.enums.ResultState;
 import utils.enums.UserRole;
-import bll.IManager;
-import dal.factories.DAOFactory;
-import dal.dao.UserDAO;
-import gui.model.UserModel;
 import utils.permissions.AccessChecker;
 import utils.permissions.RequiresPermission;
 
@@ -18,7 +19,7 @@ public class UserManager implements IManager<User> {
     private AccessChecker checker = new AccessChecker();
 
     public UserManager() {
-        dao = (UserDAO) DAOFactory.createDAO(DAOFactory.DAOType.USER);
+        dao = (UserDAO) DAOFactory.createDAO(BusinessEntityType.USER);
     }
 
     /**

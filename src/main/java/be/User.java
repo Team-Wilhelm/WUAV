@@ -1,19 +1,20 @@
 package be;
 
-import utils.enums.UserRole;
-import be.interfaces.Observable;
 import dal.factories.DocumentImageFactory;
 import javafx.scene.image.Image;
+import utils.enums.UserRole;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.UUID;
 
-public class User extends Observable<User> {
+public class User {
     private UUID userID;
     private String fullName, username, phoneNumber, profilePicturePath;
     private byte[][] password;
     private HashMap<UUID, Document> assignedDocuments;
     private UserRole userRole;
-    private Image profilePicture;
+    private byte[] profilePicture;
 
     public User(){
         assignedDocuments = new HashMap<>();
@@ -29,7 +30,6 @@ public class User extends Observable<User> {
 
         this.profilePicturePath = Objects.requireNonNullElse(profilePicturePath, "/img/icons/userIcon.png");
         this.profilePicture = DocumentImageFactory.getInstance().create(profilePicturePath);
-        notifyObservers(this);
     }
 
     public User(UUID userID, String fullName, String username, byte[][] password, String phoneNumber, UserRole userRole, String profilePicturePath) {
@@ -43,7 +43,6 @@ public class User extends Observable<User> {
 
     public void setUserID(UUID userID) {
         this.userID = userID;
-        notifyObservers(this);
     }
 
     public String getFullName() {
@@ -94,11 +93,11 @@ public class User extends Observable<User> {
         this.userRole = userRole;
     }
 
-    public Image getProfilePicture() {
+    public byte[] getProfilePicture() {
         return profilePicture;
     }
 
-    public void setProfilePicture(Image profilePicture) {
+    public void setProfilePicture(byte[] profilePicture) {
         this.profilePicture = profilePicture;
     }
 
@@ -128,7 +127,6 @@ public class User extends Observable<User> {
 
     public void setProfilePicturePath(String profilePicturePath) {
         this.profilePicturePath = profilePicturePath;
-        notifyObservers(this);
     }
 
     public String getAssignation(Document document){

@@ -1,17 +1,13 @@
 package gui.model;
 
 import be.User;
-import gui.nodes.UserCard;
 import bll.ManagerFactory;
 import bll.manager.UserManager;
+import gui.nodes.UserCard;
+import utils.enums.BusinessEntityType;
 import utils.enums.ResultState;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 public class UserModel implements IModel<User> {
     private static UserModel instance;
@@ -21,7 +17,7 @@ public class UserModel implements IModel<User> {
     private static User loggedInUser;
 
     private UserModel() {
-        userManager = (UserManager) ManagerFactory.createManager(ManagerFactory.ManagerType.USER);
+        userManager = (UserManager) ManagerFactory.createManager(BusinessEntityType.USER);
         allUsers = new HashMap<>();
         loadedCards = new HashMap<>();
         setAllUsersFromManager();

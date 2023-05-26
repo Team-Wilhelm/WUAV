@@ -23,22 +23,23 @@ public class Main extends Application {
         Parent splashRoot = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("view/Splash.fxml")));
         Scene splashScene = new Scene(splashRoot);
         primaryStage.setScene(splashScene);
+        primaryStage.setTitle("WUAV Documentation Management System");
+        primaryStage.getIcons().add(new Image("/img/icons/WUAV.png"));
         primaryStage.show();
 
         PauseTransition splashDelay = new PauseTransition(Duration.seconds(1));
         splashDelay.setOnFinished(event -> {
             try {
                 Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(SceneManager.LOGIN_SCENE)));
-                primaryStage.setTitle("WUAV Documentation Management System");
-                primaryStage.getIcons().add(new Image("/img/icons/WUAV.png"));
 
                 Scene scene = new Scene(root);
-                System.out.println("Loading application");
                 primaryStage.setScene(scene);
+                primaryStage.setWidth(Screen.getPrimary().getBounds().getWidth() - 400);
+                primaryStage.setHeight(Screen.getPrimary().getBounds().getHeight() - 200);
                 MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY);
 
-                primaryStage.centerOnScreen();
                 primaryStage.show();
+                primaryStage.centerOnScreen();
 
                 // All tables always visible
                 //primaryStage.setMinWidth(1310);

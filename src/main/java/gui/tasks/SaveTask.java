@@ -4,8 +4,6 @@ import gui.model.IModel;
 import javafx.concurrent.Task;
 import utils.enums.ResultState;
 
-import java.util.concurrent.CompletableFuture;
-
 public class SaveTask<T> extends Task<ResultState>  implements TaskCallback {
     private final T objectToSave;
     private final boolean isEditing;

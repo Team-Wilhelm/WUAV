@@ -1,6 +1,5 @@
 package gui.controller.ViewControllers;
 
-import utils.enums.ResultState;
 import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
 import io.github.palexdev.materialfx.css.themes.Themes;
 import javafx.application.Platform;
@@ -10,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import utils.enums.ResultState;
 
 import java.io.IOException;
 import java.util.List;

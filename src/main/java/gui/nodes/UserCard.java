@@ -1,13 +1,13 @@
 package gui.nodes;
 
 import be.User;
-import be.interfaces.Observable;
-import be.interfaces.Observer;
+import gui.util.ImageByteConverter;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
@@ -72,6 +72,6 @@ public class UserCard extends VBox {
     public void refreshCard(User user) {
         nameLabel.setText(user.getFullName());
         positionLabel.setText(user.getUserRole().toString());
-        profileImage.setImage(user.getProfilePicture());
+        profileImage.setImage(ImageByteConverter.getImageFromBytes(user.getProfilePicture()));
     }
 }

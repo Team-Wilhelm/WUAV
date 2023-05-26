@@ -16,8 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DocumentDAO extends DAO implements IDAO<Document> {
     private final DBConnection dbConnection;
@@ -33,6 +33,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     @Override
     public ResultState add(Document document) {
+        //TODO transactions
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
@@ -124,6 +125,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, id.toString());
             ps.setString(2, id.toString());
+            ps.setString(3, id.toString());
             ps.executeUpdate();
             documents.remove(id);
             return ResultState.SUCCESSFUL;
@@ -188,7 +190,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
     }
 
     public void assignImagesToDocument(Document document){
-        String sql = "SELECT * FROM Document_Image_Link WHERE DocumentID =? ORDER BY PictureIndex;";
+        String sql = "SELECT * FROM Document_Image_Link WHERE DocumentID = ? ORDER BY PictureIndex;";
         Connection connection = null;
         List<ImageWrapper> images = new ArrayList<>();
         try {
@@ -214,7 +216,6 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
     public void refreshCache() {
         documents.clear();
-        long startTime = System.currentTimeMillis();
         String sql = "SELECT * FROM Document WHERE Deleted = 0";
         Connection connection = null;
         try {
