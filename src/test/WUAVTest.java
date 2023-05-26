@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class WilhelmTest {
+public class WUAVTest {
 
     @DisplayName("Checks if expired customer contracts are correctly identified")
     @Test
