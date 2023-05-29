@@ -11,6 +11,7 @@ import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.Pane;
 import utils.enums.ResultState;
 
@@ -181,5 +182,14 @@ public abstract class AddController<T> {
      */
     protected boolean isInputEmpty(TextArea textArea) {
         return textArea.getText().trim().isEmpty();
+    }
+
+    protected boolean isInputEmpty(TextInputControl... controls) {
+        for (TextInputControl control : controls) {
+            if (control.getText().trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
