@@ -39,7 +39,6 @@ import utils.enums.EditingOptions;
 import utils.enums.ResultState;
 import utils.enums.UserRole;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
@@ -307,7 +306,7 @@ public class AddUserController extends AddController<User> implements Initializa
         btnSave.setVisible(hasAccess);
 
         if (!hasAccess)
-            gridPane.getRowConstraints().get(gridPane.getRowCount() -1).setPercentHeight(0); // TODO If the user cannot edit, remove dead space
+            gridPane.getRowConstraints().get(gridPane.getRowCount() -1).setPercentHeight(0);
     }
 
     private void changeTextFieldStyle() {

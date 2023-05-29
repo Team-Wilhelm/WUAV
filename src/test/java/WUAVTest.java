@@ -45,7 +45,6 @@ public class WUAVTest {
         Assertions.assertEquals(expected, actual);
     }
 
-    //TODO please check that I did this correctly
     @DisplayName("Checks if password hashing works correctly")
     @Test
     void checkPasswordHashing(){
