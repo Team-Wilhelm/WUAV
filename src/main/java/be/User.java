@@ -1,7 +1,6 @@
 package be;
 
 import dal.factories.DocumentImageFactory;
-import javafx.scene.image.Image;
 import utils.enums.UserRole;
 
 import java.util.HashMap;

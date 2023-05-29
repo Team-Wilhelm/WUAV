@@ -232,6 +232,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         return timeUntilContractExpires;
     }
 
+
     public void setVisibilityForUserRole() {
         UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
         hasAccess = loggedInUserRole == UserRole.ADMINISTRATOR || loggedInUserRole == UserRole.PROJECT_MANAGER;

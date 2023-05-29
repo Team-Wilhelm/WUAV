@@ -1,9 +1,6 @@
 package be;
 
 import gui.nodes.ImagePreview;
-import javafx.scene.image.Image;
-
-import java.io.ByteArrayInputStream;
 
 public class ImageWrapper {
     private String url, name, description;

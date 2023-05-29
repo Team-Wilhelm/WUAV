@@ -298,6 +298,10 @@ public class AddUserController extends AddController<User> implements Initializa
         file.delete();
     }
 
+    /**
+     * Sets the visibility of the nodes that are tied to functions with restricted access,
+     * based on the logged-in user's role.
+     */
     public void setVisibilityForUserRole() {
         UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
         if(loggedInUserRole == UserRole.ADMINISTRATOR || userToUpdate.equals(UserModel.getLoggedInUser())){

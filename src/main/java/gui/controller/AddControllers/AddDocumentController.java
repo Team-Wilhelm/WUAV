@@ -774,6 +774,10 @@ public class AddDocumentController extends AddController<Document> implements In
         isInputChanged.setValue(true);
     }
 
+    /**
+     * Sets the visibility of the nodes that are tied to functions with restricted access,
+     * based on the logged-in user's role.
+     */
     public void setVisibilityForUserRole() {
         UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
         if (!isEditing.get() && loggedInUserRole == UserRole.TECHNICIAN){

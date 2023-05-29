@@ -24,7 +24,7 @@ public class DocumentManager implements IManager<Document> {
     }
 
     /**
-     * Add a document to the database
+     * Add a document to the database if logged-in user has sufficient permission
      * @param document document to add
      * @return ResultState / NO_PERMISSION
      */
@@ -40,7 +40,7 @@ public class DocumentManager implements IManager<Document> {
     }
 
     /**
-     * Update a document in the database
+     * Update a document in the database if logged-in user has sufficient permission
      * @param document document to update
      * @return ResultState / NO_PERMISSION
      */
@@ -56,7 +56,7 @@ public class DocumentManager implements IManager<Document> {
     }
 
     /**
-     * Delete a document from the database
+     * Delete a document from the database if logged-in user has sufficient permission
      * @param id id of the document to delete
      * @return ResultState / NO_PERMISSION
      */
@@ -91,22 +91,28 @@ public class DocumentManager implements IManager<Document> {
     }
 
     /**
-     * Assign a user to a document
+     * Assign a user to a document if logged-in user has sufficient permission
      * @param user user to assign
      * @param document document to assign to
      * @param isAssigning true if assigning, false if unassigning
      */
+    @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER})
     public void assignUserToDocument(User user, Document document, boolean isAssigning) {
-        dao.assignUserToDocument(user, document, isAssigning);
+        if(document.getTechnicians().contains(UserModel.getLoggedInUser()) || checker.hasAccess(this.getClass())) {
+            dao.assignUserToDocument(user, document, isAssigning);
+        }
     }
 
     /**
-     * Add a drawing to a document
+     * Add a drawing to a document if logged-in user has sufficient permission
      * @param document document to add to
      * @param drawing drawing to add
      */
+    @RequiresPermission({UserRole.ADMINISTRATOR, UserRole.PROJECT_MANAGER, UserRole.TECHNICIAN})
     public void addDrawingToDocument(Document document, String drawing) {
-        dao.addDrawingToDocument(document, drawing);
+        if(checker.hasAccess(this.getClass())) {
+            dao.addDrawingToDocument(document, drawing);
+        }
     }
 
     /**

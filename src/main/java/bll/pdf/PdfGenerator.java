@@ -41,6 +41,11 @@ public class PdfGenerator {
     private int totalSteps;
     private int currentStep;
 
+    /**
+     * Generates a temporary pdf document to determine the number of pages,
+     * then generates the actual document with the temporary as a parameter
+     * @return pdf Path
+     */
     public Path generatePdf(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes) {
         totalSteps = checkBoxes.size() * 2;
         PdfDocumentWrapper temporary = getNumberOfPages(document, checkBoxes);
@@ -48,6 +53,7 @@ public class PdfGenerator {
         pdf.getPdfDocument().close();
         return pdf.getPath();
     }
+
 
     private PdfDocumentWrapper generateItextDocument(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes, PdfDocumentWrapper wrapper) {
         try {

@@ -23,7 +23,7 @@ public class CustomerManager implements IManager<Customer> {
     }
 
     /**
-     * Add a customer to the database
+     * Add a customer to the database if logged-in user has sufficient permission
      * @param customer customer to add
      * @return ResultState / NO_PERMISSION
      */
@@ -39,7 +39,7 @@ public class CustomerManager implements IManager<Customer> {
     }
 
     /**
-     * Update a customer in the database
+     * Update a customer in the database if logged-in user has sufficient permission
      * @param customer customer to update
      * @return ResultState / NO_PERMISSION
      */
@@ -55,7 +55,7 @@ public class CustomerManager implements IManager<Customer> {
     }
 
     /**
-     * Delete a customer from the database
+     * Delete a customer from the database if logged-in user has sufficient permission
      * @param id id of the customer to delete
      * @return ResultState / NO_PERMISSION
      */
@@ -102,7 +102,7 @@ public class CustomerManager implements IManager<Customer> {
 
     /**
      * Calculate the amount of customers that have a contract that expires in 2 months or less
-     * Visibility set to public in order to allow for unit testing
+     * Visibility set to public in order to allow for unit testing, should be treated as private
      */
     public int calculateExpiredCustomers(HashMap<UUID, Customer> customers){
         List<Customer> almostExpiredCustomers = new ArrayList<>();

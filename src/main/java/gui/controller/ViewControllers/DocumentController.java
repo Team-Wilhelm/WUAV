@@ -228,6 +228,10 @@ public class DocumentController extends ViewController<Document> implements Init
         btnAddDocument.setTooltip(new Tooltip("Press Ctrl+N to add a new document"));
     }
 
+    /**
+     * Sets the visibility of the nodes that are tied to functions with restricted access,
+     * based on the logged-in user's role.
+     */
     public void setVisibilityForUserRole() {
         UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
         if(loggedInUserRole == UserRole.ADMINISTRATOR || loggedInUserRole == UserRole.PROJECT_MANAGER || loggedInUserRole == UserRole.TECHNICIAN){

@@ -23,7 +23,7 @@ public class UserManager implements IManager<User> {
     }
 
     /**
-     * Add a user to the database
+     * Add a user to the database if logged-in user has sufficient permission
      * @param user user to add
      * @return ResultState / NO_PERMISSION
      */
@@ -39,7 +39,7 @@ public class UserManager implements IManager<User> {
     }
 
     /**
-     * Update a user in the database
+     * Update a user in the database if logged-in user has sufficient permission
      * @param user user to update
      * @return ResultState / NO_PERMISSION
      */
@@ -55,7 +55,7 @@ public class UserManager implements IManager<User> {
     }
 
     /**
-     * Delete a user from the database
+     * Delete a user from the database if logged-in user has sufficient permission
      * @param id id of the user to delete
      * @return ResultState / NO_PERMISSION
      */

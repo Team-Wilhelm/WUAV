@@ -19,7 +19,7 @@ public class AccessChecker {
 
     /**
      * Checks if the given serRole has access based on the contents of the RequiresPermission annotation.
-     * Visiblity is set to public for testing purposes.
+     * Visiblity is set to public for testing purposes, should not be treated as private.
      */
     public boolean calculateAccess(Class<?> thisClass, UserRole userRole){
         boolean hasAccess = false;
