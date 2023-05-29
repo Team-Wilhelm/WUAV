@@ -191,7 +191,7 @@ public class AddDocumentController extends AddController<Document> implements In
         if (selectedFile != null) {
             UUID customerId = documentToEdit != null ? documentToEdit.getCustomer().getCustomerID() : UUID.randomUUID();
             String path = BlobService.getInstance().UploadFile(selectedFile.getAbsolutePath(), customerId);
-            ImageWrapper image = new ImageWrapper(path, selectedFile.getName());
+            ImageWrapper image = new ImageWrapper(path, selectedFile.getName(), ImageByteConverter.getBytesFromURL(path), "");
             pictures.add(image);
             if (isEditing.get())
                 isInputChanged();

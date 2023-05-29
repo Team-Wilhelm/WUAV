@@ -1,5 +1,7 @@
 package dal.factories;
 
+import gui.util.ImageByteConverter;
+
 import java.io.*;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,25 +23,12 @@ public class DocumentImageFactory {
         byte[] image = imageCache.get(path);
         if (image == null) {
             try {
-                image = getBytesFromURL(path);
+                image = ImageByteConverter.getBytesFromURL(path);
                 imageCache.put(path, image);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         return image;
-    }
-
-    private byte[] getBytesFromURL(String urlString) throws IOException {
-        URL url = new URL(urlString);
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        try (InputStream inputStream = url.openStream()) {
-            int n = 0;
-            byte [] buffer = new byte[4096];
-            while (-1 != (n = inputStream.read(buffer))) {
-                output.write(buffer, 0, n);
-            }
-        }
-        return output.toByteArray();
     }
 }
