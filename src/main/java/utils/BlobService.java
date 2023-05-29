@@ -71,7 +71,7 @@ public class BlobService {
      * Uploads a file to the storage
      * @param path Absolute path to the file
      * @param customerId The id of the customer
-     * @return
+     * @return path to the file
      */
     public String UploadFile(String path, UUID customerId) throws Exception {
         Path p = Paths.get(path);
@@ -95,7 +95,6 @@ public class BlobService {
 class startup{
     public static void main(String[] args) throws IOException {
         // This is just a test
-        // TODO: Make this into unit tests
         BlobService blobService = BlobService.getInstance();
         Path currentRelativePath = Paths.get("");
         String s = currentRelativePath.toAbsolutePath().toString();
