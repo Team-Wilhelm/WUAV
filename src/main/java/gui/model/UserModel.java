@@ -41,6 +41,7 @@ public class UserModel implements IModel<User> {
 
     @Override
     public ResultState update(User user) {
+        allUsers.put(user.getUserID(), user);
         return userManager.update(user);
     }
 

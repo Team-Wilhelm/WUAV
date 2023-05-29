@@ -212,7 +212,11 @@ public class AddUserController extends AddController<User> implements Initializa
     protected void assignInputToVariables() {
         name = txtName.getText().trim();
         username = txtUsername.getText().trim();
-        phoneNumber = txtPhoneNumber.getText().trim();
+        if (txtPhoneNumber.getText().equals("No phone number available")) {
+            phoneNumber = "";
+        } else {
+            phoneNumber = txtPhoneNumber.getText().trim();
+        }
         userRole = comboPosition.getSelectionModel().getSelectedItem();
         password = txtPassword.getText().trim();
     }
