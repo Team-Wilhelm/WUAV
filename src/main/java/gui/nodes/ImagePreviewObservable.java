@@ -3,6 +3,9 @@ package gui.nodes;
 import be.interfaces.Observable;
 import be.interfaces.Observer;
 
+/**
+ * Allows the ImagePreview class to be observable.
+ */
 public class ImagePreviewObservable extends Observable<ImagePreview> {
     private ImagePreview imagePreview;
 

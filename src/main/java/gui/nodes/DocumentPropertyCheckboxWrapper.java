@@ -5,6 +5,9 @@ import io.github.palexdev.materialfx.controls.MFXCheckbox;
 import javafx.beans.property.BooleanProperty;
 import utils.enums.DocumentPropertyType;
 
+/**
+ * A wrapper class for a DocumentPropertyType and a MFXCheckbox.
+ */
 public class DocumentPropertyCheckboxWrapper {
     private DocumentPropertyType property;
     private MFXCheckbox checkbox;

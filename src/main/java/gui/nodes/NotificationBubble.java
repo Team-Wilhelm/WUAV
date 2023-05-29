@@ -6,6 +6,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
+/**
+ * Notification bubble that is displayed on customers button in the menu when there are expiring customers.
+ */
 public class NotificationBubble extends StackPane {
     private Circle bubble;
 

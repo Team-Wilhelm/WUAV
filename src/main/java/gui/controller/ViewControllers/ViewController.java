@@ -14,6 +14,10 @@ import utils.enums.ResultState;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Abstract class for all view controllers to extend.
+ * @param <T> The type of the items in the view.
+ */
 public abstract class ViewController<T> {
     public abstract void setProgressVisibility(boolean isVisible);
     public abstract void bindProgressToTask(Task<ResultState> task);

@@ -10,7 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 
 /**
- *
+ * A pane that automatically resizes the ImageView it contains to fit the pane.
  * @author akouznet
  */
 public class ImageViewPane extends Region {

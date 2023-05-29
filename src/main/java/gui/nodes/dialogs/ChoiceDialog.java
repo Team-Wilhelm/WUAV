@@ -7,6 +7,9 @@ import javafx.scene.input.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A dialogue that allows the user to choose between multiple options.
+ */
 public class ChoiceDialog extends CustomDialog {
 
     public ChoiceDialog() {

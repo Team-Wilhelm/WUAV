@@ -6,6 +6,10 @@ import utils.enums.ResultState;
 
 import java.util.UUID;
 
+/**
+ * A task that deletes an object from the database.
+ * @param <T> The type of object to delete.
+ */
 public class DeleteTask<T> extends Task<ResultState> {
     private final UUID objectToDelete;
     private final IModel<T> model;

@@ -28,6 +28,12 @@ public class CustomerModel implements IModel<Customer> {
         return instance;
     }
 
+    /**
+     * Adds a customer to the map of all customers and makes requests to the manager to add the customer to the database.
+     * Updates the customer's contracts to have the customer as their customer.
+     * @param customer the customer to add
+     * @return ResultState.SUCCESSFUL if the customer was added successfully, ResultState.UNSUCCESSFUL otherwise
+     */
     @Override
     public ResultState add(Customer customer) {
         ResultState resultState = customerManager.add(customer);
@@ -40,6 +46,12 @@ public class CustomerModel implements IModel<Customer> {
         return resultState;
     }
 
+    /**
+     * Updates a customer in the map of all customers and makes requests to the manager to update the customer in the database.
+     * Updates the customer's contracts to have the customer as their customer.
+     * @param customer the customer to update
+     * @return ResultState.SUCCESSFUL if the customer was updated successfully, ResultState.UNSUCCESSFUL otherwise
+     */
     @Override
     public ResultState update(Customer customer) {
         ResultState resultState = customerManager.update(customer);
@@ -52,6 +64,12 @@ public class CustomerModel implements IModel<Customer> {
         return resultState;
     }
 
+    /**
+     * Deletes a customer from the map of all customers and makes requests to the manager to delete the customer from the database.
+     * Deletes all documents associated with the customer.
+     * @param id the id of the customer to delete
+     * @return ResultState.SUCCESSFUL if the customer was deleted successfully, ResultState.UNSUCCESSFUL otherwise
+     */
     @Override
     public ResultState delete(UUID id) {
         ResultState resultState = customerManager.delete(id);
@@ -100,6 +118,10 @@ public class CustomerModel implements IModel<Customer> {
         return filteredCustomers;
     }
 
+    /**
+     * Puts a customer in the map of all customers, replacing the customer with the same id if it exists, but keeping the contracts.
+     * @param customer the customer to put
+     */
     public void put(Customer customer) {
         Customer temp = allCustomers.get(customer.getCustomerID());
         if (temp != null) {

@@ -29,7 +29,6 @@ import java.util.List;
 
 public class PdfGenerator {
     private static PdfFont FONT;
-    private static final int FONT_SIZE = 12;
     private PdfPageEventHandler pageNumberHandler;
 
     //Create formatting elements
@@ -55,6 +54,13 @@ public class PdfGenerator {
     }
 
 
+    /**
+     * Generates a PDF document with the given parameters
+     * @param document the document to generate
+     * @param checkBoxes the content to include in the document
+     * @param wrapper the temporary document to use for page numbers, should be null when generating the temporary document
+     * @return a PdfDocumentWrapper containing the document and its path to be used for further processing
+     */
     private PdfDocumentWrapper generateItextDocument(Document document, List<DocumentPropertyCheckboxWrapper> checkBoxes, PdfDocumentWrapper wrapper) {
         try {
             FONT = PdfFontFactory.createFont(FontConstants.HELVETICA);

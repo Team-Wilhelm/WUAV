@@ -55,6 +55,12 @@ public class LoginViewController implements Initializable {
         }
     }
 
+    /**
+     * This method is called when the user clicks the login button.
+     * It checks if the user exists and if the password is correct.
+     * @param event The event that triggered this method
+     * @return true if the user exists and the password is correct, false otherwise
+     */
     public Boolean loginUser(Event event){
         User user = userModel.getUserByUsername(usernameInput.getText());
         if(user == null){
@@ -77,6 +83,9 @@ public class LoginViewController implements Initializable {
         return false;
     }
 
+    /**
+     * Called after the user has logged in.
+     */
     private void openMenuView(){
         stage = (Stage) btnLogin.getScene().getWindow();
         Scene scene = new Scene(root);
@@ -92,7 +101,9 @@ public class LoginViewController implements Initializable {
         stage.setMaximized(true);
     }
 
-
+    /**
+     * Enables login by pressing the enter key.
+     */
     private void setEnterKeyAction() {
         Scene scene = usernameInput.getScene();
         scene.setOnKeyPressed(event -> {
@@ -102,6 +113,9 @@ public class LoginViewController implements Initializable {
         });
     }
 
+    /**
+     * Unfocuses all elements in the scene.
+     */
     public void unfocusAll() {
         borderPane.requestFocus();
     }

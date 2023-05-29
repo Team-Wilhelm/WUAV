@@ -168,6 +168,10 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         }
     }
 
+
+    /**
+     * Refreshes the items in the table view with all customers.
+     */
     @Override
     public void refreshItems() {
         refreshItems(List.copyOf(customerModel.getAll().values()));
@@ -201,6 +205,11 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         }
     }
 
+    /**
+     * Returns a string with the time until the contract expires.
+     * @param customer The customer to get the time until contract expires for.
+     * @return A string with the time until the contract expires.
+     */
     private String getTimeUntilContractExpires(Customer customer) {
         String timeUntilContractExpires = "";
         LocalDate contractExpiry = customer.getLastContract().toLocalDate().plusMonths(48);
@@ -232,7 +241,6 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         return timeUntilContractExpires;
     }
 
-
     public void setVisibilityForUserRole() {
         UserRole loggedInUserRole = UserModel.getLoggedInUser().getUserRole();
         hasAccess = loggedInUserRole == UserRole.ADMINISTRATOR || loggedInUserRole == UserRole.PROJECT_MANAGER;
@@ -247,6 +255,15 @@ public class CustomerInfoController extends ViewController<Customer> implements 
         }
     }
 
+    /**
+     * Sets the actions for the choice dialog.
+     * The actions are:
+     * - Extend by 48 months
+     * - Delete customer (sets the customerDeletedProperty to true to notify the MenuController that a customer has been deleted
+     *  and the table view with all documents needs to be refreshed)
+     * The actions are stored in a HashMap with the key being the name of the action and the value being a Runnable.
+     * The Runnable is called when the action is selected.
+     */
     private void setActions() {
         actions.put("Delete Customer", () -> {
             customerModel.delete(tblCustomers.getSelectionModel().getSelectedValue().getCustomerID());

@@ -8,6 +8,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Factory class for creating document images.
+ * Uses a cache to avoid unnecessary network calls.
+ * Stores images as byte arrays.
+ */
 public class DocumentImageFactory {
     private ConcurrentHashMap<String, byte[]> imageCache = new ConcurrentHashMap<>();
     private static DocumentImageFactory instance;

@@ -153,6 +153,9 @@ public class AddUserController extends AddController<User> implements Initializa
         });
     }
 
+    /**
+     * Opens a file chooser and allows the user to select a profile picture and crop it.
+     */
     private void profilePictureDoubleClick() {
         imgProfilePicture.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && isUpdating.get()) {
@@ -194,7 +197,10 @@ public class AddUserController extends AddController<User> implements Initializa
         }
     };
 
-    private final ChangeListener<UserRole> positionListener = new ChangeListener<UserRole>() {
+    /**
+     * Disables the save button if the user role is not selected.
+     */
+    private final ChangeListener<UserRole> positionListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends UserRole> observable, UserRole oldValue, UserRole newValue) {
             if (isInputEmpty(txtName) || isInputEmpty(txtUsername)
@@ -229,6 +235,12 @@ public class AddUserController extends AddController<User> implements Initializa
         txtPassword.textProperty().addListener(inputListener);
     }
 
+    /**
+     * Sets the user to be edited and populates the fields with the user's information.
+     * The user's password is not shown, but can be changed.
+     * The delete option is not available for the logged-in user.
+     * @param user The user to be edited.
+     */
     public void setIsEditing(User user) {
         disableFields(true);
         isEditing = true;
@@ -285,6 +297,12 @@ public class AddUserController extends AddController<User> implements Initializa
         });
     }
 
+    /**
+     * Sets the profile picture of the user and saves it to the blob service.
+     * @param image
+     * @param profilePicturePath
+     * @throws Exception
+     */
     public void setProfilePicture(Image image, String profilePicturePath) throws Exception {
         profilePicture = image;
         imgProfilePicture.setImage(CropImageToCircle.getRoundedImage(profilePicture));
@@ -317,6 +335,10 @@ public class AddUserController extends AddController<User> implements Initializa
             gridPane.getRowConstraints().get(gridPane.getRowCount() -1).setPercentHeight(0);
     }
 
+    /**
+     * When the editing option is selected, the text fields are enabled.
+     * Otherwise, the text fields are disabled and styled as labels.
+     */
     private void changeTextFieldStyle() {
         if (!isUpdating.get()) {
             // Make the text fields look like labels if they're not editable

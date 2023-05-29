@@ -67,6 +67,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class AddDocumentController extends AddController<Document> implements Initializable, Observer<ImagePreview> {
+    // Nodes
     @FXML
     public HBox canvasHolder;
     @FXML
@@ -93,6 +94,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private TextAreaWithFloatingText txtJobDescription, txtNotes;
     private DocumentPropertiesList propertiesList;
 
+    // Variables
     private final DocumentModel documentModel;
     private final CustomerModel customerModel;
     private Document documentToEdit, currentDocument;
@@ -105,6 +107,8 @@ public class AddDocumentController extends AddController<Document> implements In
     private boolean hasAccess = false;
     private ImagePreview lastFocused;
     private HashMap<String, Runnable> choices = new HashMap<>();
+    private BooleanProperty isInputChanged, isEditing; // IsEditing is used to determine if the user is editing an existing document or creating a new one
+
 
     // Document and customer information
     private UUID temporaryId;
@@ -113,7 +117,6 @@ public class AddDocumentController extends AddController<Document> implements In
     private CustomerType customerType;
     private Date lastContract;
     private List<User> technicians;
-    private BooleanProperty isInputChanged, isEditing; // IsEditing is used to determine if the user is editing an existing document or creating a new one
     private Customer customer;
 
     public AddDocumentController() {
@@ -133,6 +136,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // By default, the user is not allowed to access other tabs than the first one if it's not filled out
         btnNextJobTab.setDisable(true);
         btnNextCustomerTab.setDisable(true);
         customerInformationTab.setDisable(true);
@@ -144,15 +148,14 @@ public class AddDocumentController extends AddController<Document> implements In
         assignListenersToTextFields();
         setUpComboBox();
 
-        dateLastContract.setValue(LocalDate.now());
+        dateLastContract.setValue(LocalDate.now()); // Set the date to today
 
         Bindings.bindContent(flowPanePictures.getChildren(), imagePreviews);
-        btnSave.disableProperty().bind(isInputChanged.not());
-        btnDelete.disableProperty().bind(isEditing.not());
+        btnSave.disableProperty().bind(isInputChanged.not()); // Disable the save button if the input is not changed
+        btnDelete.disableProperty().bind(isEditing.not()); // Disable the delete button if the user is adding a new document
 
-        canvasTab.setOnSelectionChanged(event -> {
+        canvasTab.setOnSelectionChanged(event -> { // When the user switches to the canvas tab, the canvas is loaded
             if (canvasTab.isSelected()) {
-
                 canvasHolder.getChildren().clear();
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CanvasView.fxml"));
@@ -168,8 +171,8 @@ public class AddDocumentController extends AddController<Document> implements In
     }
 
     /**
-     * Uploads the pictures to the blob storage
-     * @param actionEvent
+     * Uploads the pictures to the blob storage.
+     * @param actionEvent The event that triggered the method
      * @throws Exception
      */
     @FXML
@@ -194,7 +197,7 @@ public class AddDocumentController extends AddController<Document> implements In
             ImageWrapper image = new ImageWrapper(path, selectedFile.getName(), ImageByteConverter.getBytesFromURL(path), "");
             pictures.add(image);
             if (isEditing.get())
-                isInputChanged();
+                isInputChanged(); // If the user is editing an existing document, the save button is enabled
         }
         refreshItems();
     }
@@ -203,6 +206,7 @@ public class AddDocumentController extends AddController<Document> implements In
     private void saveAction(ActionEvent actionEvent) {
         assignInputToVariables();
 
+        // Check if there is already a customer with the same email
         Customer customerByEmail = customerModel.getByEmail(email);  // Try to find a customer with the same email
         Address address = new Address(streetName, houseNumber, postcode, city, country);
         if (customer == null) { // If no customer has been selected in autocomplete
@@ -216,6 +220,8 @@ public class AddDocumentController extends AddController<Document> implements In
             customer.setLastContract(lastContract);
         }
 
+        // If there is a customer with the same email, but other values don't match,
+        // ask the user if they want to update the customer in all documents
         if (customerByEmail != null && customer.getCustomerEmail().equals(customerByEmail.getCustomerEmail())) {
             if (customerByEmail.getContracts().size() > 0 && !customer.equals(customerByEmail)) {
                 CompletableFuture<ButtonType> result = dialogManager.showConfirmation("Editing an existing customer",
@@ -238,8 +244,8 @@ public class AddDocumentController extends AddController<Document> implements In
             }
         }
 
-        if (customer == null) {return; }
-        currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(LocalDate.now()));
+        if (customer == null) {return; } // If the user cancelled the dialog, don't save anything
+        currentDocument = new Document(customer, jobDescription, notes, jobTitle, Date.valueOf(dateLastContract.getValue()));
         currentDocument.setTechnicians(technicians);
         currentDocument.setDocumentImages(pictures);
         technicians.forEach(technician -> technician.addDocument(currentDocument));
@@ -273,6 +279,10 @@ public class AddDocumentController extends AddController<Document> implements In
         tabPane.getSelectionModel().selectNext();
     }
 
+    /**
+     * Assign or unassign the user selected in the combobox to the document.
+     * @param technician The user to assign or unassign
+     */
     public void assignUserToDocument(User technician) {
         UserRole userRole = UserModel.getLoggedInUser().getUserRole();
         if (documentToEdit.getTechnicians().contains(UserModel.getLoggedInUser())
@@ -298,7 +308,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
         GeneratePdfTask task = new GeneratePdfTask(documentToEdit, checkboxWrappers);
         setUpPdfTask(task, documentToEdit, gridPanePdf);
-        ThreadPool.getInstance().execute(task);
+        executorService.execute(task);
     }
 
     // region Listeners
@@ -335,6 +345,9 @@ public class AddDocumentController extends AddController<Document> implements In
         }
     };
 
+    /**
+     * Updates the suggestions in the customer name text field.
+     */
     private final ChangeListener<String> customerListener = new ChangeListener<>() {
         @Override
         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -405,6 +418,11 @@ public class AddDocumentController extends AddController<Document> implements In
     // endregion
 
     // region Utilities, helpers and setters
+
+    /**
+     * Sets the document to edit and populates the window with the document's information.
+     * @param document
+     */
     public void setIsEditing(Document document) {
         isEditing.setValue(true);
         documentToEdit = document;
@@ -468,6 +486,9 @@ public class AddDocumentController extends AddController<Document> implements In
         txtNotes.textProperty().addListener(jobInputListener);
     }
 
+    /**
+     * Saves user input to variables.
+     */
     protected void assignInputToVariables() {
         // Customer information
         name = txtName.getText();
@@ -493,6 +514,9 @@ public class AddDocumentController extends AddController<Document> implements In
         pictures.addAll(imagePreviews.stream().map(ImagePreview::getImageWrapper).toList());
     }
 
+    /**
+     * Refreshes the image previews and adds interactivity to them.
+     */
     public void refreshItems() {
         imagePreviews.clear();
         pictures.forEach(image -> {
@@ -548,7 +572,7 @@ public class AddDocumentController extends AddController<Document> implements In
 
     // region Drag and drop
     /**
-     * Event handler for when the user drops an image preview on the flow pane.
+     * Event handler for when the user starts dragging an image in flowpane.
      */
     private EventHandler<MouseEvent> dragDetected = new EventHandler<>() {
         @Override
@@ -563,6 +587,9 @@ public class AddDocumentController extends AddController<Document> implements In
         }
     };
 
+    /**
+     * Event handler for when the user drags an image over flowpane.
+     */
     private EventHandler<DragEvent> dragOver = new EventHandler<>() {
         @Override
         public void handle(DragEvent event) {
@@ -588,6 +615,9 @@ public class AddDocumentController extends AddController<Document> implements In
         }
     };
 
+    /**
+     * Event handler for when the user drops an image in flowpane.
+     */
     private EventHandler<DragEvent> dragDropped = new EventHandler<>() {
         @Override
         public void handle(DragEvent event) {
@@ -621,6 +651,10 @@ public class AddDocumentController extends AddController<Document> implements In
     };
     // endregion
 
+    /**
+     * Populates the combo box with all the technicians.
+     * Sets a custom string converter to display if the technician is assigned, their name and username.
+     */
     private void setUpComboBox() {
         comboTechnicians.getSelectionModel().selectedItemProperty().addListener(technicianListenerNotEditing);
         comboTechnicians.setConverter(new StringConverter<>() {
@@ -650,6 +684,9 @@ public class AddDocumentController extends AddController<Document> implements In
         this.documentController = documentController;
     }
 
+    /**
+     * Checks if the current input is different from the document information.
+     */
     private void isInputChanged(){
         Document document = isEditing.get() ? documentToEdit : currentDocument;
         // Check if job information has changed
@@ -701,6 +738,9 @@ public class AddDocumentController extends AddController<Document> implements In
         }
     }
 
+    /**
+     * Populates the combo box with all the technicians.
+     */
     private void populateComboBox() {
         allTechnicians.clear();
         allTechnicians.setAll(UserModel.getInstance().getAll().values().stream().filter(user ->
@@ -743,6 +783,9 @@ public class AddDocumentController extends AddController<Document> implements In
                 + customer.getCustomerAddress().getStreetNumber() + ")";
     }
 
+    /**
+     * Sets the text fields to auto complete after a suggestion is selected in name text field.
+     */
     private void setTxtCustomerNameAutoComplete() {
         txtName.textProperty().addListener(customerInputListener);
         txtName.textProperty().addListener(customerListener);
@@ -809,6 +852,10 @@ public class AddDocumentController extends AddController<Document> implements In
     }
     // endregion
 
+    /**
+     * Prompts the user to save the document if there are unsaved changes when the window is closed.
+     * If the user is creating a new document, the prompt will only be shown if all the required fields are filled in.
+     */
     public void setOnCloseRequest() {
         Stage stage = (Stage) btnSave.getScene().getWindow();
         stage.setOnCloseRequest(e -> {
@@ -831,6 +878,10 @@ public class AddDocumentController extends AddController<Document> implements In
         });
     }
 
+    /**
+     * Checks if any of the required fields are empty.
+     * @return
+     */
     private boolean savingAllowed() {
         return !isInputEmpty(txtJobTitle, txtJobDescription.getTextArea(), txtName, txtEmail, txtPhoneNumber,
                 txtStreetName, txtHouseNumber, txtPostcode, txtCity, txtCountry);

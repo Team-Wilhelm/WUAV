@@ -23,6 +23,11 @@ public class UserDAO extends DAO implements IDAO<User> {
         documentDAO = new DocumentDAO();
     }
 
+    /**
+     * Adds a user to the database.
+     * @param user user to add
+     * @return ResultState.SUCCESSFUL if the user was added successfully, ResultState.FAILED otherwise
+     */
     @Override
     public ResultState add(User user) {
         String sql = "INSERT INTO SystemUser (FullName, Username, UserPassword, UserRole, PhoneNumber, Salt, ProfilePicture) " +
@@ -53,6 +58,11 @@ public class UserDAO extends DAO implements IDAO<User> {
         }
     }
 
+    /**
+     * Updates a user in the database.
+     * @param user user to update
+     * @return ResultState.SUCCESSFUL if the user was updated successfully, ResultState.FAILED otherwise
+     */
     @Override
     public ResultState update(User user) {
         String sql = "UPDATE SystemUser SET FullName = ?, Username = ?, UserPassword = ?, " +
@@ -74,12 +84,22 @@ public class UserDAO extends DAO implements IDAO<User> {
         }
     }
 
+    /**
+     * Deletes a user from the database.
+     * @param id id of the object to delete
+     * @return ResultState.SUCCESSFUL if the user was deleted successfully, ResultState.FAILED otherwise
+     */
     @Override
     public ResultState delete(UUID id) {
         String sql = "UPDATE SystemUser SET Deleted = 1 WHERE UserID = ?";
         return delete(id, sql);
     }
 
+    /**
+     * Gets all users from the database.
+     * Each user's document IDs are retrieved in a comma-separated string and added to the user object.
+     * @return a map of all users in the database with their IDs as keys.
+     */
     @Override
     public Map<UUID, User> getAll() {
         long startTime = System.currentTimeMillis();
@@ -113,6 +133,12 @@ public class UserDAO extends DAO implements IDAO<User> {
         return users;
     }
 
+    /**
+     * Gets a user from the database by their ID.
+     * The user's document IDs are retrieved in a comma-separated string and added to the user object.
+     * @param id id of the user to get
+     * @return the user with the given ID, or null if no user was found
+     */
     @Override
     public User getById(UUID id) {
         String sql = "SELECT SystemUser.*, " +
@@ -143,6 +169,14 @@ public class UserDAO extends DAO implements IDAO<User> {
         return null;
     }
 
+    /**
+     * Takes the comma-separated string of Document IDs from the Result set
+     * and splits it into a list of UUIDs before creating a user object from a result set.
+     * @param resultSet result set to get the user from
+     * @param assignDocuments whether to assign documents to the user
+     * @return the user from the result set with documents assigned to them
+     * @throws SQLException
+     */
     private User getUser(ResultSet resultSet, boolean assignDocuments) throws SQLException {
         List<UUID> documentIDs = new ArrayList<>();
         String documentIdsStr = resultSet.getString("DocumentIDs");
@@ -157,8 +191,14 @@ public class UserDAO extends DAO implements IDAO<User> {
         return user;
     }
 
+    /**
+     * Retrieves the user's password from the database and compares it to the given password.
+     * @param username username of the user to log in
+     * @param password password of the user to log in
+     * @return true if the password matches, false otherwise
+     */
     public boolean logIn(String username, byte[] password) {
-        String sql = "SELECT UserPassword, Salt FROM [SystemUser] WHERE Username = ?";
+        String sql = "SELECT UserPassword FROM [SystemUser] WHERE Username = ?";
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
@@ -177,6 +217,14 @@ public class UserDAO extends DAO implements IDAO<User> {
         return false;
     }
 
+    /**
+     * Gets a user from the result set and assigns documents to them if required.
+     * @param resultSet result set to get the user from
+     * @param documentIDs list of document IDs to assign to the user
+     * @param assignDocuments whether to assign documents to the user
+     * @return the user from the result set with documents assigned to them
+     * @throws SQLException
+     */
     private User getUserFromResultSet(ResultSet resultSet, List<UUID> documentIDs, boolean assignDocuments) throws SQLException {
         User user = new User(
                 UUID.fromString(resultSet.getString("UserID")),
@@ -193,6 +241,12 @@ public class UserDAO extends DAO implements IDAO<User> {
         return user;
     }
 
+    /**
+     * Fills a prepared statement with the given user's data.
+     * @param ps prepared statement to fill
+     * @param user user to get the data from
+     * @throws SQLException
+     */
     private void fillPreparedStatement(PreparedStatement ps, User user) throws SQLException {
         ps.setString(1, user.getFullName());
         ps.setString(2, user.getUsername());

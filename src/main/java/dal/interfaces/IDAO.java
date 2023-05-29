@@ -5,6 +5,10 @@ import utils.enums.ResultState;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Interface for DAO classes
+ * @param <T> type of object to be stored
+ */
 public interface IDAO<T> {
     /**
      * Add an object to the database

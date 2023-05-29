@@ -137,6 +137,9 @@ public class UserController extends ViewController<User> implements Initializabl
         }
     }
 
+    /**
+     * Refreshes the list of users with all users.
+     */
     @Override
     public void refreshItems() {
         refreshItems(List.copyOf(userModel.getAll().values()));

@@ -24,6 +24,9 @@ import javafx.scene.paint.Color;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A class representing a preview of an image. It is used to display uploaded images in the AddDocumentView.
+ */
 public class ImagePreview extends VBox {
     private Observer<ImagePreview> observer;
     private ImagePreviewObservable observable;

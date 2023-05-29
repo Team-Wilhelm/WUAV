@@ -9,7 +9,7 @@ public class HashPasswordHelper {
     /**
      * Hashes a password using PBKDF2WithHmacSHA1
      * @param password password to hash
-     * @return byte[][]
+     * @return byte[][] [0] = hashed password, [1] = salt
      */
     public byte[][] hashPassword(String password) {
         SecureRandom random = new SecureRandom();
@@ -31,7 +31,7 @@ public class HashPasswordHelper {
      * Used for checking if a password is correct
      * @param password password to hash
      * @param salt salt to use
-     * @return byte[]
+     * @return byte[] hashed password
      */
     public byte[] hashPassword(String password, byte[] salt) {
         try {

@@ -23,6 +23,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A GridPane that displays the properties of a document.
+ */
 public class DocumentPropertiesList extends GridPane {
     private Document document;
     private ColumnConstraints colLabel, colValue, colCheckbox;

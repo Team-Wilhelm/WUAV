@@ -96,14 +96,12 @@ public class MFXTextFieldWithAutofill extends MFXTextField {
 
     /**
      * Get the existing set of autocomplete entries.
-     *
      * @return The existing autocomplete entries.
      */
     public SortedSet<String> getEntries() { return suggestions; }
 
     /**
      * Set a callback to be executed when a suggestion is selected.
-     *
      * @param callback The callback function to handle the selected suggestion.
      */
     public void setSelectionCallback(Consumer<String> callback) {

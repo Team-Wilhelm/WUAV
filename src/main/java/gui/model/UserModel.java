@@ -30,6 +30,11 @@ public class UserModel implements IModel<User> {
         } return instance;
     }
 
+    /**
+     * Adds a user to the model
+     * @param user the user to add
+     * @return ResultState.SUCCESSFUL if the user was added successfully, ResultState.UNSUCCESSFUL otherwise
+     */
     @Override
     public ResultState add(User user) {
         ResultState resultState = userManager.add(user);
@@ -39,12 +44,22 @@ public class UserModel implements IModel<User> {
         return resultState;
     }
 
+    /**
+     * Updates a user in the model
+     * @param user the user to update
+     * @return ResultState.SUCCESSFUL if the user was updated successfully, ResultState.UNSUCCESSFUL otherwise
+     */
     @Override
     public ResultState update(User user) {
         allUsers.put(user.getUserID(), user);
         return userManager.update(user);
     }
 
+    /**
+     * Deletes a user from the model
+     * @param id the id of the user to delete
+     * @return ResultState.SUCCESSFUL if the user was deleted successfully, ResultState.UNSUCCESSFUL otherwise
+     */
     @Override
     public ResultState delete(UUID id) {
         allUsers.remove(id);

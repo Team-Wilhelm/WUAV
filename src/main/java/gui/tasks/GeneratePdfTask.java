@@ -9,6 +9,10 @@ import utils.enums.ResultState;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * A task that generates a PDF document.
+ * Bind the progress bar to the progress property of this task.
+ */
 public class GeneratePdfTask extends Task<ResultState> implements TaskCallback {
     private final Document document;
     private final List<DocumentPropertyCheckboxWrapper> checkboxWrappers;

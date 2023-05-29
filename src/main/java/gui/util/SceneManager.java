@@ -1,7 +1,9 @@
 package gui.util;
 
+/**
+ * Contains the paths to the FXML files
+ */
 public class SceneManager {
-
     public static final String LOGIN_SCENE = "/view/LoginView.fxml";
     public static final String MENU_SCENE = "/view/MenuView.fxml";
     public static final String DOCUMENT_SCENE = "/view/DocumentView.fxml";

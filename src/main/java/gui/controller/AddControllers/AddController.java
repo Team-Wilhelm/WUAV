@@ -20,6 +20,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
 
+/**
+ * Abstract class for add controllers to extend
+ * Mainly used for setting up tasks and checking for empty fields
+ * @param <T> type of object to add
+ */
 public abstract class AddController<T> {
     protected abstract void assignInputToVariables();
     protected abstract void assignListenersToTextFields();

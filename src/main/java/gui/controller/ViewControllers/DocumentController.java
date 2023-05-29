@@ -97,6 +97,7 @@ public class DocumentController extends ViewController<Document> implements Init
 
         tblDocument.setItems(FXCollections.observableArrayList(filteredDocuments));
     }
+
     private ObservableList<Document> filterDocumentsByCreationDate(LocalDate startDate) {
         ObservableList<Document> allDocuments = documentList;
         ObservableList<Document> filteredDocuments = FXCollections.observableArrayList();
@@ -144,6 +145,9 @@ public class DocumentController extends ViewController<Document> implements Init
         documentList.addAll(documentsToDisplay);
     }
 
+    /**
+     * Refreshes the items in the table view with all documents.
+     */
     @Override
     public void refreshItems() {
         refreshItems(List.copyOf(documentModel.getAll().values()));
@@ -208,6 +212,10 @@ public class DocumentController extends ViewController<Document> implements Init
         tblDocument.setFooterVisible(false);
     }
 
+    /**
+     * Opens the add document window when the user double-clicks on a document in the table view.
+     * @param event The mouse event.
+     */
     @FXML
     private void tableViewDoubleClickAction(MouseEvent event) {
         if (event.getClickCount() == 2) {

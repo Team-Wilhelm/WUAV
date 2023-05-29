@@ -27,6 +27,9 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * Responsible for switching between the different scenes in the application.
+ */
 public class MenuController implements Initializable {
     @FXML
     private HBox btnCustomersBox;

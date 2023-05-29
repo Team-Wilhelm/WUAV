@@ -7,7 +7,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 
-
+/**
+ * A dialogue that shows a progress bar and a label.
+ */
 public class LoadingDialog extends CustomDialog {
     private MFXProgressBar progressBar;
     private Label progressLabel;

@@ -5,6 +5,10 @@ import utils.enums.ResultState;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Interface for the Manager classes.
+ * @param <T> One of the business entities
+ */
 public interface IManager<T> {
     /**
      * Add an object to the database

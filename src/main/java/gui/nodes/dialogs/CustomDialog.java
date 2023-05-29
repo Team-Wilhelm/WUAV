@@ -5,6 +5,10 @@ import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
 import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
 import javafx.scene.Node;
 
+/**
+ * A custom dialog that can be used to create custom dialogs.
+ * It is a wrapper for the way MaterialFX dialogs are created.
+ */
 public abstract class CustomDialog extends MFXStageDialog {
     private MFXGenericDialog dialogContent;
 

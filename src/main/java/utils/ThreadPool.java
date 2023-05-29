@@ -5,6 +5,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * Thread pool to reuse an executor service throughout the application.
+ */
 public class ThreadPool {
     private static ThreadPool instance;
     private ExecutorService executorService;
@@ -28,6 +31,10 @@ public class ThreadPool {
         return executorService.submit(callable);
     }
 
+    /**
+     * Shuts down the thread pool, waiting for all tasks to finish.
+     * If tasks do not finish, they are interrupted and the thread pool is shut down forcefully.
+     */
     public void shutdown() {
         try {
             executorService.shutdown();

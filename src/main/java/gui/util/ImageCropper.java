@@ -25,6 +25,9 @@ import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import java.io.File;
 
+/**
+ * Allows the user to crop an image.
+ */
 public class ImageCropper {
     private int CROP_WIDTH = 400;
     private int CROP_HEIGHT = 400;

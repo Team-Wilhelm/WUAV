@@ -16,6 +16,9 @@ import utils.enums.UserRole;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A dialogue that allows the user to change their password.
+ */
 public class PasswordDialog extends CustomDialog {
     private HBox columns;
     private VBox rows;

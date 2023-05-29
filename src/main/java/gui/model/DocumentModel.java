@@ -30,6 +30,12 @@ public class DocumentModel implements IModel<Document> {
         return instance;
     }
 
+    /**
+     * Adds a document to the map of all documents and makes a request to the manager to add the document to the database.
+     * If the document's customer is not already in the customer model, it will be added, otherwise, they will be updated.
+     * @param document the document to be added
+     * @return ResultState.SUCCESSFUL if the document was added successfully, otherwise ResultState.UNSUCCESSFUL
+     */
     @Override
     public ResultState add(Document document) {
         addOrUpdateCustomer(document);
@@ -41,6 +47,12 @@ public class DocumentModel implements IModel<Document> {
         return resultState;
     }
 
+    /**
+     * Updates a document in all documents and makes a request to the manager to update the document in the database.
+     * Adds the document's customer to the customer model if they are not already in it, otherwise, they will be updated.
+     * @param document the document to be updated
+     * @return ResultState.SUCCESSFUL if the document was updated successfully, otherwise ResultState.UNSUCCESSFUL
+     */
     @Override
     public ResultState update(Document document) {
         addOrUpdateCustomer(document);
@@ -52,6 +64,12 @@ public class DocumentModel implements IModel<Document> {
         return resultState;
     }
 
+    /**
+     * Deletes a document from all documents and makes a request to the manager to delete the document from the database.
+     * Removes the document from the customer.
+     * @param id the id of the document to be deleted
+     * @return ResultState.SUCCESSFUL if the document was deleted successfully, otherwise ResultState.UNSUCCESSFUL
+     */
     @Override
     public ResultState delete(UUID id) {
         ResultState resultState = documentManager.delete(id);
@@ -75,6 +93,11 @@ public class DocumentModel implements IModel<Document> {
         return allDocuments.get(id);
     }
 
+    /**
+     * Sets all documents to the map of all documents from the database.
+     * Adds all customers from the documents to the customer model.
+     * If a customer is already in the customer model, the document will be added to the customer's contracts.
+     */
     public void setAllDocuments() {
         this.allDocuments.clear();
         this.allDocuments.putAll(documentManager.getAll());

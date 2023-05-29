@@ -4,6 +4,10 @@ import gui.model.IModel;
 import javafx.concurrent.Task;
 import utils.enums.ResultState;
 
+/**
+ * A task that saves an object to the database.
+ * @param <T> The type of object to save.
+ */
 public class SaveTask<T> extends Task<ResultState>  implements TaskCallback {
     private final T objectToSave;
     private final boolean isEditing;

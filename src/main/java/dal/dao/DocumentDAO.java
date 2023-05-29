@@ -31,12 +31,17 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         refreshCache();
     }
 
+    /**
+     * Adds a document to the database, retrieves the generated ID and links the document to the technicians.
+     * Inserts the image filepaths into the database and links them to the document.
+     * @param document document to add
+     * @return ResultState.SUCCESSFUL if the document was added successfully, ResultState.FAILED otherwise
+     */
     @Override
     public ResultState add(Document document) {
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
-            connection.setAutoCommit(false); // Start transaction
 
             // Insert the document into the database
             String sql = "INSERT INTO Document (JobTitle, JobDescription, Notes, CustomerId, DateOfCreation) VALUES (?, ?, ?, ?, ?)";
@@ -81,6 +86,11 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         }
     }
 
+    /**
+     * Updates a document in the database, updates the image filepaths and links them to the document.
+     * @param document document to update
+     * @return ResultState.SUCCESSFUL if the document was updated successfully, ResultState.FAILED otherwise
+     */
     @Override
     public ResultState update(Document document) {
         String sql = "UPDATE Document SET JobTitle = ?, JobDescription = ?, Notes = ?, CustomerID = ?, DateOfCreation = ? " +
@@ -115,6 +125,11 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         }
     }
 
+    /**
+     * Deletes a document from the database along with the images linked to the document.
+     * @param id id of the document to delete
+     * @return ResultState.SUCCESSFUL if the document was deleted successfully, ResultState.FAILED otherwise
+     */
     @Override
     public ResultState delete(UUID id) {
         String sql = "UPDATE Document SET Deleted = 1 WHERE DocumentID = ?;" +
@@ -138,11 +153,20 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         }
     }
 
+    /**
+     * Returns currently cached documents.
+     * @return map of documents accessible by their IDs
+     */
     @Override
     public Map<UUID, Document> getAll() {
         return documents;
     }
 
+    /**
+     * Retrieves a document by its ID from the cache, if possible, otherwise retrieves it from the database.
+     * @param id id of the document to retrieve
+     * @return document with the specified ID
+     */
     @Override
     public Document getById(UUID id) {
         if (documents.containsKey(id)) {
@@ -167,6 +191,12 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         return null;
     }
 
+    /**
+     * Used to convert a ResultSet into a Document object.
+     * @param rs ResultSet to convert
+     * @return Document object
+     * @throws SQLException if the ResultSet is invalid
+     */
     private Document createDocumentFromResultSet(ResultSet rs) throws SQLException {
         UUID documentID = UUID.fromString(rs.getString("DocumentID"));
         if (documents.containsKey(documentID)) {
@@ -190,6 +220,10 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         return document;
     }
 
+    /**
+     * Inserts all images linked to a document into the database and links them to the document.
+     * @param document
+     */
     public void assignImagesToDocument(Document document){
         String sql = "SELECT * FROM Document_Image_Link WHERE DocumentID = ? ORDER BY PictureIndex;";
         Connection connection = null;
@@ -215,6 +249,9 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         }
     }
 
+    /**
+     * Called to refresh the cache of documents.
+     */
     public void refreshCache() {
         documents.clear();
         String sql = "SELECT * FROM Document WHERE Deleted = 0";
@@ -234,7 +271,12 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         }
     }
 
-
+    /**
+     * Links a user to a document in the database or deletes the link.
+     * @param user user to assign to the document
+     * @param document document to assign the user to
+     * @param isAssigning true if the user is being assigned to the document, false if the link is being deleted
+     */
     public void assignUserToDocument(User user, Document document, boolean isAssigning){
         String sql = "INSERT INTO User_Document_Link (UserID, DocumentID) VALUES (?, ?);";
         if (!isAssigning) {
@@ -255,6 +297,11 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         }
     }
 
+    /**
+     * Links a document to a customer in the database or deletes the link.
+     * @param documentIDs IDs of the documents to assign to the customer
+     * @return map of documents accessible by their IDs
+     */
     public HashMap<UUID, Document> getDocumentsByIDs(List<UUID> documentIDs) {
         HashMap<UUID, Document> documents = new HashMap<>();
         if (documentIDs.isEmpty()) {
@@ -286,6 +333,12 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         return documents;
     }
 
+    /**
+     * Links images to a document in the database.
+     * @param connection connection to the database
+     * @param document document to link images to
+     * @throws SQLException
+     */
     private void saveImagesForDocument(Connection connection, Document document) throws SQLException {
         //Save and link image filepaths to document
         String sql = "INSERT INTO Document_Image_Link (DocumentID, Filepath, FileName, PictureIndex, Description) VALUES (?, ?, ?, ?, ?)";
@@ -303,6 +356,12 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         ps.executeBatch();
     }
 
+    /**
+     * Fills a prepared statement with the values of a document.
+     * @param ps prepared statement to fill
+     * @param document document to get values from
+     * @throws SQLException
+     */
     private void fillPreparedStatement(PreparedStatement ps, Document document) throws SQLException {
         ps.setString(1, document.getJobTitle());
         ps.setString(2, document.getJobDescription());
@@ -311,6 +370,11 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         ps.setDate(5, document.getDateOfCreation());
     }
 
+    /**
+     * Links a drawing to a document in the database.
+     * @param document document to link drawing to
+     * @param canvasImage drawing to link to the document
+     */
     public void addDrawingToDocument(Document document, String canvasImage) {
         String sql = "MERGE INTO Document_Drawing_Link AS target " +
                 "USING (VALUES (?, ?)) AS source (DocumentID, Drawing) " +
@@ -333,6 +397,11 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         }
     }
 
+    /**
+     * Gets the drawing linked to a document.
+     * @param document document to get drawing from
+     * @return URL to the blob of the drawing linked to the document
+     */
     public String getDrawingOnDocument(Document document){
         String sql = "SELECT * FROM Document_Drawing_Link WHERE DocumentID = ?";
         Connection connection = null;

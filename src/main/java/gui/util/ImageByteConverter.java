@@ -12,10 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+/**
+ * Convert an image to a byte array and vice versa.
+ * Convert a URL to a byte array.
+ */
 public class ImageByteConverter {
-    public ImageByteConverter() {
-
-    }
+    public ImageByteConverter() {}
 
     public static Image getImageFromBytes(byte[] bytes) {
         return new Image(new ByteArrayInputStream(bytes));

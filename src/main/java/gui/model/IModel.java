@@ -5,6 +5,10 @@ import utils.enums.ResultState;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Interface for the model classes
+ * @param <T> the type of the model
+ */
 public interface IModel<T> {
     ResultState add(T obj);
     ResultState update(T obj);

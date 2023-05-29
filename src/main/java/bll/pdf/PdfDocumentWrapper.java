@@ -8,6 +8,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * Wrapper class created in order to reuse the same method for generating PDFs regardless of if its purpose, which is
+ * either generating a PDF to determine the number of pages or to generate the final PDF. This class is used to encapsulate
+ * the PDF document, the path to the PDF document, the document object and the list of checkboxes from the first generated PDF
+ * and is used to delete the PDF document when the final PDF is generated and the other PDF is no longer needed.
+ */
 public class PdfDocumentWrapper {
     private com.itextpdf.layout.Document pdfDocument;
     private Path path;
@@ -63,11 +69,15 @@ public class PdfDocumentWrapper {
         this.numberOfPages = numberOfPages;
     }
 
+    /**
+     * Deletes the PDF document.
+     * Should be called when the final PDF is generated and the other PDF is no longer needed.
+     */
     public void delete() {
         try {
             Files.delete(path);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 }

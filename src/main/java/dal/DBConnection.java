@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
+/**
+ * Singleton class for handling database connections.
+ * Uses a connection pool to avoid creating new connections if not necessary.
+ */
 public class DBConnection {
     private final SQLServerDataSource ds = new SQLServerDataSource();
     private static DBConnection instance;
@@ -30,6 +34,11 @@ public class DBConnection {
         return instance;
     }
 
+    /**
+     * Returns a connection from the connection pool if available, otherwise creates a new connection.
+     * @return a connection to the database
+     * @throws SQLException
+     */
     public synchronized Connection getConnection() throws SQLException {
         Connection connection;
 
@@ -45,6 +54,10 @@ public class DBConnection {
         return connection;
     }
 
+    /**
+     * Releases a connection back to the connection pool.
+     * @param connection the connection to release
+     */
     public void releaseConnection(Connection connection){
         if (connection != null && usedConnections.contains(connection)){
             usedConnections.remove(connection);
