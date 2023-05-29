@@ -41,6 +41,7 @@ public class MenuController implements Initializable {
     private MFXButton logOutButton;
     private NotificationBubble notificationBubble;
     private BooleanProperty customerChangedProperty = new SimpleBooleanProperty(false);
+    private BooleanProperty customerDeletedProperty = new SimpleBooleanProperty(false);
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -71,6 +72,15 @@ public class MenuController implements Initializable {
             customerChangedProperty.addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
                     customerController.showAlmostExpiredCustomers();
+                }
+            });
+
+            // If a customer is deleted, all the documents associated with that customer are deleted as well
+            customerDeletedProperty.bind(customerController.customerDeletedProperty());
+            customerDeletedProperty.addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    documentController.refreshItems();
+                    customerController.customerDeletedProperty().set(false);
                 }
             });
 

@@ -1,5 +1,6 @@
 package gui.model;
 
+import be.Customer;
 import be.Document;
 import be.User;
 import bll.ManagerFactory;
@@ -56,7 +57,10 @@ public class DocumentModel implements IModel<Document> {
         ResultState resultState = documentManager.delete(id);
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             Document d = allDocuments.remove(id);
-            CustomerModel.getInstance().getById(d.getCustomer().getCustomerID()).getContracts().remove(id);
+
+            Customer c = CustomerModel.getInstance().getById(d.getCustomer().getCustomerID());
+            if (c != null)
+                CustomerModel.getInstance().getById(d.getCustomer().getCustomerID()).getContracts().remove(id);
         }
         return resultState;
     }
@@ -113,6 +117,18 @@ public class DocumentModel implements IModel<Document> {
             customerModel.add(document.getCustomer());
         } else {
             customerModel.update(document.getCustomer());
+        }
+    }
+
+    public void deleteDocumentsByCustomer(UUID customerID) {
+        List<Document> documentsToDelete = new ArrayList<>();
+        for (Document document : allDocuments.values()) {
+            if (document.getCustomer().getCustomerID().equals(customerID)) {
+                documentsToDelete.add(document);
+            }
+        }
+        for (Document document : documentsToDelete) {
+            delete(document.getDocumentID());
         }
     }
 }

@@ -50,6 +50,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
     private final CustomerModel customerModel = CustomerModel.getInstance();
     private boolean hasAccess = false;
     private HashMap<String, Runnable> actions = new HashMap<>();
+    private BooleanProperty customerDeletedProperty = new SimpleBooleanProperty(false);
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -250,6 +251,7 @@ public class CustomerInfoController extends ViewController<Customer> implements 
             customerModel.delete(tblCustomers.getSelectionModel().getSelectedValue().getCustomerID());
             almostExpiredCustomers.remove(tblCustomers.getSelectionModel().getSelectedValue());
             refreshItems();
+            customerDeletedProperty.set(true);
         });
 
         actions.put("Extend by 48 months", () -> {
@@ -264,6 +266,9 @@ public class CustomerInfoController extends ViewController<Customer> implements 
 
     public BooleanProperty expiredCustomersProperty() {
         return expiredCustomersProperty;
+    }
+    public BooleanProperty customerDeletedProperty() {
+        return customerDeletedProperty;
     }
 }
 
