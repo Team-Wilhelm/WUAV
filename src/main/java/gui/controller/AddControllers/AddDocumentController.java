@@ -191,7 +191,7 @@ public class AddDocumentController extends AddController<Document> implements In
         if (selectedFile != null) {
             UUID customerId = documentToEdit != null ? documentToEdit.getCustomer().getCustomerID() : UUID.randomUUID();
             String path = BlobService.getInstance().UploadFile(selectedFile.getAbsolutePath(), customerId);
-            ImageWrapper image = new ImageWrapper(path, selectedFile.getName());
+            ImageWrapper image = new ImageWrapper(path, selectedFile.getName(), ImageByteConverter.getBytesFromURL(path), "");
             pictures.add(image);
             if (isEditing.get())
                 isInputChanged();
@@ -807,7 +807,7 @@ public class AddDocumentController extends AddController<Document> implements In
         Stage stage = (Stage) btnSave.getScene().getWindow();
         stage.setOnCloseRequest(e -> {
             if (isEditing.getValue()) isInputChanged();
-            if (isInputChanged.getValue() || !isEditing.getValue()) {
+            if ((isInputChanged.getValue() && savingAllowed()) || (!isEditing.getValue() && savingAllowed())) {
                 HashMap<String, Runnable> actions = new HashMap<>();
                 actions.put("Save", () -> {
                     saveAction(null);
@@ -823,5 +823,11 @@ public class AddDocumentController extends AddController<Document> implements In
                 e.consume();
             }
         });
+    }
+
+    private boolean savingAllowed() {
+        return !isInputEmpty(txtJobTitle, txtJobDescription.getTextArea(), txtName, txtEmail, txtPhoneNumber,
+                txtStreetName, txtHouseNumber, txtPostcode, txtCity, txtCountry);
+
     }
 }

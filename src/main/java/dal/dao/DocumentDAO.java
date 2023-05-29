@@ -36,6 +36,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         Connection connection = null;
         try {
             connection = dbConnection.getConnection();
+            connection.setAutoCommit(false); // Start transaction
 
             // Insert the document into the database
             String sql = "INSERT INTO Document (JobTitle, JobDescription, Notes, CustomerId, DateOfCreation) VALUES (?, ?, ?, ?, ?)";
@@ -69,6 +70,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
 
             //Save and link image filepaths to document
             saveImagesForDocument(connection, document);
+            connection.commit(); // End transaction
             documents.put(document.getDocumentID(), document);
             return ResultState.SUCCESSFUL;
         } catch (Exception e) {

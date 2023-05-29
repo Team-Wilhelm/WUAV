@@ -57,9 +57,7 @@ public class CustomerModel implements IModel<Customer> {
         ResultState resultState = customerManager.delete(id);
         if (resultState.equals(ResultState.SUCCESSFUL)) {
             allCustomers.remove(id);
-            for (Document document : DocumentModel.getInstance().getAll().values()) {
-                DocumentModel.getInstance().delete(document.getDocumentID());
-            }
+            DocumentModel.getInstance().deleteDocumentsByCustomer(id);
         }
         return resultState;
     }

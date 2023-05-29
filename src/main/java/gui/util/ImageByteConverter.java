@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 public class ImageByteConverter {
     public ImageByteConverter() {
@@ -26,6 +28,19 @@ public class ImageByteConverter {
         byte[] res  = s.toByteArray();
         s.close(); //especially if you are using a different output stream.
         return res;
+    }
+
+    public static byte[] getBytesFromURL(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try (InputStream inputStream = url.openStream()) {
+            int n = 0;
+            byte [] buffer = new byte[4096];
+            while (-1 != (n = inputStream.read(buffer))) {
+                output.write(buffer, 0, n);
+            }
+        }
+        return output.toByteArray();
     }
 
     public static ImageView getImageViewFromBytes(byte[] bytes) {

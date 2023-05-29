@@ -32,7 +32,7 @@ public class DialogManager {
     private MFXButton btnConfirm, btnCancel;
     private CompletableFuture<ButtonType> result;
 
-    // Dialogues
+    // Dialogs
     private PasswordDialog passwordDialog;
     private TextInputDialog textInputDialog;
     private LoadingDialog loadingDialog;
