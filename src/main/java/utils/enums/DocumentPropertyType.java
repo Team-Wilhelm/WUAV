@@ -6,6 +6,7 @@ public enum DocumentPropertyType {
     JOB_DESCRIPTION("Job description: "),
     NOTES("Notes: "),
     TECHNICIANS("Technicians: "),
+    DRAWING("Drawing: "),
     IMAGE("Image: ");
 
     private final String name;

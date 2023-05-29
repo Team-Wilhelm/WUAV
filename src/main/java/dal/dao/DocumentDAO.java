@@ -348,7 +348,7 @@ public class DocumentDAO extends DAO implements IDAO<Document> {
         } finally {
             dbConnection.releaseConnection(connection);
         }
-        return "";
+        return null;
     }
 }
 

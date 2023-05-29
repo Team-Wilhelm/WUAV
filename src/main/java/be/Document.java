@@ -14,7 +14,7 @@ public class Document {
     private Date dateOfCreation;
     private List<User> technicians;
     private List<ImageWrapper> documentImages;
-    private String jobDescription, optionalNotes, jobTitle;
+    private String jobDescription, optionalNotes, jobTitle, drawingUrl;
     private BooleanProperty isLoadingImages;
 
     public Document (){
@@ -139,5 +139,11 @@ public class Document {
 
     public void setLoadingImages(boolean isLoadingImages) {
         this.isLoadingImages.set(isLoadingImages);
+    }
+    public void setDrawing(String url){
+        this.drawingUrl = url;
+    }
+    public String getDrawing(){
+        return this.drawingUrl;
     }
 }

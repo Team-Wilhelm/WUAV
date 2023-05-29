@@ -9,6 +9,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -86,6 +87,11 @@ public class DocumentPropertiesList extends GridPane {
             // Optional properties
             if (document.getOptionalNotes() != null && !document.getOptionalNotes().isEmpty())
                 addProperty(DocumentPropertyType.NOTES.toString(), document.getOptionalNotes(), row++);
+
+            if(document.getDrawing() != null) {
+                ImageWrapper imageView = new ImageWrapper(document.getDrawing(), "Drawing", ImageByteConverter.getBytesFromImage(new Image(document.getDrawing())),"");
+                addProperty(DocumentPropertyType.DRAWING.toString(), imageView, row++);
+            }
 
             for (ImageWrapper imageWrapper : document.getDocumentImages()) {
                 addProperty(DocumentPropertyType.IMAGE.toString(), imageWrapper, row++);

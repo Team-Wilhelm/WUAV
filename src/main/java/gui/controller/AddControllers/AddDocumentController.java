@@ -709,6 +709,10 @@ public class AddDocumentController extends AddController<Document> implements In
     }
 
     public void setUpPdfListView() {
+        var drawingUrl = documentModel.getDrawingFromDocument(documentToEdit);
+        if(drawingUrl != null) {
+            documentToEdit.setDrawing(drawingUrl);
+        }
         propertiesList = new DocumentPropertiesList(documentToEdit);
         gridPanePdf.getChildren().removeIf(node -> node instanceof DocumentPropertiesList);
         gridPanePdf.add(propertiesList, 0, 0);

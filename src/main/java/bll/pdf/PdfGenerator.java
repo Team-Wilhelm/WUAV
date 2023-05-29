@@ -95,7 +95,15 @@ public class PdfGenerator {
                 }
             }
             //Add images
-            List<DocumentPropertyCheckboxWrapper> imageCheckboxes = checkBoxes.stream().filter(checkbox -> checkbox.getProperty() == DocumentPropertyType.IMAGE).toList();
+            List<DocumentPropertyCheckboxWrapper> imageCheckboxes;
+            var drawing =  checkBoxes.stream().filter(checkbox -> checkbox.getProperty() == DocumentPropertyType.DRAWING).toList();
+            if(!drawing.isEmpty())
+            {
+                imageCheckboxes = checkBoxes.stream().filter(checkbox -> checkbox.getProperty() == DocumentPropertyType.IMAGE || checkbox.getProperty() == DocumentPropertyType.DRAWING).toList();
+            }
+            else {
+                imageCheckboxes = checkBoxes.stream().filter(checkbox -> checkbox.getProperty() == DocumentPropertyType.IMAGE).toList();
+            }
             if (!imageCheckboxes.isEmpty()) {
                 float maxHeight = (pdfDoc.getDefaultPageSize().getHeight()/2) - margin;
                 doc.add(pageBreak);
