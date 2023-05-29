@@ -797,6 +797,8 @@ public class AddDocumentController extends AddController<Document> implements In
         btnUploadPictures.setVisible(hasAccess);
         btnSave.setVisible(hasAccess);
         toggleCustomerType.disableProperty().setValue(!hasAccess);
+        dateLastContract.disableProperty().setValue(!hasAccess);
+        canvasTab.setDisable(!hasAccess);
 
         if (!hasAccess)
             imagePreviews.forEach(ImagePreview::makeContextMenuNotEditable);
