@@ -566,7 +566,8 @@ public class AddDocumentController extends AddController<Document> implements In
             });
 
             imagePreviews.add(imagePreview);
-            isInputChanged();
+            if (isEditing.get())
+                isInputChanged();
         });
     }
 
